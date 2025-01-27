@@ -1,4 +1,4 @@
-# RunPod Hunyuan Template
+# RunPod Hunyuan Template -Initial setup for Hunyuan ComfyUI template
 
 A custom RunPod template for running Hunyuan video generation with ComfyUI and VS Code.
 
