@@ -10,6 +10,46 @@ handle_error() {
     exit 1
 }
 
+# Function to download models if they don't exist
+download_models() {
+    echo "Checking and downloading required models..."
+    
+    # Create directories if they don't exist
+    mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale}
+    
+    # Download HunyuanVideo models if they don't exist
+    if [ ! -f /workspace/ComfyUI/models/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors ]; then
+        echo "Downloading hunyuan_video_t2v_720p_bf16.safetensors..."
+        wget -O /workspace/ComfyUI/models/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors \
+            "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true"
+    fi
+
+    if [ ! -f /workspace/ComfyUI/models/text_encoders/clip_l.safetensors ]; then
+        echo "Downloading clip_l.safetensors..."
+        wget -O /workspace/ComfyUI/models/text_encoders/clip_l.safetensors \
+            "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors?download=true"
+    fi
+
+    if [ ! -f /workspace/ComfyUI/models/text_encoders/llava_llama3_fp8_scaled.safetensors ]; then
+        echo "Downloading llava_llama3_fp8_scaled.safetensors..."
+        wget -O /workspace/ComfyUI/models/text_encoders/llava_llama3_fp8_scaled.safetensors \
+            "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors?download=true"
+    fi
+
+    if [ ! -f /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors ]; then
+        echo "Downloading hunyuan_video_vae_bf16.safetensors..."
+        wget -O /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors \
+            "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors?download=true"
+    fi
+
+    # Download upscaler model if it doesn't exist
+    if [ ! -f /workspace/ComfyUI/models/upscale/4x_foolhardy_Remacri.pth ]; then
+        echo "Downloading 4x_foolhardy_Remacri.pth..."
+        wget -O /workspace/ComfyUI/models/upscale/4x_foolhardy_Remacri.pth \
+            "https://huggingface.co/datasets/FacehugmansPics/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth"
+    fi
+}
+
 # Set up logging
 exec 1> >(tee -a /workspace/startup.log)
 exec 2> >(tee -a /workspace/startup.log >&2)
@@ -19,6 +59,9 @@ echo "Starting services at $(date)"
 # Create necessary directories
 mkdir -p /workspace/ComfyUI/output || handle_error "Failed to create output directory"
 mkdir -p /workspace/logs || handle_error "Failed to create logs directory"
+
+# Download models if needed
+download_models
 
 # Start code-server (VS Code)
 echo "Starting VS Code server..."
@@ -58,9 +101,6 @@ python3 -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}');
 python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header --verbose > /workspace/logs/comfyui.log 2>&1 &
 COMFY_PID=$!
 echo "ComfyUI started with PID: $COMFY_PID"
-
-# Wait and check logs
-sleep 5
 
 # Monitor processes
 while true; do

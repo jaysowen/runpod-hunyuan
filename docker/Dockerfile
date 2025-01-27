@@ -87,30 +87,12 @@ RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true &
 # Create model directories
 RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras/HUNYUAN/custom}
 
-# Download model files
-RUN wget -O models/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors \
-    "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true" && \
-    wget -O models/text_encoders/clip_l.safetensors \
-    "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors?download=true" && \
-    wget -O models/text_encoders/llava_llama3_fp8_scaled.safetensors \
-    "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors?download=true" && \
-    wget -O models/vae/hunyuan_video_vae_bf16.safetensors \
-    "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors?download=true"
-
-# Download upscale model
-RUN cd models/upscale && \
-    wget -O 4x_foolhardy_Remacri.pth \
-    "https://huggingface.co/datasets/FacehugmansPics/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth"
-
 # Copy startup scripts
 COPY setup.sh /workspace/setup.sh
 COPY start.sh /workspace/start.sh
 
 # Make scripts executable
 RUN chmod +x /workspace/setup.sh /workspace/start.sh
-
-# Run setup
-RUN /workspace/setup.sh
 
 # Expose ports
 EXPOSE 8080 8188
