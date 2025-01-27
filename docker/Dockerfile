@@ -1,5 +1,5 @@
 # Start with RunPod CUDA base image
-FROM runpod/pytorch:2.1.1-py3.10-cuda11.8-devel
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
