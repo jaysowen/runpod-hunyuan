@@ -1,5 +1,5 @@
 # Start with RunPod CUDA base image
-FROM runpod/base:0.4.0-cuda11.8
+FROM runpod/base:0.5.0-cuda12.1.1
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
