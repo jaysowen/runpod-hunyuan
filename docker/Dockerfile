@@ -1,4 +1,3 @@
-# Start with RunPod CUDA base image
 FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
 # Install system dependencies
@@ -21,8 +20,10 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Clone ComfyUI
+# Create workspace directory
 WORKDIR /workspace
+
+# Clone ComfyUI
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 WORKDIR /workspace/ComfyUI
 
@@ -31,14 +32,15 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
 RUN pip install -r requirements.txt
 RUN pip install moviepy opencv-python pillow
 
-# Copy setup script
+# Copy our scripts
 COPY setup.sh /workspace/setup.sh
-RUN chmod +x /workspace/setup.sh
-RUN /workspace/setup.sh
-
-# Copy startup script
 COPY start.sh /workspace/start.sh
-RUN chmod +x /workspace/start.sh
+
+# Make scripts executable
+RUN chmod +x /workspace/setup.sh /workspace/start.sh
+
+# Run setup
+RUN /workspace/setup.sh
 
 # Expose ports
 EXPOSE 8080 8188
@@ -46,4 +48,5 @@ EXPOSE 8080 8188
 # Set working directory
 WORKDIR /workspace
 
-CMD ["/workspace/start.sh"]
+# Set the entrypoint to our start script
+ENTRYPOINT ["/workspace/start.sh"]
