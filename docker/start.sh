@@ -3,6 +3,10 @@
 # Function to handle errors
 handle_error() {
     echo "Error: $1"
+    if [ -f /workspace/logs/comfyui.log ]; then
+        echo "ComfyUI Log Output:"
+        cat /workspace/logs/comfyui.log
+    fi
     exit 1
 }
 
@@ -12,7 +16,7 @@ exec 2> >(tee -a /workspace/startup.log >&2)
 
 echo "Starting services at $(date)"
 
-# Create necessary directories if they don't exist
+# Create necessary directories
 mkdir -p /workspace/ComfyUI/output || handle_error "Failed to create output directory"
 mkdir -p /workspace/logs || handle_error "Failed to create logs directory"
 
@@ -44,18 +48,32 @@ fi
 if [ -e "/proc/driver/nvidia/version" ]; then
     echo "NVIDIA driver detected, setting up CUDA environment..."
     export CUDA_VISIBLE_DEVICES=all
+    nvidia-smi # Print GPU information for debugging
 fi
 
-# Start ComfyUI with proper parameters
-python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header > /workspace/logs/comfyui.log 2>&1 &
+# List installed Python packages for debugging
+echo "Installed Python packages:"
+pip list
+
+# Print Python and torch versions
+echo "Python version:"
+python --version
+echo "Torch version and CUDA availability:"
+python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}')"
+
+# Start ComfyUI with verbose output
+echo "Starting ComfyUI with verbose output..."
+python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header --verbose > /workspace/logs/comfyui.log 2>&1 &
 COMFY_PID=$!
 echo "ComfyUI started with PID: $COMFY_PID"
 
-# Wait a moment to ensure ComfyUI is running
+# Wait a moment and check logs
 sleep 5
 
-# Check if ComfyUI is running
+# Check if ComfyUI is running and show logs if it failed
 if ! kill -0 $COMFY_PID 2>/dev/null; then
+    echo "ComfyUI failed to start. Last 50 lines of log:"
+    tail -n 50 /workspace/logs/comfyui.log
     handle_error "ComfyUI failed to start"
 fi
 
@@ -70,9 +88,11 @@ while true; do
     fi
     
     if ! kill -0 $COMFY_PID 2>/dev/null; then
-        echo "ComfyUI crashed, restarting..."
+        echo "ComfyUI crashed, log output:"
+        tail -n 50 /workspace/logs/comfyui.log
+        echo "Restarting ComfyUI..."
         cd /workspace/ComfyUI
-        python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header > /workspace/logs/comfyui.log 2>&1 &
+        python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header --verbose > /workspace/logs/comfyui.log 2>&1 &
         COMFY_PID=$!
     fi
     
