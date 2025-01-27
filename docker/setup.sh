@@ -38,9 +38,6 @@ cd /workspace/ComfyUI/models
 cd upscale
 wget -O 4x_foolhardy_Remacri.pth https://huggingface.co/datasets/FacehugmansPics/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth
 
-cd ../loras/HUNYUAN/custom
-wget -O p0rtm4n-hunyuan-v1.1-vfx_ai.safetensors https://civitai.com/api/download/models/293884
-
 # Install additional Python packages required by the custom nodes
 cd /workspace/ComfyUI
 pip install -r custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt
