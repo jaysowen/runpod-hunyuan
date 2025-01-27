@@ -38,48 +38,31 @@ fi
 echo "Starting ComfyUI..."
 cd /workspace/ComfyUI || handle_error "Failed to change to ComfyUI directory"
 
-# Activate virtual environment if it exists
-if [ -d "/opt/venv" ]; then
-    echo "Activating virtual environment..."
-    source /opt/venv/bin/activate || handle_error "Failed to activate virtual environment"
+# Activate virtual environment
+source /opt/venv/bin/activate || handle_error "Failed to activate virtual environment"
+
+# Check NVIDIA driver and CUDA
+if ! command -v nvidia-smi &> /dev/null; then
+    handle_error "NVIDIA driver not found"
 fi
 
-# Set CUDA device if available
-if [ -e "/proc/driver/nvidia/version" ]; then
-    echo "NVIDIA driver detected, setting up CUDA environment..."
-    export CUDA_VISIBLE_DEVICES=all
-    nvidia-smi # Print GPU information for debugging
-fi
+echo "CUDA Environment Check:"
+nvidia-smi
+echo "NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES}"
+echo "CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES}"
 
-# List installed Python packages for debugging
-echo "Installed Python packages:"
-pip list
+# Verify PyTorch CUDA availability
+python3 -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}'); print(f'CUDA device count: {torch.cuda.device_count()}')" || handle_error "PyTorch CUDA check failed"
 
-# Print Python and torch versions
-echo "Python version:"
-python --version
-echo "Torch version and CUDA availability:"
-python -c "import torch; print(f'Torch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}')"
-
-# Start ComfyUI with verbose output
-echo "Starting ComfyUI with verbose output..."
+# Start ComfyUI
 python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header --verbose > /workspace/logs/comfyui.log 2>&1 &
 COMFY_PID=$!
 echo "ComfyUI started with PID: $COMFY_PID"
 
-# Wait a moment and check logs
+# Wait and check logs
 sleep 5
 
-# Check if ComfyUI is running and show logs if it failed
-if ! kill -0 $COMFY_PID 2>/dev/null; then
-    echo "ComfyUI failed to start. Last 50 lines of log:"
-    tail -n 50 /workspace/logs/comfyui.log
-    handle_error "ComfyUI failed to start"
-fi
-
-echo "All services started successfully!"
-
-# Keep the script running and monitor processes
+# Monitor processes
 while true; do
     if ! kill -0 $VSCODE_PID 2>/dev/null; then
         echo "VS Code server crashed, restarting..."
@@ -88,7 +71,7 @@ while true; do
     fi
     
     if ! kill -0 $COMFY_PID 2>/dev/null; then
-        echo "ComfyUI crashed, log output:"
+        echo "ComfyUI crashed, checking logs:"
         tail -n 50 /workspace/logs/comfyui.log
         echo "Restarting ComfyUI..."
         cd /workspace/ComfyUI

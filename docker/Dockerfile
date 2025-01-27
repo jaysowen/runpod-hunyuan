@@ -1,38 +1,89 @@
-FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:11.8.0-base-ubuntu22.04 as runtime
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Set environment variables
+ENV SHELL=/bin/bash
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /
+
+# System setup and dependencies
+RUN apt-get update --yes && \
+    apt-get upgrade --yes && \
+    apt install --yes --no-install-recommends \
+    git \
     wget \
     curl \
-    git \
-    python3-pip \
-    python3-venv \
-    nodejs \
-    npm \
+    bash \
+    libgl1 \
+    software-properties-common \
+    openssh-server \
     ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+    nodejs \
+    npm && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt install python3.10-dev python3.10-venv -y --no-install-recommends && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+
+# Set up Python
+RUN ln -s /usr/bin/python3.10 /usr/bin/python && \
+    rm /usr/bin/python3 && \
+    ln -s /usr/bin/python3.10 /usr/bin/python3 && \
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python get-pip.py
+
+# Create and activate virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python packages
+RUN pip install --upgrade --no-cache-dir pip && \
+    pip install --upgrade setuptools && \
+    pip install --upgrade wheel
+
+# Install PyTorch with CUDA 11.8 support
+RUN pip install --upgrade --no-cache-dir \
+    torch==2.0.1+cu118 \
+    torchvision==0.15.2+cu118 \
+    torchaudio==2.0.2 \
+    --index-url https://download.pytorch.org/whl/cu118
 
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create and activate virtual environment
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
 # Create workspace directory
 WORKDIR /workspace
 
-# Clone ComfyUI
+# Clone and set up ComfyUI
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 WORKDIR /workspace/ComfyUI
 
-# Install Python dependencies
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# Install ComfyUI requirements
 RUN pip install -r requirements.txt
 RUN pip install moviepy opencv-python pillow
 
-# Copy our scripts
+# Install custom nodes
+RUN mkdir -p custom_nodes && \
+    cd custom_nodes && \
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
+
+# Install custom nodes requirements
+RUN cd custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Frame-Interpolation && pip install -r requirements.txt || true && \
+    cd ../ComfyUI_Noise && pip install -r requirements.txt || true
+
+# Create model directories
+RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras/HUNYUAN/custom}
+
+# Copy startup scripts
 COPY setup.sh /workspace/setup.sh
 COPY start.sh /workspace/start.sh
 
@@ -45,8 +96,6 @@ RUN /workspace/setup.sh
 # Expose ports
 EXPOSE 8080 8188
 
-# Set working directory
 WORKDIR /workspace
 
-# Set the entrypoint to our start script
 ENTRYPOINT ["/workspace/start.sh"]
