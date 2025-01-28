@@ -83,7 +83,7 @@ RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true &
     cd ../cg-noisetools && pip install -r requirements.txt || true
 
 # Create model directories
-RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras/HUNYUAN/custom}
+RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
 
 # Copy startup scripts
 COPY setup.sh /workspace/setup.sh

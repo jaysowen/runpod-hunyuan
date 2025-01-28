@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create directory structure
-mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,loras/HUNYUAN/custom}
+mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,loras}
 mkdir -p /workspace/ComfyUI/custom_nodes
 
 # Install custom nodes
@@ -17,12 +17,12 @@ git clone https://github.com/BlenderNeko/ComfyUI_Noise.git
 git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
 
 # Save the workflow
-cat > /workspace/ComfyUI/workflow.json << 'EOF'
+cat > /workspace/ComfyUI/user/default/workflow.json << 'EOF'
 {
   "last_node_id": 104,
   "last_link_id": 242,
-  "nodes": [
-    # Rest of the workflow JSON content here...
+  "version": 0.4
+}
 EOF
 
 # Download required model files
@@ -36,7 +36,7 @@ cd /workspace/ComfyUI/models
 
 # Download additional required models
 cd upscale
-wget -O 4x_foolhardy_Remacri.pth https://huggingface.co/datasets/FacehugmansPics/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth
+wget -O 4x_foolhardy_Remacri.pth https://huggingface.co/FacehugmanIII/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth
 
 # Install additional Python packages required by the custom nodes
 cd /workspace/ComfyUI
@@ -47,7 +47,7 @@ pip install -r custom_nodes/ComfyUI_Noise/requirements.txt
 # Add to the startup script to ensure models are in place
 echo "
 # Check and create required directories
-mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,loras/HUNYUAN/custom}
+mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,loras}
 
 # Ensure workflow is in place
 if [ ! -f /workspace/ComfyUI/workflow.json ]; then
