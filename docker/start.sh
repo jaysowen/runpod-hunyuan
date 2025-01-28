@@ -45,8 +45,8 @@ download_models() {
     # Download upscaler model if it doesn't exist
     if [ ! -f /workspace/ComfyUI/models/upscale/4x_foolhardy_Remacri.pth ]; then
         echo "Downloading 4x_foolhardy_Remacri.pth..."
-        wget -O /workspace/ComfyUI/models/upscale/4x_foolhardy_Remacri.pth \
-            "https://huggingface.co/datasets/FacehugmansPics/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth"
+        wget -O /workspace/ComfyUI/models/upscale_models/4x_foolhardy_Remacri.pth \
+            "https://huggingface.co/FacehugmanIII/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth?download=true"
     fi
 }
 

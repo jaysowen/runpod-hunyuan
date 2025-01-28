@@ -20,7 +20,16 @@ This repository contains a Docker setup for running ComfyUI with HunyuanVideo an
 - Runpod.io account
 - Docker Hub account (if you want to build and push your own image)
 - NVIDIA GPU with CUDA support
+- PyTorch with CUDA 11.8 support
 
+## Installation Notes
+
+If you need to manually install or update PyTorch, use:
+
+```bash
+pip uninstall -y torch torchvision torchaudio
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
 ## Quick Start on Runpod
 
 1. Create a new pod on Runpod.io
