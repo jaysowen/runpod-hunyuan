@@ -73,14 +73,18 @@ RUN mkdir -p custom_nodes && \
     git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
     git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone https://github.com/chrisgoringe/cg-noisetools.git
+    git clone https://github.com/chrisgoringe/cg-noisetools.git && \
+    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
 
 # Install custom nodes requirements
 RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true && \
     cd ../ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && \
     cd ../ComfyUI-Frame-Interpolation && pip install -r requirements.txt || true && \
     cd ../ComfyUI_Noise && pip install -r requirements.txt || true && \
-    cd ../cg-noisetools && pip install -r requirements.txt || true
+    cd ../cg-noisetools && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Crystools && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true
 
 # Create model directories
 RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
