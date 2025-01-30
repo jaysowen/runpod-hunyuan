@@ -10,6 +10,10 @@ This repository contains a Docker setup for running ComfyUI with HunyuanVideo an
   - Frame Interpolation
   - Noise Tools
   - Custom Scripts
+  - Crystools
+  - Impact Pack
+  - RGThree's Nodes
+  - KJNodes
 - Built-in VS Code server
 - Auto-recovery from crashes
 - Pre-configured workflow for video generation
@@ -71,7 +75,15 @@ The following models are automatically downloaded on first run:
 │   │   ├── ComfyUI-VideoHelperSuite/
 │   │   ├── ComfyUI-Frame-Interpolation/
 │   │   ├── ComfyUI_Noise/
-│   │   └── ComfyUI-Custom-Scripts/
+│   │   ├── ComfyUI-Custom-Scripts/
+│   │   ├── ComfyUI-Crystools/
+│   │   ├── ComfyUI-Impact-Pack/
+│   │   ├── rgthree-comfy/
+│   │   └── ComfyUI-KJNodes/
+│   ├── user/
+│   │   └── default/
+│   │       └── workflows/
+│   │           └── workflow.json
 │   └── output/
 └── logs/
 ```

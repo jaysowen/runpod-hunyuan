@@ -75,7 +75,9 @@ RUN mkdir -p custom_nodes && \
     git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone https://github.com/chrisgoringe/cg-noisetools.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/rgthree/rgthree-comfy.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git
 
 # Install custom nodes requirements
 RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true && \
@@ -84,8 +86,10 @@ RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true &
     cd ../ComfyUI_Noise && pip install -r requirements.txt || true && \
     cd ../cg-noisetools && pip install -r requirements.txt || true && \
     cd ../ComfyUI-Crystools && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true
-
+    cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true && \
+    cd ../rgthree-comfy && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-KJNodes && pip install -r requirements.txt || true
+    
 # Create model directories
 RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
 
