@@ -65,7 +65,7 @@ WORKDIR /workspace/ComfyUI
 RUN pip install -r requirements.txt
 RUN pip install moviepy opencv-python pillow
 
-# Install custom nodes including ComfyUI-Manager and cg-noisetools
+# Install all custom nodes (merged list)
 RUN mkdir -p custom_nodes && \
     cd custom_nodes && \
     git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
@@ -77,7 +77,14 @@ RUN mkdir -p custom_nodes && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
-    git clone https://github.com/kijai/ComfyUI-KJNodes.git
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/Suzie1/ComfyUI-VideoHelperSuite.git VideoHelperSuite-Suzie && \
+    git clone https://github.com/7eu7d7/ComfyUI-HuggingFace-Nodes.git && \
+    git clone https://github.com/thecooltechguy/ComfyUI-Essentials.git && \
+    git clone https://github.com/LucianoCirino/efficiency-nodes-comfyui.git && \
+    git clone https://github.com/MECv2/ComfyUI-Advanced-ControlNet.git && \
+    git clone https://github.com/TonyLianLong/CLIPtion.git && \
+    git clone https://github.com/Rayzr522/ComfyUI-Flux.git
 
 # Install custom nodes requirements
 RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true && \
@@ -88,7 +95,14 @@ RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true &
     cd ../ComfyUI-Crystools && pip install -r requirements.txt || true && \
     cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true && \
     cd ../rgthree-comfy && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-KJNodes && pip install -r requirements.txt || true
+    cd ../ComfyUI-KJNodes && pip install -r requirements.txt || true && \
+    cd ../VideoHelperSuite-Suzie && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-HuggingFace-Nodes && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Essentials && pip install -r requirements.txt || true && \
+    cd ../efficiency-nodes-comfyui && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Advanced-ControlNet && pip install -r requirements.txt || true && \
+    cd ../CLIPtion && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Flux && pip install -r requirements.txt || true
     
 # Create model directories
 RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
