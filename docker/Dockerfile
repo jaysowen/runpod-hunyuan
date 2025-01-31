@@ -72,49 +72,42 @@ RUN pip install moviepy opencv-python pillow
 RUN mkdir -p custom_nodes
 WORKDIR /workspace/ComfyUI/custom_nodes
 
-# Clone custom nodes - Group 1
+# Clone core custom nodes
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
     git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
     git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
 
-# Clone custom nodes - Group 2
+# Clone utility nodes
 RUN git clone https://github.com/chrisgoringe/cg-noisetools.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
     git clone https://github.com/kijai/ComfyUI-KJNodes.git
 
-# Clone custom nodes - Group 3
-RUN git clone https://github.com/7eu7d7/ComfyUI-HuggingFace-Nodes.git && \
-    git clone https://github.com/thecooltechguy/ComfyUI-Essentials.git && \
-    git clone https://github.com/LucianoCirino/efficiency-nodes-comfyui.git && \
-    git clone https://github.com/MECv2/ComfyUI-Advanced-ControlNet.git && \
-    git clone https://github.com/Rayzr522/ComfyUI-Flux.git
-
-# Clone custom nodes - Group 4
+# Clone enhancement nodes
 RUN git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials.git && \
     git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/Jonseed/ComfyUI-Detail-Daemon.git && \
     git clone https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git
 
-# Clone custom nodes - Group 5
+# Clone workflow nodes
 RUN git clone https://github.com/Amorano/Jovimetrix.git && \
     git clone https://github.com/sipherxyz/comfyui-art-venture.git && \
     git clone https://github.com/theUpsider/ComfyUI-Logic.git && \
     git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
     git clone https://github.com/alt-key-project/comfyui-dream-project.git
 
-# Clone custom nodes - Group 6
+# Clone special purpose nodes
 RUN git clone https://github.com/pharmapsychotic/comfy-cliption.git && \
     git clone https://github.com/darkpixel/darkprompts.git && \
     git clone https://github.com/Koushakur/ComfyUI-DenoiseChooser.git && \
     git clone https://github.com/city96/ComfyUI-GGUF.git && \
     git clone https://github.com/giriss/comfy-image-saver.git
 
-# Clone custom nodes - Group 7
+# Clone additional nodes
 RUN git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
     git clone https://github.com/11dogzi/Comfyui-ergouzi-Nodes.git && \
     git clone https://github.com/jamesWalker55/comfyui-various.git && \
