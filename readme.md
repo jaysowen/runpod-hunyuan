@@ -5,15 +5,7 @@ This repository contains a Docker setup for running ComfyUI with HunyuanVideo an
 ## Features
 
 - ComfyUI with HunyuanVideo support
-- Custom nodes for video processing:
-  - Video Helper Suite
-  - Frame Interpolation
-  - Noise Tools
-  - Custom Scripts
-  - Crystools
-  - Impact Pack
-  - RGThree's Nodes
-  - KJNodes
+- Extensive custom nodes collection for video processing and enhancement
 - Built-in VS Code server
 - Auto-recovery from crashes
 - Pre-configured workflow for video generation
@@ -34,6 +26,7 @@ If you need to manually install or update PyTorch, use:
 pip uninstall -y torch torchvision torchaudio
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
+
 ## Quick Start on Runpod
 
 1. Create a new pod on Runpod.io
@@ -41,6 +34,26 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 3. Set the following environment variables:
    - `NVIDIA_VISIBLE_DEVICES=all`
    - `CUDA_VISIBLE_DEVICES=all`
+
+## File Transfer on Runpod
+
+You can transfer files to and from your pod using several methods:
+
+1. **SFTP**: Use the built-in SFTP feature in RunPod's web interface
+   - Navigate to your pod's "Connect" tab
+   - Click "Connect" under "SFTP File Transfer"
+   - Use provided credentials in your SFTP client
+
+2. **Command Line**: Use `scp` or `rsync`
+```bash
+# Upload to pod
+scp -P <port> local_file root@<pod_ip>:/workspace/
+
+# Download from pod
+scp -P <port> root@<pod_ip>:/workspace/file local_destination/
+```
+
+For more detailed instructions on file transfer, visit the [RunPod documentation](https://docs.runpod.io/pods/storage/transfer-files).
 
 ## Ports
 
@@ -52,11 +65,18 @@ The container exposes two ports:
 
 The following models are automatically downloaded on first run:
 
-- `clip_l.safetensors`
-- `llava_llama3_fp8_scaled.safetensors`
+### Hunyuan Models
 - `hunyuan_video_t2v_720p_bf16.safetensors`
 - `hunyuan_video_vae_bf16.safetensors`
-- `4x_foolhardy_Remacri.pth` (upscaler)
+
+### CLIP Models
+- `clip_l.safetensors`
+- `llava_llama3_fp8_scaled.safetensors`
+- `Long-ViT-L-14-GmP-SAE-TE-only.safetensors`
+- `clip-vit-large-patch14.safetensors`
+
+### Upscalers
+- `4x_foolhardy_Remacri.pth`
 
 ## Directory Structure
 
@@ -66,24 +86,50 @@ The following models are automatically downloaded on first run:
 │   ├── models/
 │   │   ├── diffusion_models/
 │   │   ├── text_encoders/
+│   │   ├── clip_vision/
 │   │   ├── vae/
 │   │   ├── upscale/
 │   │   └── loras/
-│   │       └── HUNYUAN/
-│   │           └── custom/
 │   ├── custom_nodes/
-│   │   ├── ComfyUI-VideoHelperSuite/
-│   │   ├── ComfyUI-Frame-Interpolation/
-│   │   ├── ComfyUI_Noise/
-│   │   ├── ComfyUI-Custom-Scripts/
-│   │   ├── ComfyUI-Crystools/
-│   │   ├── ComfyUI-Impact-Pack/
-│   │   ├── rgthree-comfy/
-│   │   └── ComfyUI-KJNodes/
+│   │   ├── Core Nodes/
+│   │   │   ├── ComfyUI-Manager/
+│   │   │   ├── ComfyUI-VideoHelperSuite/
+│   │   │   ├── ComfyUI-Frame-Interpolation/
+│   │   │   ├── ComfyUI_Noise/
+│   │   │   └── ComfyUI-Custom-Scripts/
+│   │   ├── Utility Nodes/
+│   │   │   ├── cg-noisetools/
+│   │   │   ├── ComfyUI-Crystools/
+│   │   │   ├── ComfyUI-Impact-Pack/
+│   │   │   ├── rgthree-comfy/
+│   │   │   └── ComfyUI-KJNodes/
+│   │   ├── Enhancement Nodes/
+│   │   │   ├── ComfyUI-Easy-Use/
+│   │   │   ├── ComfyUI_essentials/
+│   │   │   ├── cg-use-everywhere/
+│   │   │   ├── ComfyUI-Detail-Daemon/
+│   │   │   └── Comfyui_TTP_Toolset/
+│   │   ├── Workflow Nodes/
+│   │   │   ├── Jovimetrix/
+│   │   │   ├── comfyui-art-venture/
+│   │   │   ├── ComfyUI-Logic/
+│   │   │   ├── ComfyUI-mxToolkit/
+│   │   │   └── comfyui-dream-project/
+│   │   └── Special Purpose/
+│   │       ├── comfy-cliption/
+│   │       ├── darkprompts/
+│   │       ├── ComfyUI-DenoiseChooser/
+│   │       ├── ComfyUI-GGUF/
+│   │       ├── comfy-image-saver/
+│   │       ├── ComfyUI-HunyuanVideoMultiLora/
+│   │       ├── Comfyui-ergouzi-Nodes/
+│   │       ├── comfyui-various/
+│   │       ├── ComfyUI_JPS-Nodes/
+│   │       ├── ComfyUI-ImageMotionGuider/
+│   │       └── ComfyLiterals/
 │   ├── user/
 │   │   └── default/
 │   │       └── workflows/
-│   │           └── workflow.json
 │   └── output/
 └── logs/
 ```

@@ -15,13 +15,26 @@ download_models() {
     echo "Checking and downloading required models..."
     
     # Create directories if they don't exist
-    mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale}
+    mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,clip_vision}
     
     # Download HunyuanVideo models if they don't exist
     if [ ! -f /workspace/ComfyUI/models/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors ]; then
         echo "Downloading hunyuan_video_t2v_720p_bf16.safetensors..."
         wget -O /workspace/ComfyUI/models/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors \
             "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true"
+    fi
+
+    # Download CLIP models
+    if [ ! -f /workspace/ComfyUI/models/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors ]; then
+        echo "Downloading Long-ViT-L-14-GmP-SAE-TE-only.safetensors..."
+        wget -O /workspace/ComfyUI/models/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors \
+            "https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors?download=true"
+    fi
+
+    if [ ! -f /workspace/ComfyUI/models/clip_vision/clip-vit-large-patch14.safetensors ]; then
+        echo "Downloading clip-vit-large-patch14.safetensors..."
+        wget -O /workspace/ComfyUI/models/clip_vision/clip-vit-large-patch14.safetensors \
+            "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors?download=true"
     fi
 
     if [ ! -f /workspace/ComfyUI/models/text_encoders/clip_l.safetensors ]; then
