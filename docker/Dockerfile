@@ -68,79 +68,64 @@ WORKDIR /workspace/ComfyUI
 RUN pip install -r requirements.txt
 RUN pip install moviepy opencv-python pillow
 
-# Install custom nodes (original + new correct list)
-RUN mkdir -p custom_nodes && \
-    cd custom_nodes && \
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+# Create custom_nodes directory
+RUN mkdir -p custom_nodes
+WORKDIR /workspace/ComfyUI/custom_nodes
+
+# Clone custom nodes - Group 1
+RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
     git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone https://github.com/chrisgoringe/cg-noisetools.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
+
+# Clone custom nodes - Group 2
+RUN git clone https://github.com/chrisgoringe/cg-noisetools.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
-    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/7eu7d7/ComfyUI-HuggingFace-Nodes.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git
+
+# Clone custom nodes - Group 3
+RUN git clone https://github.com/7eu7d7/ComfyUI-HuggingFace-Nodes.git && \
     git clone https://github.com/thecooltechguy/ComfyUI-Essentials.git && \
     git clone https://github.com/LucianoCirino/efficiency-nodes-comfyui.git && \
     git clone https://github.com/MECv2/ComfyUI-Advanced-ControlNet.git && \
-    git clone https://github.com/Rayzr522/ComfyUI-Flux.git && \
-    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone https://github.com/Rayzr522/ComfyUI-Flux.git
+
+# Clone custom nodes - Group 4
+RUN git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials.git && \
     git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/Jonseed/ComfyUI-Detail-Daemon.git && \
-    git clone https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git && \
-    git clone https://github.com/Amorano/Jovimetrix.git && \
+    git clone https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git
+
+# Clone custom nodes - Group 5
+RUN git clone https://github.com/Amorano/Jovimetrix.git && \
     git clone https://github.com/sipherxyz/comfyui-art-venture.git && \
     git clone https://github.com/theUpsider/ComfyUI-Logic.git && \
     git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
-    git clone https://github.com/alt-key-project/comfyui-dream-project.git && \
-    git clone https://github.com/pharmapsychotic/comfy-cliption.git && \
+    git clone https://github.com/alt-key-project/comfyui-dream-project.git
+
+# Clone custom nodes - Group 6
+RUN git clone https://github.com/pharmapsychotic/comfy-cliption.git && \
     git clone https://github.com/darkpixel/darkprompts.git && \
     git clone https://github.com/Koushakur/ComfyUI-DenoiseChooser.git && \
     git clone https://github.com/city96/ComfyUI-GGUF.git && \
-    git clone https://github.com/giriss/comfy-image-saver.git && \
-    git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
+    git clone https://github.com/giriss/comfy-image-saver.git
+
+# Clone custom nodes - Group 7
+RUN git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
     git clone https://github.com/11dogzi/Comfyui-ergouzi-Nodes.git && \
     git clone https://github.com/jamesWalker55/comfyui-various.git && \
     git clone https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
     git clone https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git && \
     git clone https://github.com/M1kep/ComfyLiterals.git
 
-# Install custom nodes requirements
-RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Frame-Interpolation && pip install -r requirements.txt || true && \
-    cd ../ComfyUI_Noise && pip install -r requirements.txt || true && \
-    cd ../cg-noisetools && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Crystools && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true && \
-    cd ../rgthree-comfy && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-KJNodes && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-HuggingFace-Nodes && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Easy-Use && pip install -r requirements.txt || true && \
-    cd ../ComfyUI_essentials && pip install -r requirements.txt || true && \
-    cd ../cg-use-everywhere && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Detail-Daemon && pip install -r requirements.txt || true && \
-    cd ../Comfyui_TTP_Toolset && pip install -r requirements.txt || true && \
-    cd ../Jovimetrix && pip install -r requirements.txt || true && \
-    cd ../comfyui-art-venture && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Logic && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-mxToolkit && pip install -r requirements.txt || true && \
-    cd ../comfyui-dream-project && pip install -r requirements.txt || true && \
-    cd ../comfy-cliption && pip install -r requirements.txt || true && \
-    cd ../darkprompts && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-DenoiseChooser && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-GGUF && pip install -r requirements.txt || true && \
-    cd ../comfy-image-saver && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-HunyuanVideoMultiLora && pip install -r requirements.txt || true && \
-    cd ../Comfyui-ergouzi-Nodes && pip install -r requirements.txt || true && \
-    cd ../comfyui-various && pip install -r requirements.txt || true && \
-    cd ../ComfyUI_JPS-Nodes && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-ImageMotionGuider && pip install -r requirements.txt || true && \
-    cd ../ComfyLiterals && pip install -r requirements.txt || true
-    
+# Install requirements for all custom nodes
+WORKDIR /workspace/ComfyUI
+RUN find custom_nodes -name requirements.txt -exec pip install -r {} \;
+
 # Create model directories
 RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
 
