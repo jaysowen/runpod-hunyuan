@@ -132,6 +132,9 @@ RUN chmod +x /workspace/setup.sh /workspace/start.sh
 # Expose ports
 EXPOSE 8080 8188
 
+# Add cleanup for EG_GN_NODES
+RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
+
 WORKDIR /workspace
 
 ENTRYPOINT ["/workspace/start.sh"]
