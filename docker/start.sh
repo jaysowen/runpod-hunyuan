@@ -58,13 +58,13 @@ download_models() {
     # Download upscaler models if they don't exist
     if [ ! -f /workspace/ComfyUI/models/upscale/4x_foolhardy_Remacri.pth ]; then
         echo "Downloading 4x_foolhardy_Remacri.pth..."
-        wget -O /workspace/ComfyUI/models/upscale/4x_foolhardy_Remacri.pth \
+        wget -O /workspace/ComfyUI/models/upscale_models/4x_foolhardy_Remacri.pth \
             "https://huggingface.co/FacehugmanIII/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth?download=true"
     fi
 
     if [ ! -f /workspace/ComfyUI/models/upscale/realesr-general-x4v3.pth ]; then
         echo "Downloading realesr-general-x4v3.pth..."
-        wget -O /workspace/ComfyUI/models/upscale/realesr-general-x4v3.pth \
+        wget -O /workspace/ComfyUI/models/upscale_models/realesr-general-x4v3.pth \
             "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-general-x4v3.pth"
     fi
 }
