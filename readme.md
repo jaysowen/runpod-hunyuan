@@ -2,6 +2,10 @@
 
 This repository contains a Docker setup for running ComfyUI with HunyuanVideo and various custom nodes for AI video generation. The setup is optimized for use on Runpod.io and includes video processing capabilities.
 
+The build is based on the workflow by LatentDream's Hunyuan 💥 AllInOne ▪ Fast (+Tips)
+https://civitai.com/models/1007385/hunyuan-allinone-fast-tips
+
+
 ## Features
 
 - ComfyUI with HunyuanVideo support
