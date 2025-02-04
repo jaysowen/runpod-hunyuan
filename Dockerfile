@@ -131,12 +131,15 @@ COPY AllinOne1.4.json /workspace/ComfyUI/user/default/workflows/
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
 # Copy startup scripts
-COPY setup.sh /workspace/setup.sh
 COPY start.sh /workspace/start.sh
+COPY setup.sh /workspace/setup.sh
 
-# Make scripts executable and fix line endings
-RUN chmod +x /workspace/*.sh && \
-    dos2unix /workspace/*.sh
+# Fix line endings and set permissions - using tr instead of dos2unix
+RUN tr -d '\r' < /workspace/start.sh > /workspace/start.sh.tmp && \
+    mv /workspace/start.sh.tmp /workspace/start.sh && \
+    tr -d '\r' < /workspace/setup.sh > /workspace/setup.sh.tmp && \
+    mv /workspace/setup.sh.tmp /workspace/setup.sh && \
+    chmod +x /workspace/*.sh
 
 # Create required directories
 RUN mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,loras} && \
