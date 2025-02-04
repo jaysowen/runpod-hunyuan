@@ -122,17 +122,22 @@ RUN find custom_nodes -name requirements.txt -exec pip install -r {} \;
 # Create model directories
 RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
 
+# Copy workflow file
+COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+
 # Copy startup scripts
 COPY setup.sh /workspace/setup.sh
 COPY start.sh /workspace/start.sh
 
-# Make scripts executable
-RUN chmod +x /workspace/setup.sh /workspace/start.sh
+# Make scripts executable and fix line endings
+RUN chmod +x /workspace/*.sh && \
+    dos2unix /workspace/*.sh
 
-# Expose ports
-EXPOSE 8080 8188
+# Create required directories
+RUN mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,loras} && \
+    mkdir -p /workspace/logs
 
-# Add cleanup for EG_GN_NODES
+# Remove any problematic extensions
 RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
 
 WORKDIR /workspace
