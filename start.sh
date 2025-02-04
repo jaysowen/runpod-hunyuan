@@ -19,9 +19,9 @@ download_models() {
     
     # Download HunyuanVideo models if they don't exist
     if [ ! -f /workspace/ComfyUI/models/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors ]; then
-        echo "Downloading hunyuan_video_t2v_720p_bf16.safetensors..."
-        wget -O /workspace/ComfyUI/models/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors \
-            "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true"
+        echo "Downloading hunyuan_video_720_cfgdistill_bf16.safetensors..."
+        wget -O /workspace/ComfyUI/models/unet/hunyuan_video_720_cfgdistill_bf16.safetensors \
+            "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
     fi
 
     # Download CLIP models
@@ -52,7 +52,7 @@ download_models() {
     if [ ! -f /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors ]; then
         echo "Downloading hunyuan_video_vae_bf16.safetensors..."
         wget -O /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors \
-            "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors?download=true"
+            "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"
     fi
 
     # Download upscaler models if they don't exist
