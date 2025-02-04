@@ -122,12 +122,17 @@ RUN find custom_nodes -name requirements.txt -exec pip install -r {} \;
 # Create model directories
 RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
 
+# Create workflows directory
+RUN mkdir -p /workspace/ComfyUI/user/default/workflows
+
 # Copy workflow file
-COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+COPY workflows/AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
 # Copy startup scripts
 COPY setup.sh /workspace/setup.sh
 COPY start.sh /workspace/start.sh
+
+# Rest of Dockerfile remains the same...
 
 # Make scripts executable and fix line endings
 RUN chmod +x /workspace/*.sh && \
