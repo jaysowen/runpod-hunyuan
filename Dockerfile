@@ -22,7 +22,8 @@ RUN apt-get update --yes && \
     openssh-server \
     ffmpeg \
     nodejs \
-    npm && \
+    npm \
+    dos2unix && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt install python3.10-dev python3.10-venv -y --no-install-recommends && \
     apt-get autoremove -y && \
