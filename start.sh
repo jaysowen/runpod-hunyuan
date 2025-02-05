@@ -15,20 +15,13 @@ download_models() {
     echo "Checking and downloading required models..."
     
     # Create directories if they don't exist
-    mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,clip_vision,loras}
+    mkdir -p /workspace/ComfyUI/models/{text_encoders,vae,clip_vision,unet,loras,upscale}
     
-    # Download HunyuanVideo base model
-    if [ ! -f /workspace/ComfyUI/models/diffusion_models/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors ]; then
-        echo "Downloading hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors..."
-        wget -O /workspace/ComfyUI/models/diffusion_models/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors \
-            "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor"
-    fi
-
-    # Download VAE model
-    if [ ! -f /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors ]; then
-        echo "Downloading hunyuan_video_vae_bf16.safetensors..."
-        wget -O /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors \
-            "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"
+    # Download UNET model
+    if [ ! -f /workspace/ComfyUI/models/unet/hunyuan_video_720_cfgdistill_bf16.safetensors ]; then
+        echo "Downloading hunyuan_video_720_cfgdistill_bf16.safetensors..."
+        wget -O /workspace/ComfyUI/models/unet/hunyuan_video_720_cfgdistill_bf16.safetensors \
+            "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
     fi
 
     # Download text encoder models
@@ -44,10 +37,11 @@ download_models() {
             "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors"
     fi
 
-    if [ ! -f /workspace/ComfyUI/models/text_encoders/clip_l.safetensors ]; then
-        echo "Downloading clip_l.safetensors..."
-        wget -O /workspace/ComfyUI/models/text_encoders/clip_l.safetensors \
-            "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors"
+    # Download VAE model
+    if [ ! -f /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors ]; then
+        echo "Downloading hunyuan_video_vae_bf16.safetensors..."
+        wget -O /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors \
+            "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"
     fi
 
     # Download CLIP vision model
@@ -57,31 +51,26 @@ download_models() {
             "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
     fi
 
-    # Download LoRA models
-    if [ ! -f /workspace/ComfyUI/models/loras/img2vid.safetensors ]; then
-        echo "Downloading img2vid.safetensors..."
-        wget -O /workspace/ComfyUI/models/loras/img2vid.safetensors \
-            "https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors"
-    fi
+    # Optional/Additional Models (commented out)
+    # # Download additional UNET model
+    # if [ ! -f /workspace/ComfyUI/models/unet/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors ]; then
+    #     echo "Downloading hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors..."
+    #     wget -O /workspace/ComfyUI/models/unet/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors \
+    #         "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor"
+    # fi
 
-    if [ ! -f /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors ]; then
-        echo "Downloading hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors..."
-        wget -O /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors \
-            "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
-    fi
+    # # Download LoRA models
+    # if [ ! -f /workspace/ComfyUI/models/loras/img2vid.safetensors ]; then
+    #     echo "Downloading img2vid.safetensors..."
+    #     wget -O /workspace/ComfyUI/models/loras/img2vid.safetensors \
+    #         "https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors"
+    # fi
 
-    # Download upscaler models
-    if [ ! -f /workspace/ComfyUI/models/upscale_models/4x_foolhardy_Remacri.pth ]; then
-        echo "Downloading 4x_foolhardy_Remacri.pth..."
-        wget -O /workspace/ComfyUI/models/upscale_models/4x_foolhardy_Remacri.pth \
-            "https://huggingface.co/FacehugmanIII/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth"
-    fi
-
-    if [ ! -f /workspace/ComfyUI/models/upscale_models/realesr-general-x4v3.pth ]; then
-        echo "Downloading realesr-general-x4v3.pth..."
-        wget -O /workspace/ComfyUI/models/upscale_models/realesr-general-x4v3.pth \
-            "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-general-x4v3.pth"
-    fi
+    # if [ ! -f /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors ]; then
+    #     echo "Downloading hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors..."
+    #     wget -O /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors \
+    #         "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
+    # fi
 
     echo "Model downloads completed."
 }
