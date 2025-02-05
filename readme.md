@@ -107,7 +107,7 @@ The following models are automatically downloaded on first run:
 /workspace/
 ├── ComfyUI/
 │   ├── models/
-│   │   ├── diffusion_models/
+│   │   ├── unet/
 │   │   ├── text_encoders/
 │   │   ├── clip_vision/
 │   │   ├── vae/
@@ -236,26 +236,38 @@ The container includes automatic error recovery:
 3. Submit a pull request
 
 
+# DEBUG DOWNLOAD FAIL
+If for some reason the safetensor files didnt download. (You can check the size of the files on terminal with 'ls -l --block-size=M').
+
+I've added a download-fix.sh file to the ./workspace folder which checks the size of models and download them if incorrect or 0mb which tends to happen.
+
 
 # DEBUG FILES REQUIRED IF DONWLOAD FAILS
 
-wget -O hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor
+wget -O hunyuan_video_t2v_720p_bf16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensor
 
-wget -O hunyuan_video_t2v_720p_bf16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true
 
-wget -O img2vid.safetensors https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors
 
-wget -O hunyuan_video_vae_bf16_comfyorg https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors?download=true
+wget -O llava_llama3_fp8_scaled.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors
 
-wget -O llava_llama3_fp8_scaled.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors?download=true
+wget -O llava_llama3_fp16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors
 
-wget -O llava_llama3_fp16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors?download=true
 
-wget -O clip_l.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors?download=true
 
+wget -O clip_l.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors
+
+wget -O clip-vit-large-patch14.safetensors https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors
+
+May not work with all models
+wget -O hunyuan_video_vae_bf16_comfyorg https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors
+
+Kijai version works on other models
 wget -O hunyuan_video_vae_bf16.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
 
-wget -O clip-vit-large-patch14.safetensors https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors?download=true
+Optional
+wget -O img2vid.safetensors https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors
+
+wget -O hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor
 
 
 ls -l --block-size=M

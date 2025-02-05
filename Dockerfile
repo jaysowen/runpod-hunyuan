@@ -122,7 +122,7 @@ WORKDIR /workspace/ComfyUI
 RUN find custom_nodes -name requirements.txt -exec pip install -r {} \;
 
 # Create model directories
-RUN mkdir -p models/{diffusion_models,text_encoders,vae,upscale,loras}
+RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras}
 
 # Create workflows directory
 RUN mkdir -p /workspace/ComfyUI/user/default/workflows
@@ -134,7 +134,7 @@ COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 # Copy startup scripts
 COPY start.sh /workspace/start.sh
 COPY setup.sh /workspace/setup.sh
-COPY download-fix.sh /download-fix.sh
+COPY download-fix.sh /workspace//download-fix.sh
 
 # Fix line endings and set permissions - using tr instead of dos2unix
 RUN tr -d '\r' < /workspace/start.sh > /workspace/start.sh.tmp && \
@@ -144,7 +144,7 @@ RUN tr -d '\r' < /workspace/start.sh > /workspace/start.sh.tmp && \
     chmod +x /workspace/*.sh
 
 # Create required directories
-RUN mkdir -p /workspace/ComfyUI/models/{diffusion_models,text_encoders,vae,upscale,loras} && \
+RUN mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,upscale,loras} && \
     mkdir -p /workspace/logs
 
 # Remove any problematic extensions

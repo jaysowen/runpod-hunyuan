@@ -33,17 +33,19 @@ verify_and_redownload() {
 
 # Array of model files and their URLs
 declare -A MODEL_URLS=(
-    ["${MODEL_BASE_DIR}/diffusion_models/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor"
-    ["${MODEL_BASE_DIR}/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true"
+    ["${MODEL_BASE_DIR}/unet/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor"
+    ["${MODEL_BASE_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
     ["${MODEL_BASE_DIR}/vae/hunyuan_video_vae_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"
-    ["${MODEL_BASE_DIR}/text_encoders/llava_llama3_fp8_scaled.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors?download=true"
-    ["${MODEL_BASE_DIR}/text_encoders/llava_llama3_fp16.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors?download=true"
-    ["${MODEL_BASE_DIR}/text_encoders/clip_l.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors?download=true"
-    ["${MODEL_BASE_DIR}/clip_vision/clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors?download=true"
+    ["${MODEL_BASE_DIR}/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"]="https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
+    ["${MODEL_BASE_DIR}/text_encoders/llava_llama3_fp8_scaled.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors"
+    ["${MODEL_BASE_DIR}/text_encoders/clip_l.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors"
+    ["${MODEL_BASE_DIR}/clip_vision/clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
+    ["${MODEL_BASE_DIR}/loras/img2vid.safetensors"]="https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors"
+    ["${MODEL_BASE_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
 )
 
 # Create directories if they don't exist
-mkdir -p "${MODEL_BASE_DIR}"/{diffusion_models,text_encoders,vae,clip_vision}
+mkdir -p "${MODEL_BASE_DIR}"/{diffusion_models,text_encoders,vae,clip_vision,loras,unet}
 
 # Check and redownload each model if necessary
 for file_path in "${!MODEL_URLS[@]}"; do
@@ -62,3 +64,17 @@ for file_path in "${!MODEL_URLS[@]}"; do
         echo "$file_path: Not found"
     fi
 done
+
+
+    # ["${MODEL_BASE_DIR}/unet/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor"
+    # ["${MODEL_BASE_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
+    # ["${MODEL_BASE_DIR}/unet/hunyuan_video_t2v_720p_bf16.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors"
+    # ["${MODEL_BASE_DIR}/vae/hunyuan_video_vae_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"
+    # ["${MODEL_BASE_DIR}/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"]="https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
+    # ["${MODEL_BASE_DIR}/text_encoders/llava_llama3_fp8_scaled.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors"
+    # ["${MODEL_BASE_DIR}/text_encoders/clip_l.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors"
+    # ["${MODEL_BASE_DIR}/clip_vision/clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
+    # ["${MODEL_BASE_DIR}/loras/img2vid.safetensors"]="https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors"
+    # ["${MODEL_BASE_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
+    # ["${MODEL_BASE_DIR}/vae/hunyuan_video_vae_bf16_comfyorg"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors"
+    # ["${MODEL_BASE_DIR}/text_encoders/llava_llama3_fp16.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors"
