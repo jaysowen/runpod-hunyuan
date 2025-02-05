@@ -114,7 +114,7 @@ RUN git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
     git clone https://github.com/jamesWalker55/comfyui-various.git && \
     git clone https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
     git clone https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git && \
-    git clone https://github.com/M1kep/ComfyLiterals.git \
+    git clone https://github.com/M1kep/ComfyLiterals.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui
 
 # Install requirements for all custom nodes
@@ -134,6 +134,7 @@ COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 # Copy startup scripts
 COPY start.sh /workspace/start.sh
 COPY setup.sh /workspace/setup.sh
+COPY download-fix.sh /download-fix.sh
 
 # Fix line endings and set permissions - using tr instead of dos2unix
 RUN tr -d '\r' < /workspace/start.sh > /workspace/start.sh.tmp && \
