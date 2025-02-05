@@ -114,7 +114,8 @@ RUN git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
     git clone https://github.com/jamesWalker55/comfyui-various.git && \
     git clone https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
     git clone https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git && \
-    git clone https://github.com/M1kep/ComfyLiterals.git
+    git clone https://github.com/M1kep/ComfyLiterals.git \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui
 
 # Install requirements for all custom nodes
 WORKDIR /workspace/ComfyUI
