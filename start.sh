@@ -74,6 +74,12 @@ download_models() {
                     "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
             fi
 
+            if [ ! -f /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors ]; then
+                echo "Downloading hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors..."
+                wget -O /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors \
+                    "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
+            fi
+
             # Optional/Additional Models (commented out)
             # # Download additional UNET model
             # if [ ! -f /workspace/ComfyUI/models/unet/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors ]; then
@@ -89,11 +95,7 @@ download_models() {
             #         "https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors"
             # fi
 
-            # if [ ! -f /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors ]; then
-            #     echo "Downloading hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors..."
-            #     wget -O /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors \
-            #         "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
-            # fi
+
             
             echo "Model downloads completed."
             return 0
