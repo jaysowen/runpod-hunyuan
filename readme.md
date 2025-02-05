@@ -1,25 +1,4 @@
-# DEBUG FILES REQUIRED IF DONWLOAD FAILS
 
-wget -O hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor
-
-wget -O hunyuan_video_t2v_720p_bf16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true
-
-wget -O img2vid.safetensors https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors
-
-wget -O hunyuan_video_vae_bf16_comfyorg https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors?download=true
-
-wget -O llava_llama3_fp8_scaled.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors?download=true
-
-wget -O llava_llama3_fp16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors?download=true
-
-wget -O clip_l.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors?download=true
-
-wget -O hunyuan_video_vae_bf16.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
-
-wget -O clip-vit-large-patch14.safetensors https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors?download=true
-
-
-ls -l --block-size=M
 
 # ComfyUI HunyuanVideo Docker Container
 
@@ -27,7 +6,6 @@ This repository contains a Docker setup for running ComfyUI with HunyuanVideo an
 
 The build is based on the workflow by LatentDream's Hunyuan 💥 AllInOne ▪ Fast (+Tips)
 https://civitai.com/models/1007385/hunyuan-allinone-fast-tips
-
 
 ## Features
 
@@ -37,6 +15,7 @@ https://civitai.com/models/1007385/hunyuan-allinone-fast-tips
 - Auto-recovery from crashes
 - Pre-configured workflow for video generation
 - Support for model management and custom LoRAs
+- Automatic model verification and recovery
 
 ## Prerequisites
 
@@ -44,6 +23,21 @@ https://civitai.com/models/1007385/hunyuan-allinone-fast-tips
 - Docker Hub account (if you want to build and push your own image)
 - NVIDIA GPU with CUDA support
 - PyTorch with CUDA 11.8 support
+
+## Model Verification
+
+The container includes a model verification script that can be run manually to ensure all models are downloaded correctly:
+
+```bash
+chmod +x /workspace/verify_models.sh
+./workspace/verify_models.sh
+```
+
+The script will:
+- Check if all required models exist
+- Verify each model file is at least 20MB in size
+- Automatically redownload any corrupted or missing models
+- Display final file sizes for verification
 
 ## Installation Notes
 
@@ -53,6 +47,8 @@ If you need to manually install or update PyTorch, use:
 pip uninstall -y torch torchvision torchaudio
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
+
+-----------------------------------------------------------------------------------------
 
 ## Quick Start on Runpod
 
@@ -238,6 +234,31 @@ The container includes automatic error recovery:
 1. Fork the repository
 2. Create a feature branch
 3. Submit a pull request
+
+
+
+# DEBUG FILES REQUIRED IF DONWLOAD FAILS
+
+wget -O hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor
+
+wget -O hunyuan_video_t2v_720p_bf16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensors?download=true
+
+wget -O img2vid.safetensors https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors
+
+wget -O hunyuan_video_vae_bf16_comfyorg https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors?download=true
+
+wget -O llava_llama3_fp8_scaled.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors?download=true
+
+wget -O llava_llama3_fp16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors?download=true
+
+wget -O clip_l.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors?download=true
+
+wget -O hunyuan_video_vae_bf16.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
+
+wget -O clip-vit-large-patch14.safetensors https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors?download=true
+
+
+ls -l --block-size=M
 
 ## License
 
