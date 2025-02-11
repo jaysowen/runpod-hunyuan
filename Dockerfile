@@ -1,4 +1,3 @@
-# Use RunPod's base image instead of nvidia/cuda
 FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -9,8 +8,6 @@ ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV NVIDIA_VISIBLE_DEVICES=all
-
-WORKDIR /workspace
 
 # System setup and dependencies
 RUN apt-get update --yes && \
@@ -26,20 +23,13 @@ RUN apt-get update --yes && \
     ffmpeg \
     nodejs \
     npm \
-    dos2unix && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt install python3.10-dev python3.10-venv -y --no-install-recommends && \
+    dos2unix \
+    build-essential \
+    libcudnn8 && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
-
-# Set up Python
-RUN ln -s /usr/bin/python3.10 /usr/bin/python && \
-    rm /usr/bin/python3 && \
-    ln -s /usr/bin/python3.10 /usr/bin/python3 && \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python get-pip.py
 
 # Create and activate virtual environment
 RUN python -m venv /opt/venv
@@ -53,10 +43,8 @@ RUN pip install --upgrade --no-cache-dir pip && \
 # Install numpy first with specific version
 RUN pip install numpy==1.23.5
 
-# Install latest PyTorch with CUDA 11.8 support
-RUN pip install --no-cache-dir \
-    torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cu118
+# Install triton and sageattention
+RUN pip install --no-cache-dir triton sageattention
 
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
@@ -95,7 +83,8 @@ RUN git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials.git && \
     git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/Jonseed/ComfyUI-Detail-Daemon.git && \
-    git clone https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git
+    git clone https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git && \
+    git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git
 
 # Clone workflow nodes
 RUN git clone https://github.com/Amorano/Jovimetrix.git && \
@@ -118,7 +107,8 @@ RUN git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
     git clone https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
     git clone https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git && \
     git clone https://github.com/M1kep/ComfyLiterals.git && \
-    git clone https://github.com/WASasquatch/was-node-suite-comfyui
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui && \
+    git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git
 
 # Install requirements for all custom nodes
 WORKDIR /workspace/ComfyUI
@@ -133,17 +123,10 @@ RUN mkdir -p /workspace/ComfyUI/user/default/workflows
 # Copy workflow file
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
-# Copy startup scripts
+# Copy startup scripts with proper permissions
 COPY --chmod=755 start.sh /start.sh
 COPY --chmod=755 setup.sh /workspace/setup.sh
 COPY --chmod=755 download-fix.sh /workspace/download-fix.sh
-
-# Fix line endings and set permissions - using tr instead of dos2unix
-RUN tr -d '\r' < /workspace/start.sh > /workspace/start.sh.tmp && \
-    mv /workspace/start.sh.tmp /workspace/start.sh && \
-    tr -d '\r' < /workspace/setup.sh > /workspace/setup.sh.tmp && \
-    mv /workspace/setup.sh.tmp /workspace/setup.sh && \
-    chmod +x /workspace/*.sh
 
 # Create required directories
 RUN mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,upscale,loras} && \
@@ -151,5 +134,7 @@ RUN mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,upscale,loras} &&
 
 # Remove any problematic extensions
 RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
+
+WORKDIR /workspace
 
 ENTRYPOINT ["/start.sh"]
