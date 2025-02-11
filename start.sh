@@ -149,9 +149,6 @@ fi
 echo "Starting ComfyUI..."
 cd /workspace/ComfyUI || handle_error "Failed to change to ComfyUI directory"
 
-# Activate virtual environment
-source /opt/venv/bin/activate || handle_error "Failed to activate virtual environment"
-
 # Check NVIDIA driver and CUDA
 if ! command -v nvidia-smi &> /dev/null; then
     handle_error "NVIDIA driver not found"
