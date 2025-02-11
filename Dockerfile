@@ -35,30 +35,29 @@ RUN apt-get update --yes && \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python packages
+# Install base Python packages
 RUN pip install --upgrade --no-cache-dir pip && \
-    pip install --upgrade setuptools && \
-    pip install --upgrade wheel
+    pip install --upgrade setuptools wheel && \
+    pip install numpy==1.23.5 && \
+    pip install --no-cache-dir triton sageattention
 
-# Install numpy first with specific version
-RUN pip install numpy==1.23.5
-
-# Install triton and sageattention
-RUN pip install --no-cache-dir triton sageattention
+# Pre-install some key dependencies
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
+    pip install --no-cache-dir moviepy opencv-python pillow
 
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create workspace directory
+# Create workspace directory and clone ComfyUI
 WORKDIR /workspace
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 
-# Clone ComfyUI and install its requirements
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
-    cd ComfyUI && \
-    pip install -r requirements.txt && \
-    pip install moviepy opencv-python pillow
+# Install ComfyUI requirements separately
+WORKDIR /workspace/ComfyUI
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Create custom_nodes directory
+RUN mkdir -p custom_nodes
 WORKDIR /workspace/ComfyUI/custom_nodes
 
 # Clone core custom nodes
@@ -107,27 +106,26 @@ RUN git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui && \
     git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git
 
-# Install requirements for all custom nodes
+# Install requirements for custom nodes
 WORKDIR /workspace/ComfyUI
-RUN find custom_nodes -name requirements.txt -exec pip install -r {} \;
+RUN for req in $(find custom_nodes -name "requirements.txt"); do \
+    echo "Installing requirements from $req"; \
+    pip install --no-cache-dir -r "$req" || echo "Failed to install some requirements from $req"; \
+    done
 
-# Create model directories
-RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras}
-
-# Create workflows directory
-RUN mkdir -p /workspace/ComfyUI/user/default/workflows
+# Create necessary directories
+RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras} && \
+    mkdir -p user/default/workflows && \
+    mkdir -p /workspace/logs
 
 # Copy workflow files
+COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
 # Copy startup scripts with proper permissions
 COPY --chmod=755 start.sh /start.sh
 COPY --chmod=755 setup.sh /workspace/setup.sh
 COPY --chmod=755 download-fix.sh /workspace/download-fix.sh
-
-# Create required directories
-RUN mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,upscale,loras} && \
-    mkdir -p /workspace/logs
 
 # Remove any problematic extensions
 RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
