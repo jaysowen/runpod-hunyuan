@@ -52,16 +52,13 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh
 # Create workspace directory
 WORKDIR /workspace
 
-# Clone and set up ComfyUI
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git
-WORKDIR /workspace/ComfyUI
-
-# Install ComfyUI requirements
-RUN pip install -r requirements.txt
-RUN pip install moviepy opencv-python pillow
+# Clone ComfyUI and install its requirements
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
+    cd ComfyUI && \
+    pip install -r requirements.txt && \
+    pip install moviepy opencv-python pillow
 
 # Create custom_nodes directory
-RUN mkdir -p custom_nodes
 WORKDIR /workspace/ComfyUI/custom_nodes
 
 # Clone core custom nodes
@@ -120,7 +117,8 @@ RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras}
 # Create workflows directory
 RUN mkdir -p /workspace/ComfyUI/user/default/workflows
 
-# Copy workflow file
+# Copy workflow files
+COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
 # Copy startup scripts with proper permissions
