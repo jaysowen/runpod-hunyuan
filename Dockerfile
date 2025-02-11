@@ -1,4 +1,4 @@
-FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.0-base-ubuntu22.04 as runtime
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -8,6 +8,8 @@ ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV NVIDIA_VISIBLE_DEVICES=all
+
+WORKDIR /
 
 # System setup and dependencies
 RUN apt-get update --yes && \
@@ -25,25 +27,42 @@ RUN apt-get update --yes && \
     npm \
     dos2unix \
     build-essential \
+    cuda-toolkit-12-4 \
+    cuda-runtime-12-4 \
     libcudnn8 && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt install python3.10-dev python3.10-venv -y --no-install-recommends && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 
+# Set up Python
+RUN ln -s /usr/bin/python3.10 /usr/bin/python && \
+    rm /usr/bin/python3 && \
+    ln -s /usr/bin/python3.10 /usr/bin/python3 && \
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python get-pip.py
+
 # Create and activate virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install base Python packages
+# Install Python packages
 RUN pip install --upgrade --no-cache-dir pip && \
-    pip install --upgrade setuptools wheel && \
-    pip install numpy==1.23.5 && \
-    pip install --no-cache-dir triton sageattention
+    pip install --upgrade setuptools && \
+    pip install --upgrade wheel
 
-# Pre-install some key dependencies
-RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
-    pip install --no-cache-dir moviepy opencv-python pillow
+# Install numpy first with specific version
+RUN pip install numpy==1.23.5
+
+# Install latest PyTorch with CUDA 12.1 support (closest to 12.4)
+RUN pip install --no-cache-dir \
+    torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cu121
+
+# Install triton and sageattention
+RUN pip install --no-cache-dir triton sageattention
 
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
