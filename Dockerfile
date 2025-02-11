@@ -119,7 +119,7 @@ RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras} && \
     mkdir -p /workspace/logs
 
 # Copy workflow files
-COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/
+# COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
 # Copy startup scripts with proper permissions
