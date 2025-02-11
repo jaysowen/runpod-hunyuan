@@ -1,4 +1,5 @@
-FROM nvidia/cuda:11.8.0-base-ubuntu22.04 as runtime
+# Use RunPod's base image instead of nvidia/cuda
+FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -6,8 +7,10 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV SHELL=/bin/bash
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND=noninteractive
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV NVIDIA_VISIBLE_DEVICES=all
 
-WORKDIR /
+WORKDIR /workspace
 
 # System setup and dependencies
 RUN apt-get update --yes && \
@@ -131,9 +134,9 @@ RUN mkdir -p /workspace/ComfyUI/user/default/workflows
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
 # Copy startup scripts
-COPY start.sh /workspace/start.sh
-COPY setup.sh /workspace/setup.sh
-COPY download-fix.sh /workspace//download-fix.sh
+COPY --chmod=755 start.sh /start.sh
+COPY --chmod=755 setup.sh /workspace/setup.sh
+COPY --chmod=755 download-fix.sh /workspace/download-fix.sh
 
 # Fix line endings and set permissions - using tr instead of dos2unix
 RUN tr -d '\r' < /workspace/start.sh > /workspace/start.sh.tmp && \
@@ -149,6 +152,4 @@ RUN mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,upscale,loras} &&
 # Remove any problematic extensions
 RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
 
-WORKDIR /workspace
-
-ENTRYPOINT ["/workspace/start.sh"]
+ENTRYPOINT ["/start.sh"]
