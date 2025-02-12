@@ -71,7 +71,6 @@ RUN mkdir -p /root/.jupyter && \
     echo "c.ServerApp.password = ''" >> /root/.jupyter/jupyter_server_config.py
 
 # Copy scripts and set permissions
-COPY start.sh /workspace/
 COPY setup.sh /workspace/
 COPY download-fix.sh /workspace/
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
@@ -90,4 +89,4 @@ RUN ls -la /workspace && \
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/workspace/start.sh"]
+ENTRYPOINT ["/workspace/setup.sh"]
