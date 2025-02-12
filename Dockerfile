@@ -25,9 +25,6 @@ RUN apt-get update --yes && \
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Install Jupyter Lab
-RUN pip install jupyterlab ipywidgets jupyter-resource-usage
-
 # Create and set workspace directory
 WORKDIR /
 RUN mkdir -p /workspace
@@ -61,26 +58,32 @@ RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras} && \
     mkdir -p user/default/workflows && \
     mkdir -p /workspace/logs
 
-# Set up Jupyter Lab configuration
-RUN mkdir -p /root/.jupyter && \
-    echo "c.ServerApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_server_config.py && \
-    echo "c.ServerApp.port = 8888" >> /root/.jupyter/jupyter_server_config.py && \
-    echo "c.ServerApp.allow_origin = '*'" >> /root/.jupyter/jupyter_server_config.py && \
-    echo "c.ServerApp.allow_root = True" >> /root/.jupyter/jupyter_server_config.py && \
-    echo "c.ServerApp.token = ''" >> /root/.jupyter/jupyter_server_config.py && \
-    echo "c.ServerApp.password = ''" >> /root/.jupyter/jupyter_server_config.py
+# Create service files for runpod
+RUN mkdir -p /etc/supervisor/conf.d/
 
-# Copy scripts and set permissions
-COPY setup.sh /workspace/
-COPY download-fix.sh /workspace/
-COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
+# Copy workflow file if it exists
+COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/ || echo "Workflow file not found, skipping..."
 
-# Fix line endings and set permissions
-RUN dos2unix /workspace/*.sh && \
-    chmod +x /workspace/*.sh
+# Create ComfyUI service file
+RUN echo '[program:comfyui]\n\
+command=python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --enable-cors-header\n\
+directory=/workspace/ComfyUI\n\
+autostart=true\n\
+autorestart=true\n\
+stdout_logfile=/workspace/logs/comfyui.log\n\
+stderr_logfile=/workspace/logs/comfyui.err\n\
+environment=PYTHONUNBUFFERED=1\n\
+' > /etc/supervisor/conf.d/comfyui.conf
 
-# Remove any problematic extensions
-RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
+# Create VS Code service file
+RUN echo '[program:code-server]\n\
+command=code-server --bind-addr 0.0.0.0:8080 --auth none\n\
+directory=/workspace\n\
+autostart=true\n\
+autorestart=true\n\
+stdout_logfile=/workspace/logs/vscode.log\n\
+stderr_logfile=/workspace/logs/vscode.err\n\
+' > /etc/supervisor/conf.d/code-server.conf
 
 # Verify the installation
 RUN ls -la /workspace && \
@@ -89,4 +92,5 @@ RUN ls -la /workspace && \
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/workspace/setup.sh"]
+# Don't override the entrypoint - let runpod handle it
+# The services will be started by supervisord
