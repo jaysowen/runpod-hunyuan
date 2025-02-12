@@ -2,9 +2,9 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ "main", "allinone", "allinoneold" ]
+    branches: [ "allinoneold" ]
   pull_request:
-    branches: [ "main", "allinone", "allinoneold" ]
+    branches: [ "allinoneold" ]
 
 env:
   REGISTRY: docker.io
