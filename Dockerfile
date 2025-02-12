@@ -16,27 +16,39 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
+# Update pip and install Python dependencies
+RUN pip install --upgrade --no-cache-dir pip && \
+    pip install --upgrade setuptools wheel && \
+    pip install numpy==1.23.5 && \
+    pip install --no-cache-dir triton sageattention
+
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
+
+# Copy workflow file and installation scripts
+COPY AllinOneUltra1.2.json /AllinOneUltra1.2.json
+COPY AllinOneUltra1.3.json /AllinOneUltra1.3.json
+COPY install-repositories.sh /install-repositories.sh
+RUN chmod +x /install-repositories.sh
 
 # Create and set up the pre-start script
 COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
 cd /workspace
 if [ ! -d "ComfyUI" ]; then
-    git clone https://github.com/comfyanonymous/ComfyUI.git
-    cd ComfyUI
-    pip install -r requirements.txt
-    mkdir -p custom_nodes
-    cd custom_nodes
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git
-    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git
-    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git
-    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
-    git clone https://github.com/Kijai/ComfyUI-KJNodes.git
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+    /install-repositories.sh
+    
+    # Create workflows directory and copy the workflow file
+    cp /AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
+    cp /AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/
 fi
+
+# Start ComfyUI in the background
+cd /workspace/ComfyUI
+nohup python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header > /workspace/comfyui.log 2>&1 &
+
+# Start VS Code in the background
+nohup code-server --bind-addr 0.0.0.0:8080 --auth none > /workspace/vscode.log 2>&1 &
 EOT
 
 RUN chmod +x /pre_start.sh
@@ -45,8 +57,8 @@ RUN chmod +x /pre_start.sh
 RUN mkdir -p /root/.config/code-server && \
     echo "bind-addr: 0.0.0.0:8080\nauth: password\npassword: runpod\ncert: false" > /root/.config/code-server/config.yaml
 
-# Expose port for VS Code Web
-EXPOSE 8080
+# Expose ports for VS Code Web and ComfyUI
+EXPOSE 8080 8188
 
 # Use RunPod's default start script
 CMD ["/start.sh"]
