@@ -61,9 +61,6 @@ RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras} && \
 # Create service files for runpod
 RUN mkdir -p /etc/supervisor/conf.d/
 
-# Copy workflow file if it exists
-COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/ || echo "Workflow file not found, skipping..."
-
 # Create ComfyUI service file
 RUN echo '[program:comfyui]\n\
 command=python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --enable-cors-header\n\
@@ -85,12 +82,43 @@ stdout_logfile=/workspace/logs/vscode.log\n\
 stderr_logfile=/workspace/logs/vscode.err\n\
 ' > /etc/supervisor/conf.d/code-server.conf
 
+# Create download fix script
+RUN echo '#!/bin/bash\n\
+\n\
+MODEL_BASE_DIR="/workspace/ComfyUI/models"\n\
+\n\
+verify_and_redownload() {\n\
+    local file_path="$1"\n\
+    local url="$2"\n\
+    local min_size=$((20 * 1024 * 1024))\n\
+    \n\
+    if [ -f "$file_path" ]; then\n\
+        local file_size=$(stat -f%z "$file_path" 2>/dev/null || stat -c%s "$file_path")\n\
+        if [ "$file_size" -lt "$min_size" ]; then\n\
+            rm "$file_path"\n\
+            wget -O "$file_path" "$url"\n\
+        fi\n\
+    else\n\
+        wget -O "$file_path" "$url"\n\
+    fi\n\
+}\n\
+\n\
+declare -A MODEL_URLS=(\n\
+    ["${MODEL_BASE_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"\n\
+    ["${MODEL_BASE_DIR}/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"]="https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"\n\
+    ["${MODEL_BASE_DIR}/text_encoders/llava_llama3_fp8_scaled.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors"\n\
+    ["${MODEL_BASE_DIR}/vae/hunyuan_video_vae_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"\n\
+    ["${MODEL_BASE_DIR}/clip_vision/clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"\n\
+)\n\
+\n\
+for file_path in "${!MODEL_URLS[@]}"; do\n\
+    verify_and_redownload "$file_path" "${MODEL_URLS[$file_path]}"\n\
+done\n\
+' > /workspace/download-fix.sh && chmod +x /workspace/download-fix.sh
+
 # Verify the installation
 RUN ls -la /workspace && \
     ls -la /workspace/ComfyUI && \
     python3 -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
 
 WORKDIR /workspace
-
-# Don't override the entrypoint - let runpod handle it
-# The services will be started by supervisord
