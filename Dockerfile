@@ -25,19 +25,21 @@ RUN apt-get update --yes && \
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create workspace directory
+# Install Jupyter Lab
+RUN pip install jupyterlab ipywidgets jupyter-resource-usage
+
+# Create and set workspace directory
+WORKDIR /
+RUN mkdir -p /workspace
 WORKDIR /workspace
 
 # Clone and set up ComfyUI
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git
-WORKDIR /workspace/ComfyUI
-
-# Install ComfyUI requirements
-RUN pip install -r requirements.txt
-RUN pip install moviepy opencv-python pillow
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
+    cd ComfyUI && \
+    pip install -r requirements.txt && \
+    pip install moviepy opencv-python pillow
 
 # Create custom_nodes directory and clone repositories
-RUN mkdir -p custom_nodes
 WORKDIR /workspace/ComfyUI/custom_nodes
 
 # Clone essential custom nodes
@@ -50,35 +52,42 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone https://github.com/city96/ComfyUI-GGUF.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui
 
-# Install requirements for essential custom nodes
+# Install requirements for all custom nodes
 WORKDIR /workspace/ComfyUI
 RUN find custom_nodes -name requirements.txt -exec pip install -r {} \;
 
-# Create model directories
-RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras}
+# Create necessary directories
+RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras} && \
+    mkdir -p user/default/workflows && \
+    mkdir -p /workspace/logs
 
-# Create workflows directory
-RUN mkdir -p /workspace/ComfyUI/user/default/workflows
+# Set up Jupyter Lab configuration
+RUN mkdir -p /root/.jupyter && \
+    echo "c.ServerApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.port = 8888" >> /root/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.allow_origin = '*'" >> /root/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.allow_root = True" >> /root/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.token = ''" >> /root/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.password = ''" >> /root/.jupyter/jupyter_server_config.py
 
-# Copy workflow files
+# Copy scripts and set permissions
+COPY start.sh /workspace/
+COPY setup.sh /workspace/
+COPY download-fix.sh /workspace/
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
-# Copy startup scripts
-COPY setup.sh /workspace/setup.sh
-COPY download-fix.sh /workspace/download-fix.sh
-
 # Fix line endings and set permissions
-RUN tr -d '\r' < /workspace/setup.sh > /workspace/setup.sh.tmp && \
-    mv /workspace/setup.sh.tmp /workspace/setup.sh && \
+RUN dos2unix /workspace/*.sh && \
     chmod +x /workspace/*.sh
-
-# Create required directories
-RUN mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,upscale,loras} && \
-    mkdir -p /workspace/logs
 
 # Remove any problematic extensions
 RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
 
+# Verify the installation
+RUN ls -la /workspace && \
+    ls -la /workspace/ComfyUI && \
+    python3 -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
+
 WORKDIR /workspace
 
-ENTRYPOINT ["/start.sh"]
+ENTRYPOINT ["/workspace/start.sh"]
