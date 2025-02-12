@@ -22,25 +22,20 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh
 # Set up workspace and ensure persistence
 WORKDIR /workspace
 
-# Create setup script (using proper line endings)
-RUN printf '#!/bin/bash\n\
-if [ ! -d "/workspace/ComfyUI" ]; then\n\
-    git clone https://github.com/comfyanonymous/ComfyUI.git\n\
-    cd ComfyUI\n\
-    pip install -r requirements.txt\n\
-    cd custom_nodes\n\
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git\n\
-    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git\n\
-    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git\n\
-    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git\n\
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git\n\
-    git clone https://github.com/Kijai/ComfyUI-KJNodes.git\n\
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git\n\
-fi\n\
-code-server --bind-addr 0.0.0.0:8080 --auth none &\n\
-exec /start.sh\n' > /setup.sh && \
-    chmod +x /setup.sh && \
-    dos2unix /setup.sh
+# Clone ComfyUI base
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
+    cd ComfyUI && \
+    pip install -r requirements.txt
+
+# Clone core custom nodes
+RUN cd ComfyUI/custom_nodes && \
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/Kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
 
 # Configure code-server
 RUN mkdir -p /root/.config/code-server && \
@@ -49,5 +44,5 @@ RUN mkdir -p /root/.config/code-server && \
 # Expose port for VS Code Web
 EXPOSE 8080
 
-# Use our setup script as the entry point
-CMD ["/setup.sh"]
+# Use RunPod's default start script
+CMD ["/start.sh"]
