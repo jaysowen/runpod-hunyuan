@@ -64,14 +64,11 @@ RUN mkdir -p /workspace/ComfyUI/user/default/workflows
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/
 
 # Copy startup scripts
-COPY start.sh /workspace/start.sh
 COPY setup.sh /workspace/setup.sh
 COPY download-fix.sh /workspace/download-fix.sh
 
 # Fix line endings and set permissions
-RUN tr -d '\r' < /workspace/start.sh > /workspace/start.sh.tmp && \
-    mv /workspace/start.sh.tmp /workspace/start.sh && \
-    tr -d '\r' < /workspace/setup.sh > /workspace/setup.sh.tmp && \
+RUN tr -d '\r' < /workspace/setup.sh > /workspace/setup.sh.tmp && \
     mv /workspace/setup.sh.tmp /workspace/setup.sh && \
     chmod +x /workspace/*.sh
 
@@ -84,4 +81,4 @@ RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/workspace/start.sh"]
+ENTRYPOINT ["/workspace/setup.sh"]
