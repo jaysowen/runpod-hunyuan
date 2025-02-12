@@ -22,8 +22,8 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh
 # Set up workspace and ensure persistence
 WORKDIR /workspace
 
-# Create a setup script that will run at container startup
-RUN echo '#!/bin/bash\n\
+# Create setup script (using proper line endings)
+RUN printf '#!/bin/bash\n\
 if [ ! -d "/workspace/ComfyUI" ]; then\n\
     git clone https://github.com/comfyanonymous/ComfyUI.git\n\
     cd ComfyUI\n\
@@ -38,8 +38,9 @@ if [ ! -d "/workspace/ComfyUI" ]; then\n\
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git\n\
 fi\n\
 code-server --bind-addr 0.0.0.0:8080 --auth none &\n\
-/start.sh\n' > /setup.sh && \
-    chmod +x /setup.sh
+exec /start.sh\n' > /setup.sh && \
+    chmod +x /setup.sh && \
+    dos2unix /setup.sh
 
 # Configure code-server
 RUN mkdir -p /root/.config/code-server && \
