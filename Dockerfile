@@ -20,22 +20,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # Create and set up the pre-start script
-RUN echo '#!/bin/bash\n\
-cd /workspace\n\
-if [ ! -d "ComfyUI" ]; then\n\
-    git clone https://github.com/comfyanonymous/ComfyUI.git\n\
-    cd ComfyUI\n\
-    pip install -r requirements.txt\n\
-    mkdir -p custom_nodes\n\
-    cd custom_nodes\n\
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git\n\
-    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git\n\
-    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git\n\
-    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git\n\
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git\n\
-    git clone https://github.com/Kijai/ComfyUI-KJNodes.git\n\
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git\n\
-fi' > /pre_start.sh && chmod +x /pre_start.sh
+COPY <<-'EOT' /pre_start.sh
+#!/bin/bash
+cd /workspace
+if [ ! -d "ComfyUI" ]; then
+    git clone https://github.com/comfyanonymous/ComfyUI.git
+    cd ComfyUI
+    pip install -r requirements.txt
+    mkdir -p custom_nodes
+    cd custom_nodes
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git
+    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git
+    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
+    git clone https://github.com/Kijai/ComfyUI-KJNodes.git
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+fi
+EOT
+
+RUN chmod +x /pre_start.sh
 
 # Configure code-server
 RUN mkdir -p /root/.config/code-server && \
