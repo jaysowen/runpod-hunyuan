@@ -19,24 +19,34 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create and set working directory
+# Set up workspace and ensure persistence
 WORKDIR /workspace
 
-# Clone repositories
-RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
-    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
-    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone https://github.com/Kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+# Create a setup script that will run at container startup
+RUN echo '#!/bin/bash\n\
+if [ ! -d "/workspace/ComfyUI" ]; then\n\
+    git clone https://github.com/comfyanonymous/ComfyUI.git\n\
+    cd ComfyUI\n\
+    pip install -r requirements.txt\n\
+    cd custom_nodes\n\
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git\n\
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git\n\
+    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git\n\
+    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git\n\
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git\n\
+    git clone https://github.com/Kijai/ComfyUI-KJNodes.git\n\
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git\n\
+fi\n\
+code-server --bind-addr 0.0.0.0:8080 --auth none &\n\
+/start.sh\n' > /setup.sh && \
+    chmod +x /setup.sh
 
 # Configure code-server
-RUN mkdir -p ~/.config/code-server && \
-    echo "bind-addr: 0.0.0.0:8080\nauth: password\npassword: runpod\ncert: false" > ~/.config/code-server/config.yaml
+RUN mkdir -p /root/.config/code-server && \
+    echo "bind-addr: 0.0.0.0:8080\nauth: password\npassword: runpod\ncert: false" > /root/.config/code-server/config.yaml
 
 # Expose port for VS Code Web
 EXPOSE 8080
 
-# Use RunPod's default start script
-CMD ["/start.sh"]
+# Use our setup script as the entry point
+CMD ["/setup.sh"]
