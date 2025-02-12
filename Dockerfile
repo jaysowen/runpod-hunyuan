@@ -81,4 +81,4 @@ RUN rm -rf /workspace/ComfyUI/web/extensions/EG_GN_NODES || true
 
 WORKDIR /workspace
 
-ENTRYPOINT ["/workspace/setup.sh"]
+ENTRYPOINT ["/start.sh"]
