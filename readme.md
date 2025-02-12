@@ -1,277 +1,128 @@
+# Hunyuan Video Generation on RunPod - Setup Guide
 
-
-# ComfyUI HunyuanVideo Docker Container
-
-This repository contains a Docker setup for running ComfyUI with HunyuanVideo and various custom nodes for AI video generation. The setup is optimized for use on Runpod.io and includes video processing capabilities.
-
-The build is based on the workflow by LatentDream's Hunyuan 💥 AllInOne ▪ Fast (+Tips)
-https://civitai.com/models/1007385/hunyuan-allinone-fast-tips
-
-## Features
-
-- ComfyUI with HunyuanVideo support
-- Extensive custom nodes collection for video processing and enhancement
-- Built-in VS Code server
-- Auto-recovery from crashes
-- Pre-configured workflow for video generation
-- Support for model management and custom LoRAs
-- Automatic model verification and recovery
+This guide will walk you through setting up and running the Hunyuan Video Generation environment on RunPod.
 
 ## Prerequisites
 
-- Runpod.io account
-- Docker Hub account (if you want to build and push your own image)
-- NVIDIA GPU with CUDA support
-- PyTorch with CUDA 11.8 support
+- A RunPod account (sign up at https://runpod.io)
+- Basic familiarity with Docker and command-line interfaces
 
-## Model Verification
+## Step 1: Setting Up Your RunPod Environment
 
-The container includes a model verification script that can be run manually to ensure all models are downloaded correctly:
+1. Log in to your RunPod account
+2. Navigate to the "Pods" section
+3. Click "Deploy" to create a new pod
 
-```bash
-chmod +x /workspace/verify_models.sh
-./workspace/verify_models.sh
-```
+## Step 2: Selecting Template
 
-The script will:
-- Check if all required models exist
-- Verify each model file is at least 20MB in size
-- Automatically redownload any corrupted or missing models
-- Display final file sizes for verification
+1. In the template selection:
+   - Select "Custom Template"
+   - Container Image: `dihan/hunyuan-runpod:allinone`
+   - Choose a GPU (Recommended: RTX 4090 or better)
+   - Select at least 24GB RAM
+   - Storage: Minimum 20GB (Recommended: 40GB)
 
-## Installation Notes
+## Step 3: Port Configuration
 
-If you need to manually install or update PyTorch, use:
-
-```bash
-pip uninstall -y torch torchvision torchaudio
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-```
-
------------------------------------------------------------------------------------------
-
-## Quick Start on Runpod
-
-1. Create a new pod on Runpod.io
-2. Select a template with NVIDIA GPU support
-3. Set the following environment variables:
-   - `NVIDIA_VISIBLE_DEVICES=all`
-   - `CUDA_VISIBLE_DEVICES=all`
-
-## File Transfer on Runpod
-
-You can transfer files to and from your pod using several methods:
-
-1. **SFTP**: Use the built-in SFTP feature in RunPod's web interface
-   - Navigate to your pod's "Connect" tab
-   - Click "Connect" under "SFTP File Transfer"
-   - Use provided credentials in your SFTP client
-
-2. **Command Line**: Use `scp` or `rsync`
-```bash
-# Upload to pod
-scp -P <port> local_file root@<pod_ip>:/workspace/
-
-# Download from pod
-scp -P <port> root@<pod_ip>:/workspace/file local_destination/
-```
-
-For more detailed instructions on file transfer, visit the [RunPod documentation](https://docs.runpod.io/pods/storage/transfer-files).
-
-## Ports
-
-The container exposes two ports:
+The following ports need to be exposed:
 - `8188`: ComfyUI web interface
 - `8080`: VS Code web interface
 
-## Models
+These are pre-configured in the template, but verify they're exposed in the RunPod UI.
 
-The following models are automatically downloaded on first run:
+## Step 4: Deploying Your Pod
 
-### Hunyuan Models
-- `hunyuan_video_t2v_720p_bf16.safetensors`
-- `hunyuan_video_vae_bf16.safetensors`
+1. Click "Deploy" to start your pod
+2. Wait for the pod to initialize (this may take 5-10 minutes on first run due to model downloads)
+3. Once the pod is running, you'll see "Connected" status
 
-### CLIP Models
-- `clip_l.safetensors`
-- `llava_llama3_fp8_scaled.safetensors`
-- `Long-ViT-L-14-GmP-SAE-TE-only.safetensors`
-- `clip-vit-large-patch14.safetensors`
+## Step 5: Accessing the Interfaces
 
-### Upscalers
-- `4x_foolhardy_Remacri.pth`
+After deployment, you can access:
 
-## Directory Structure
+1. ComfyUI Interface:
+   - Click on "Connect" in your pod's details
+   - Select port 8188
+   - This opens the ComfyUI web interface
 
-```
-/workspace/
-├── ComfyUI/
-│   ├── models/
-│   │   ├── unet/
-│   │   ├── text_encoders/
-│   │   ├── clip_vision/
-│   │   ├── vae/
-│   │   ├── upscale/
-│   │   └── loras/
-│   ├── custom_nodes/
-│   │   ├── Core Nodes/
-│   │   │   ├── ComfyUI-Manager/
-│   │   │   ├── ComfyUI-VideoHelperSuite/
-│   │   │   ├── ComfyUI-Frame-Interpolation/
-│   │   │   ├── ComfyUI_Noise/
-│   │   │   └── ComfyUI-Custom-Scripts/
-│   │   ├── Utility Nodes/
-│   │   │   ├── cg-noisetools/
-│   │   │   ├── ComfyUI-Crystools/
-│   │   │   ├── ComfyUI-Impact-Pack/
-│   │   │   ├── rgthree-comfy/
-│   │   │   └── ComfyUI-KJNodes/
-│   │   ├── Enhancement Nodes/
-│   │   │   ├── ComfyUI-Easy-Use/
-│   │   │   ├── ComfyUI_essentials/
-│   │   │   ├── cg-use-everywhere/
-│   │   │   ├── ComfyUI-Detail-Daemon/
-│   │   │   └── Comfyui_TTP_Toolset/
-│   │   ├── Workflow Nodes/
-│   │   │   ├── Jovimetrix/
-│   │   │   ├── comfyui-art-venture/
-│   │   │   ├── ComfyUI-Logic/
-│   │   │   ├── ComfyUI-mxToolkit/
-│   │   │   └── comfyui-dream-project/
-│   │   └── Special Purpose/
-│   │       ├── comfy-cliption/
-│   │       ├── darkprompts/
-│   │       ├── ComfyUI-DenoiseChooser/
-│   │       ├── ComfyUI-GGUF/
-│   │       ├── comfy-image-saver/
-│   │       ├── ComfyUI-HunyuanVideoMultiLora/
-│   │       ├── Comfyui-ergouzi-Nodes/
-│   │       ├── comfyui-various/
-│   │       ├── ComfyUI_JPS-Nodes/
-│   │       ├── ComfyUI-ImageMotionGuider/
-│   │       └── ComfyLiterals/
-│   ├── user/
-│   │   └── default/
-│   │       └── workflows/
-│   └── output/
-└── logs/
-```
+2. VS Code Interface:
+   - Click on "Connect"
+   - Select port 8080
+   - This opens the VS Code web interface
 
-## Building the Image
+## Step 6: Using the Environment
 
-```bash
-docker build -t your-dockerhub-username/comfyui-hunyuan:latest .
-docker push your-dockerhub-username/comfyui-hunyuan:latest
-```
+### ComfyUI Workflow
 
-## GitHub Actions
+1. Navigate to the ComfyUI interface
+2. Load the provided workflow:
+   - Click the folder icon in the top-right
+   - Select "AllinOneUltra1.3.json" from the workflows folder
 
-The repository includes a GitHub Actions workflow (`docker-publish.yml`) that automatically builds and pushes the Docker image to Docker Hub when changes are pushed to the main branch. To use this:
+### Model Files
 
-1. Add the following secrets to your GitHub repository:
-   - `DOCKERHUB_USERNAME`
-   - `DOCKERHUB_TOKEN`
-
-2. Push to the main branch to trigger the build
-
-## Usage
-
-1. Access ComfyUI interface at `http://your-pod-ip:8188`
-2. Access VS Code interface at `http://your-pod-ip:8080`
-3. The included workflow (`workflow.json`) provides a starting point for video generation
-
-## Included Workflow
-
-The default workflow includes:
-- Text-to-Video generation using HunyuanVideo
-- Frame interpolation for smoother videos
-- Upscaling capabilities using 4x_foolhardy_Remacri
-- Video encoding with NVENC support
-
-## Monitoring and Logs
-
-Logs are stored in `/workspace/logs/`:
-- `startup.log`: Container startup logs
-- `comfyui.log`: ComfyUI application logs
-- `vscode.log`: VS Code server logs
-
-## Error Recovery
-
-The container includes automatic error recovery:
-- Monitors both ComfyUI and VS Code processes
-- Automatically restarts crashed services
-- Logs errors for debugging
-
-## Environment Variables
-
-- `NVIDIA_VISIBLE_DEVICES`: Control GPU visibility (default: all)
-- `CUDA_VISIBLE_DEVICES`: Control CUDA device visibility (default: all)
-- `PYTHONUNBUFFERED`: Control Python output buffering (default: 1)
+The following models are automatically downloaded on first startup:
+- `hunyuan_video_720_cfgdistill_bf16.safetensors` (UNET)
+- `Long-ViT-L-14-GmP-SAE-TE-only.safetensors` (Text Encoder)
+- `llava_llama3_fp8_scaled.safetensors` (Text Encoder)
+- `hunyuan_video_vae_bf16.safetensors` (VAE)
+- `clip-vit-large-patch14.safetensors` (CLIP Vision)
+- `hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors` (FastVideo LoRA)
 
 ## Troubleshooting
 
-1. If models fail to download:
-   ```bash
-   # Check the logs
-   cat /workspace/logs/startup.log
-   ```
+### Common Issues
 
-2. If services aren't starting:
-   ```bash
-   # Check process status
-   ps aux | grep python
-   ps aux | grep code-server
-   ```
+1. **Models Not Loading**
+   - Check `/workspace/comfyui.log` for download errors
+   - Verify disk space availability
+   - Try running `/workspace/download-fix.sh` manually
 
-3. For CUDA issues:
-   ```bash
-   # Verify CUDA availability
-   python3 -c "import torch; print(torch.cuda.is_available())"
-   ```
+2. **ComfyUI Not Starting**
+   - Check `/workspace/comfyui.log` for errors
+   - Ensure all required models are downloaded
+   - Restart the pod if necessary
 
-## Contributing
+3. **VS Code Not Accessible**
+   - Check `/workspace/vscode.log` for errors
+   - Verify port 8080 is exposed and not blocked
+   - Restart the pod if necessary
 
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+### Checking Logs
 
+You can view logs through VS Code or terminal:
+```bash
+# ComfyUI logs
+tail -f /workspace/comfyui.log
 
-# DEBUG DOWNLOAD FAIL
-If for some reason the safetensor files didnt download. (You can check the size of the files on terminal with 'ls -l --block-size=M').
+# VS Code logs
+tail -f /workspace/vscode.log
+```
 
-I've added a download-fix.sh file to the ./workspace folder which checks the size of models and download them if incorrect or 0mb which tends to happen.
+## Maintenance
 
+### Updating the Environment
 
-# DEBUG FILES REQUIRED IF DONWLOAD FAILS
+To update to the latest version:
+1. Stop your current pod
+2. Delete the pod (your workspace volume will be preserved)
+3. Deploy a new pod using the latest image
 
-wget -O hunyuan_video_t2v_720p_bf16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_t2v_720p_bf16.safetensor
+### Backup
 
+Important files are stored in:
+- `/workspace/ComfyUI/models/` - Model files
+- `/workspace/ComfyUI/user/default/workflows/` - Workflows
 
+## Support
 
-wget -O llava_llama3_fp8_scaled.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors
+For issues or questions:
+1. Check the GitHub repository issues section
+2. Join the ComfyUI Discord community
+3. Check RunPod documentation for platform-specific issues
 
-wget -O llava_llama3_fp16.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp16.safetensors
+## Additional Resources
 
-
-
-wget -O clip_l.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors
-
-wget -O clip-vit-large-patch14.safetensors https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors
-
-May not work with all models
-wget -O hunyuan_video_vae_bf16_comfyorg https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/vae/hunyuan_video_vae_bf16.safetensors
-
-Kijai version works on other models
-wget -O hunyuan_video_vae_bf16.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
-
-Optional
-wget -O img2vid.safetensors https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors
-
-wget -O hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensor
-
-
-ls -l --block-size=M
-
-## License
-
-This project is open-source and available under the MIT License.
+- [ComfyUI Documentation](https://github.com/comfyanonymous/ComfyUI)
+- [RunPod Documentation](https://docs.runpod.io/)
+- [Hunyuan Video Generation Repository](https://github.com/dihan/hunyuan-runpod)
