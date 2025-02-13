@@ -1,5 +1,5 @@
 # Use RunPod pytorch base image which includes JupyterLab
-FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
+FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -35,12 +35,13 @@ RUN chmod +x /install-repositories.sh
 # Create and set up the pre-start script
 COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
+
 cd /workspace
 if [ ! -d "ComfyUI" ]; then
     /install-repositories.sh
 fi
 
-# Create model directories if they don't exist
+# Create model directories if they dont exist
 mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,clip_vision,loras}
 
 # Download UNET model
@@ -95,7 +96,7 @@ EOT
 RUN chmod +x /pre_start.sh
 
 # Expose ports for VS Code Web and ComfyUI
-EXPOSE 8080 8188
+EXPOSE 8080 8188 8888
 
 # Use RunPod's default start script
 CMD ["/start.sh"]
