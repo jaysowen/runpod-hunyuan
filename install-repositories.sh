@@ -110,8 +110,8 @@ fi
 echo "Starting ComfyUI..."
 cd /workspace/ComfyUI || handle_error "Failed to change to ComfyUI directory"
 
-# Activate virtual environment
-source /opt/venv/bin/activate || handle_error "Failed to activate virtual environment"
+# # Activate virtual environment
+# source /opt/venv/bin/activate || handle_error "Failed to activate virtual environment"
 
 # Check NVIDIA driver and CUDA
 if ! command -v nvidia-smi &> /dev/null; then
@@ -133,12 +133,6 @@ echo "ComfyUI started with PID: $COMFY_PID"
 
 # Monitor processes
 while true; do
-    if ! kill -0 $VSCODE_PID 2>/dev/null; then
-        echo "VS Code server crashed, restarting..."
-        code-server --bind-addr 0.0.0.0:8080 --auth none > /workspace/logs/vscode.log 2>&1 &
-        VSCODE_PID=$!
-    fi
-    
     if ! kill -0 $COMFY_PID 2>/dev/null; then
         echo "ComfyUI crashed, checking logs:"
         tail -n 50 /workspace/logs/comfyui.log
