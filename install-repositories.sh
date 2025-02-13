@@ -19,28 +19,61 @@ echo "Starting services at $(date)"
 # Create necessary directories
 mkdir -p /workspace/ComfyUI/output || handle_error "Failed to create output directory"
 mkdir -p /workspace/logs || handle_error "Failed to create logs directory"
+mkdir -p /workspace/ComfyUI/custom_nodes || handle_error "Failed to create custom_nodes directory"
 
-# Function to download a model if it doesn't exist
-download_model() {
-    local directory=$1
-    local filename=$2
-    local url=$3
+# Function to clone and install repository
+clone_and_install() {
+    local repo_url=$1
+    local repo_name=$(basename "$repo_url" .git)
     
-    if [ ! -f "$directory/$filename" ]; then
-        echo "Downloading $filename..."
-        wget -O "$directory/$filename" "$url" || {
-            echo "Failed to download $filename"
-            return 1
-        }
+    echo "Processing $repo_name..."
+    
+    if [ -d "/workspace/ComfyUI/custom_nodes/$repo_name" ]; then
+        echo "$repo_name already exists, updating..."
+        cd "/workspace/ComfyUI/custom_nodes/$repo_name"
+        git pull
     else
-        echo "$filename already exists, skipping download"
+        echo "Cloning $repo_name..."
+        cd /workspace/ComfyUI/custom_nodes
+        git clone "$repo_url" || handle_error "Failed to clone $repo_name"
+        cd "$repo_name"
+    fi
+    
+    if [ -f "requirements.txt" ]; then
+        echo "Installing requirements for $repo_name..."
+        pip install -r requirements.txt || echo "Warning: Some requirements for $repo_name may have failed to install"
     fi
 }
 
-# Create directory structure
+# Clone and install all repositories
+echo "Starting custom nodes installation..."
+
+# Main repositories
+clone_and_install "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git"
+clone_and_install "https://github.com/cubiq/ComfyUI_essentials.git"
+clone_and_install "https://github.com/chrisgoringe/cg-use-everywhere.git"
+clone_and_install "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git"
+clone_and_install "https://github.com/Jonseed/ComfyUI-Detail-Daemon.git"
+clone_and_install "https://github.com/welltop-cn/ComfyUI-TeaCache.git"
+clone_and_install "https://github.com/Amorano/Jovimetrix.git"
+clone_and_install "https://github.com/sipherxyz/comfyui-art-venture.git"
+clone_and_install "https://github.com/Smirnov75/ComfyUI-mxToolkit.git"
+clone_and_install "https://github.com/alt-key-project/comfyui-dream-project.git"
+
+# Recently added repositories
+clone_and_install "https://github.com/dwery4/comfyui-gguf.git"  # ComfyUI-GGUF
+clone_and_install "https://github.com/pythongosssss/ComfyUI-SaveImageMetadata.git"  # Save Image with Generation Metadata
+clone_and_install "https://github.com/kijai/ComfyUI-HunyuanVideoMultiLora.git"  # ComfyUI-HunyuanVideoMultiLora
+clone_and_install "https://github.com/typecat/ComfyUI-Nodes-by-Type.git"  # Various ComfyUI Nodes by Type
+clone_and_install "https://github.com/ergouzi-git/comfyui-ergouzi-nodes.git"  # Comfyui-ergouzi-Nodes
+clone_and_install "https://github.com/jpsmithdev/jps-custom-nodes-comfyui.git"  # JPS Custom Nodes for ComfyUI
+clone_and_install "https://github.com/ZHO-ZHO-ZHO/ComfyUI-ImageMotionGuider.git"  # ComfyUI-ImageMotionGuider
+clone_and_install "https://github.com/szhublox/ComfyLiterals.git"  # ComfyLiterals
+
+echo "Custom nodes installation completed"
+
+# Create directory structure for models
 mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,upscale,loras}
-mkdir -p /workspace/ComfyUI/custom_nodes
-mkdir -p /workspace/ComfyUI/user/default/workflows
 
 # Set base paths
 MODELS_DIR="/workspace/ComfyUI/models"
@@ -144,3 +177,5 @@ while true; do
     
     sleep 10
 done
+
+echo "Installation completed successfully!"
