@@ -80,9 +80,8 @@ RUN chmod +x /install-repositories.sh
 # Rest of the Dockerfile remains the same...
 COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
-
 cd /workspace
-if [ ! -d "ComfyUI" ]; then
+if [ -d "ComfyUI" ]; then
     /install-repositories.sh
 fi
 EOT
