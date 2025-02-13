@@ -74,10 +74,11 @@ RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true &
 WORKDIR /
 
 # Copy workflow file and installation scripts
-COPY pre_start.sh /install-repositories.sh
+COPY install-repositories.sh /install-repositories.sh
 RUN chmod +x /install-repositories.sh
 
-# Modify the pre_start.sh to include log forwarding
+
+# Rest of the Dockerfile remains the same...
 COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
 
@@ -92,10 +93,8 @@ mkfifo /workspace/logs/comfyui.pipe
 tail -f /workspace/logs/startup.pipe > /dev/stdout &
 tail -f /workspace/logs/comfyui.pipe > /dev/stdout &
 
-# Start services
 cd /workspace
 if [ -d "ComfyUI" ]; then
-    # Redirect all script output to the named pipe
     /install-repositories.sh > /workspace/logs/startup.pipe 2>&1
 fi
 EOT
