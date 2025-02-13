@@ -25,16 +25,55 @@ RUN pip install --upgrade --no-cache-dir pip && \
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Clone ComfyUI and install core dependencies
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI && \
-    cd /workspace/ComfyUI && \
-    pip install -r requirements.txt
+RUN mkdir -p /workspace
 
+# Create workspace directory
+WORKDIR /workspace
+# Clone and set up ComfyUI
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git
+
+
+COPY download-fix.sh /download-fix.sh
+COPY AllinOneUltra1.2.json /ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+COPY AllinOneUltra1.3.json /ComfyUI/user/default/workflows/AllinOneUltra1.3.json
+
+WORKDIR /workspace/ComfyUI
+# Install ComfyUI requirements
+RUN pip install -r requirements.txt
+RUN pip install moviepy opencv-python pillow
+
+
+WORKDIR /workspace/ComfyUI
+
+# Install custom nodes
+RUN mkdir -p custom_nodes && \
+    cd custom_nodes && \
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/rgthree/rgthree-comfy.git && \
+    git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui
+    
+
+# Install custom nodes requirements
+RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Easy-Use && pip install -r requirements.txt || true  && \
+    cd ../ComfyUI-Crystools && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-KJNodes && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true && \
+    cd ../ComfyUI-Custom-Scripts && pip install -r requirements.txt || true && \
+    cd ../rgthree-comfy && pip install -r requirements.txt || true && \
+    cd ../Comfy-WaveSpeed && pip install -r requirements.txt || true && \
+    cd ../was-node-suite-comfyui && pip install -r requirements.txt || true
+
+
+WORKDIR /
 
 # Copy workflow file and installation scripts
-COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
-COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
-COPY download-fix.sh /workspace/download-fix.sh
 COPY install-repositories.sh /install-repositories.sh
 RUN chmod +x /install-repositories.sh
 
@@ -46,16 +85,6 @@ cd /workspace
 if [ ! -d "ComfyUI" ]; then
     /install-repositories.sh
 fi
-
-# Create model directories if they dont exist
-# mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,clip_vision,loras}
-
-# Start ComfyUI in the background
-cd /workspace/ComfyUI
-nohup python main.py --listen 0.0.0.0 --port 8188 --enable-cors-header > /workspace/comfyui.log 2>&1 &
-
-# Start VS Code in the background with no auth
-nohup code-server --bind-addr 0.0.0.0:8080 --auth none > /workspace/vscode.log 2>&1 &
 EOT
 
 RUN chmod +x /pre_start.sh
