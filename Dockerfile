@@ -25,6 +25,28 @@ RUN pip install --upgrade --no-cache-dir pip && \
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
+# Clone ComfyUI and install core dependencies
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI && \
+    cd /workspace/ComfyUI && \
+    pip install -r requirements.txt
+
+# Install core custom nodes
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/rgthree/rgthree-comfy.git && \
+    git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui && \
+    for d in */ ; do \
+        if [ -f "${d}requirements.txt" ]; then \
+            cd "$d" && pip install -r requirements.txt || true && cd ..; \
+        fi \
+    done
+
 # Copy workflow file and installation scripts
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
 COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
@@ -32,7 +54,7 @@ COPY download-fix.sh /workspace/download-fix.sh
 COPY install-repositories.sh /install-repositories.sh
 RUN chmod +x /install-repositories.sh
 
-# Create and set up the pre-start script
+# Rest of the Dockerfile remains the same...
 COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
 

@@ -1,24 +1,17 @@
 #!/bin/bash
 
-# Clone ComfyUI base
-git clone https://github.com/comfyanonymous/ComfyUI.git
-cd ComfyUI
-pip install -r requirements.txt
+# Clone ComfyUI base if it doesn't exist
+if [ ! -d "ComfyUI" ]; then
+    git clone https://github.com/comfyanonymous/ComfyUI.git
+    cd ComfyUI
+    pip install -r requirements.txt
+else
+    cd ComfyUI
+fi
 
 # Create and enter custom_nodes directory
 mkdir -p custom_nodes
 cd custom_nodes
-
-# Core custom nodes
-git clone https://github.com/ltdrdata/ComfyUI-Manager.git
-git clone https://github.com/yolain/ComfyUI-Easy-Use.git
-git clone https://github.com/crystian/ComfyUI-Crystools.git
-git clone https://github.com/kijai/ComfyUI-KJNodes.git
-git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
-git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
-git clone https://github.com/rgthree/rgthree-comfy.git
-git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git
-git clone https://github.com/WASasquatch/was-node-suite-comfyui
 
 # Utility nodes
 git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git
