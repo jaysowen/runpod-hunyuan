@@ -21,15 +21,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages
+# Install Python packages - Fixed command structure
 RUN pip install --upgrade --no-cache-dir pip && \
     pip install --upgrade setuptools wheel && \
     pip install numpy && \
-    pip install --no-cache-dir triton sageattention \
-    pip install --upgrade setuptools && \
-    pip install --upgrade wheel && \
+    pip install --no-cache-dir triton sageattention && \
     pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-
 
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
