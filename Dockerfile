@@ -94,7 +94,7 @@ tail -f /workspace/logs/startup.pipe > /dev/stdout &
 tail -f /workspace/logs/comfyui.pipe > /dev/stdout &
 
 cd /workspace
-if [ -d "ComfyUI" ]; then
+if [ ! -d "ComfyUI" ]; then
     /install-repositories.sh > /workspace/logs/startup.pipe 2>&1
 fi
 EOT

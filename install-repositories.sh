@@ -61,14 +61,12 @@ clone_and_install "https://github.com/Smirnov75/ComfyUI-mxToolkit.git"
 clone_and_install "https://github.com/alt-key-project/comfyui-dream-project.git"
 
 # Recently added repositories
-clone_and_install "https://github.com/dwery4/comfyui-gguf.git"  # ComfyUI-GGUF
+clone_and_install "https://github.com/city96/ComfyUI-GGUF.git"  # ComfyUI-GGUF
 clone_and_install "https://github.com/pythongosssss/ComfyUI-SaveImageMetadata.git"  # Save Image with Generation Metadata
 clone_and_install "https://github.com/kijai/ComfyUI-HunyuanVideoMultiLora.git"  # ComfyUI-HunyuanVideoMultiLora
-clone_and_install "https://github.com/typecat/ComfyUI-Nodes-by-Type.git"  # Various ComfyUI Nodes by Type
 clone_and_install "https://github.com/ergouzi-git/comfyui-ergouzi-nodes.git"  # Comfyui-ergouzi-Nodes
-clone_and_install "https://github.com/jpsmithdev/jps-custom-nodes-comfyui.git"  # JPS Custom Nodes for ComfyUI
-clone_and_install "https://github.com/ZHO-ZHO-ZHO/ComfyUI-ImageMotionGuider.git"  # ComfyUI-ImageMotionGuider
-clone_and_install "https://github.com/szhublox/ComfyLiterals.git"  # ComfyLiterals
+clone_and_install "https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git"  # ComfyUI-ImageMotionGuider
+clone_and_install "https://github.com/M1kep/ComfyLiterals.git"  # ComfyLiterals
 
 echo "Custom nodes installation completed"
 
