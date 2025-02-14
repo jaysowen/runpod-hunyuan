@@ -34,8 +34,8 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 
 
 COPY download-fix.sh /download-fix.sh
-COPY AllinOneUltra1.2.json /ComfyUI/user/default/workflows/AllinOneUltra1.2.json
-COPY AllinOneUltra1.3.json /ComfyUI/user/default/workflows/AllinOneUltra1.3.json
+COPY AllinOneUltra1.2.json workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
 
 WORKDIR /workspace/ComfyUI
 # Install ComfyUI requirements

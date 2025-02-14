@@ -10,11 +10,6 @@ handle_error() {
     exit 1
 }
 
-# Set up logging
-exec 1> >(tee -a /workspace/startup.log)
-exec 2> >(tee -a /workspace/startup.log >&2)
-
-echo "Starting services at $(date)"
 
 # Create necessary directories
 mkdir -p /workspace/ComfyUI/output || handle_error "Failed to create output directory"
