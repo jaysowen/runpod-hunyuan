@@ -25,17 +25,17 @@ RUN pip install --upgrade --no-cache-dir pip && \
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
+# Clone ComfyUI and install core dependencies
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI && \
+    cd /workspace/ComfyUI && \
+    pip install -r requirements.txt
+
 RUN mkdir -p /workspace
+RUN mkdir -p /workspace/ComfyUI/user/default/workflows/
 
-# Create workspace directory
-WORKDIR /workspace
-# Clone and set up ComfyUI
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git
-
-
-COPY download-fix.sh /download-fix.sh
-COPY AllinOneUltra1.2.json /ComfyUI/user/default/workflows/AllinOneUltra1.2.json
-COPY AllinOneUltra1.3.json /ComfyUI/user/default/workflows/AllinOneUltra1.3.json
+COPY download-fix.sh /workspace/download-fix.sh
+COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
 
 WORKDIR /workspace/ComfyUI
 # Install ComfyUI requirements
@@ -77,11 +77,13 @@ WORKDIR /
 COPY install-repositories.sh /install-repositories.sh
 RUN chmod +x /install-repositories.sh
 
+
 # Rest of the Dockerfile remains the same...
 COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
+
 cd /workspace
-if [ -d "ComfyUI" ]; then
+if [ ! -d "ComfyUI" ]; then
     /install-repositories.sh
 fi
 EOT
