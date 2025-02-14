@@ -34,8 +34,8 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 
 
 COPY download-fix.sh /download-fix.sh
-COPY AllinOneUltra1.2.json /ComfyUI/user/default/workflows/AllinOneUltra1.2.json
-COPY AllinOneUltra1.3.json /ComfyUI/user/default/workflows/AllinOneUltra1.3.json
+COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
 
 WORKDIR /workspace/ComfyUI
 # Install ComfyUI requirements
@@ -82,19 +82,8 @@ RUN chmod +x /install-repositories.sh
 COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
 
-# Create log directory
-mkdir -p /workspace/logs
-
-# Create named pipes for log forwarding
-mkfifo /workspace/logs/startup.pipe
-mkfifo /workspace/logs/comfyui.pipe
-
-# Start log forwarding in background
-tail -f /workspace/logs/startup.pipe > /dev/stdout &
-tail -f /workspace/logs/comfyui.pipe > /dev/stdout &
-
 cd /workspace
-if [ ! -d "ComfyUI" ]; then
+if [ -d "ComfyUI" ]; then
     /install-repositories.sh > /workspace/logs/startup.pipe 2>&1
 fi
 EOT
