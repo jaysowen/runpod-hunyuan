@@ -19,11 +19,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
-RUN ln -s /usr/bin/python3.11 /usr/bin/python && \
-    rm /usr/bin/python3 && \
-    ln -s /usr/bin/python3.11 /usr/bin/python3 && \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python get-pip.py
+# RUN ln -s /usr/bin/python3.11 /usr/bin/python && \
+#     rm /usr/bin/python3 && \
+#     ln -s /usr/bin/python3.11 /usr/bin/python3 && \
+#     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+#     python get-pip.py
 
 # Install Python packages
 RUN pip install --upgrade --no-cache-dir pip && \
@@ -49,32 +49,20 @@ WORKDIR /workspace
 # Clone and set up ComfyUI
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 
-
-COPY download-fix.sh /download-fix.sh
-COPY AllinOneUltra1.2.json workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
-COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
-
 WORKDIR /workspace/ComfyUI
 # Install ComfyUI requirements
 RUN pip install -r requirements.txt
 RUN pip install moviepy opencv-python pillow
 
-
 WORKDIR /workspace/ComfyUI
+
+COPY download-fix.sh /download-fix.sh
+COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
 
 # Install custom nodes
 RUN mkdir -p custom_nodes && \
-    cd custom_nodes && \
-# Create workspace directory
-WORKDIR /workspace
-
-# Clone and set up ComfyUI
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git
-WORKDIR /workspace/ComfyUI
-
-# Install ComfyUI requirements
-RUN pip install -r requirements.txt
-RUN pip install moviepy opencv-python pillow
+    cd custom_nodes 
 
 # Install custom nodes including ComfyUI-Manager and additional requested nodes
 # Install custom nodes
