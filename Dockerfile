@@ -30,7 +30,10 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI &
     cd /workspace/ComfyUI && \
     pip install -r requirements.txt
 
-COPY download-fix.sh /download-fix.sh
+RUN mkdir -p /workspace
+RUN mkdir -p /workspace/ComfyUI/user/default/workflows/
+
+COPY download-fix.sh /workspace/download-fix.sh
 COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
 COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
 
@@ -80,8 +83,8 @@ COPY <<-'EOT' /pre_start.sh
 #!/bin/bash
 
 cd /workspace
-if [ -d "ComfyUI" ]; then
-    /install-repositories.sh > /workspace/logs/startup.pipe 2>&1
+if [ ! -d "ComfyUI" ]; then
+    /install-repositories.sh
 fi
 EOT
 
