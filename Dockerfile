@@ -10,25 +10,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /
 
-# System setup and dependencies
-RUN apt-get update --yes && \
-    apt-get upgrade --yes && \
-    apt install --yes --no-install-recommends \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    wget \
     curl \
-    bash \
-    libgl1 \
-    software-properties-common \
-    openssh-server \
-    ffmpeg \
+    wget \
     nodejs \
-    npm && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/bin/python3.11 /usr/bin/python && \
     rm /usr/bin/python3 && \
