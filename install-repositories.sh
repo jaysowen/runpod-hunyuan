@@ -62,7 +62,6 @@ clone_and_install "https://github.com/alt-key-project/comfyui-dream-project.git"
 
 # Recently added repositories
 clone_and_install "https://github.com/city96/ComfyUI-GGUF.git"  # ComfyUI-GGUF
-clone_and_install "https://github.com/pythongosssss/ComfyUI-SaveImageMetadata.git"  # Save Image with Generation Metadata
 clone_and_install "https://github.com/kijai/ComfyUI-HunyuanVideoMultiLora.git"  # ComfyUI-HunyuanVideoMultiLora
 clone_and_install "https://github.com/ergouzi-git/comfyui-ergouzi-nodes.git"  # Comfyui-ergouzi-Nodes
 clone_and_install "https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git"  # ComfyUI-ImageMotionGuider
