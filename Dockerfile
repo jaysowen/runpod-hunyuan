@@ -63,8 +63,4 @@ RUN chmod +x /pre_start.sh
 # Expose ports
 EXPOSE 8080 8188 8888
 
-# Set up entrypoint
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 ENTRYPOINT ["/start.sh"]
