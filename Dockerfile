@@ -24,6 +24,9 @@ RUN pip install --no-cache-dir \
     requests \
     tqdm
 
+# Install code-server (VS Code)
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+
 # Clone ComfyUI repository
 WORKDIR /workspace
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
