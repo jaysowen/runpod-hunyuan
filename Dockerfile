@@ -90,22 +90,6 @@ EOT
 RUN chmod +x /pre_start.sh
 
 
-# Create model directories and download models
-WORKDIR /workspace/ComfyUI
-RUN mkdir -p /workspace/ComfyUI/models/{unet,text_encoders,vae,clip_vision,loras} && \
-    wget -O /workspace/ComfyUI/models/unet/hunyuan_video_720_cfgdistill_bf16.safetensors \
-        "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors" && \
-    wget -O /workspace/ComfyUI/models/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors \
-        "https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors" && \
-    wget -O /workspace/ComfyUI/models/text_encoders/llava_llama3_fp8_scaled.safetensors \
-        "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors" && \
-    wget -O /workspace/ComfyUI/models/vae/hunyuan_video_vae_bf16.safetensors \
-        "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors" && \
-    wget -O /workspace/ComfyUI/models/clip_vision/clip-vit-large-patch14.safetensors \
-        "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors" && \
-    wget -O /workspace/ComfyUI/models/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors \
-        "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
-
 
 # Expose ports
 EXPOSE 8080 8188 8888
