@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # Clone ComfyUI base if it doesn't exist
-# if [ ! -d "ComfyUI" ]; then
-#     git clone https://github.com/comfyanonymous/ComfyUI.git
-#     cd ComfyUI
-#     pip install -r requirements.txt
-# else
-#     cd ComfyUI
-# fi
+if [ ! -d "ComfyUI" ]; then
+    echo 'ComfyUI NOOOOOOOOOooooooooo'
+    # git clone https://github.com/comfyanonymous/ComfyUI.git
+    # cd ComfyUI
+    # pip install -r requirements.txt
+else
+    cd ComfyUI
+fi
 
 # Create and enter custom_nodes directory
 mkdir -p custom_nodes

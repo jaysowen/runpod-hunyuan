@@ -46,7 +46,7 @@ RUN pip install --upgrade --no-cache-dir pip && \
 RUN pip install --upgrade --no-cache-dir pip && \
     pip install --upgrade setuptools wheel && \
     pip install numpy && \
-    pip install --no-cache-dir triton sageattention
+    pip install --no-cache-dir triton sageattention \
     pip install --upgrade setuptools && \
     pip install --upgrade wheel
 
@@ -88,16 +88,15 @@ RUN pip install -r requirements.txt
 RUN pip install moviepy opencv-python pillow
 
 # Install custom nodes including ComfyUI-Manager and additional requested nodes
+# Install custom nodes
 RUN mkdir -p custom_nodes && \
     cd custom_nodes && \
     git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
-    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
-    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone https://github.com/chrisgoringe/cg-noisetools.git && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
     git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui
@@ -114,34 +113,6 @@ RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true &
     cd ../Comfy-WaveSpeed && pip install -r requirements.txt || true && \
     cd ../was-node-suite-comfyui && pip install -r requirements.txt || true
 
-
-WORKDIR /
-
-# Copy workflow file and installation scripts
-COPY install-repositories.sh /install-repositories.sh
-RUN chmod +x /install-repositories.sh
-    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/kijai/ComfyUI-HunyuanVideoWrapper.git && \
-    git clone https://github.com/cubiq/ComfyUI_essentials.git && \
-    git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
-    git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
-    git clone https://github.com/spacepxl/ComfyUI-Image-Filters.git
-
-# Install custom nodes requirements
-RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Frame-Interpolation && pip install -r requirements.txt || true && \
-    cd ../ComfyUI_Noise && pip install -r requirements.txt || true && \
-    cd ../cg-noisetools && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Crystools && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true && \
-    cd ../rgthree-comfy && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-KJNodes && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-HunyuanVideoWrapper && pip install -r requirements.txt || true && \
-    cd ../ComfyUI_essentials && pip install -r requirements.txt || true && \
-    cd ../cg-use-everywhere && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-mxToolkit && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Image-Filters && pip install -r requirements.txt || true
 
 
 RUN mkdir -p models/upscale && \
