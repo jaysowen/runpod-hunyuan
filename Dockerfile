@@ -1,104 +1,45 @@
-# Use RunPod pytorch base image which includes JupyterLab
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# Use RunPod pytorch base image which includes JupyterLab
 FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 # Set environment variables
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     git \
-    curl \
     wget \
-    nodejs \
-    npm \
+    curl \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages - Fixed command structure
-RUN pip install --upgrade --no-cache-dir pip && \
-    pip install --upgrade setuptools wheel && \
-    pip install numpy && \
-    pip install --no-cache-dir triton sageattention && \
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+# Install Python packages
+RUN pip install --no-cache-dir \
+    torch \
+    torchvision \
+    torchaudio \
+    opencv-python \
+    numpy \
+    pillow \
+    requests \
+    tqdm
 
-# Install code-server (VS Code)
-RUN curl -fsSL https://code-server.dev/install.sh | sh
-
-RUN mkdir -p /workspace
-
-# Create workspace directory
+# Clone ComfyUI repository
 WORKDIR /workspace
-# Clone and set up ComfyUI
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
-
-WORKDIR /workspace/ComfyUI
-# Install ComfyUI requirements
-RUN pip install -r requirements.txt
-RUN pip install moviepy opencv-python pillow
-
 WORKDIR /workspace/ComfyUI
 
-COPY download-fix.sh /download-fix.sh
-COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
-COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
+# Install ComfyUI dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install custom nodes
-RUN mkdir -p custom_nodes && \
-    cd custom_nodes 
+# Create necessary directories
+RUN mkdir -p /workspace/ComfyUI/models/checkpoints
+RUN mkdir -p /workspace/ComfyUI/models/vae
+RUN mkdir -p /workspace/ComfyUI/models/loras
+RUN mkdir -p /workspace/ComfyUI/models/controlnet
+RUN mkdir -p /workspace/ComfyUI/input
+RUN mkdir -p /workspace/ComfyUI/output
 
-# Install custom nodes including ComfyUI-Manager and additional requested nodes
-# Install custom nodes
-RUN mkdir -p custom_nodes && \
-    cd custom_nodes && \
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
-    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
-    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone https://github.com/rgthree/rgthree-comfy.git && \
-    git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
-    git clone https://github.com/WASasquatch/was-node-suite-comfyui
-    
-
-# Install custom nodes requirements
-RUN cd custom_nodes/ComfyUI-Manager && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Easy-Use && pip install -r requirements.txt || true  && \
-    cd ../ComfyUI-Crystools && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-KJNodes && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Impact-Pack && pip install -r requirements.txt || true && \
-    cd ../ComfyUI-Custom-Scripts && pip install -r requirements.txt || true && \
-    cd ../rgthree-comfy && pip install -r requirements.txt || true && \
-    cd ../Comfy-WaveSpeed && pip install -r requirements.txt || true && \
-    cd ../was-node-suite-comfyui && pip install -r requirements.txt || true
-
-
-
-RUN mkdir -p models/upscale && \
-    cd models/upscale && \
-    wget -O 4x_foolhardy_Remacri.pth https://huggingface.co/FacehugmanIII/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth
-
-
-# Create model directories and download models
-# RUN mkdir -p models/{unet,text_encoders,vae,upscale,loras} && \
-#     cd models && \
-#     cd unet && \
-#     wget -O hunyuan_video_720_cfgdistill_bf16.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors && \
-#     cd ../vae && \
-#     wget -O img2vid.safetensors https://huggingface.co/leapfusion-image2vid-test/image2vid-512x320/resolve/main/img2vid.safetensors && \
-#     wget -O hunyuan_video_vae_bf16.safetensors https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors && \
-#     cd ../upscale && \
-#     wget -O 4x_foolhardy_Remacri.pth https://huggingface.co/FacehugmanIII/4x_foolhardy_Remacri/resolve/main/4x_foolhardy_Remacri.pth && \
-#     cd ../text_encoders && \
-#     wget -O clip_l.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors && \
-#     wget -O llava_llama3_fp8_scaled.safetensors https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors
 
 
 # Rest of the Dockerfile remains the same...
@@ -119,8 +60,11 @@ EOT
 
 RUN chmod +x /pre_start.sh
 
-# Expose ports for VS Code Web and ComfyUI
+# Expose ports
 EXPOSE 8080 8188 8888
 
-# Use RunPod's default start script
-CMD ["/start.sh"]
+# Set up entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/start.sh"]
