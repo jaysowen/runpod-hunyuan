@@ -22,7 +22,9 @@ RUN pip install --no-cache-dir \
     numpy \
     pillow \
     requests \
-    tqdm
+    tqdm \
+    triton \
+    sageattention
 
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
