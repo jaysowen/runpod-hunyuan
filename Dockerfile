@@ -15,9 +15,9 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python packages
 RUN pip install --no-cache-dir \
-    torch \
-    torchvision \
-    torchaudio \
+    # torch \
+    # torchvision \
+    # torchaudio \
     opencv-python \
     numpy \
     pillow \
@@ -27,9 +27,9 @@ RUN pip install --no-cache-dir \
 # Clone ComfyUI repository
 WORKDIR /workspace
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
-WORKDIR /workspace/ComfyUI
 
 # Install ComfyUI dependencies
+WORKDIR /workspace/ComfyUI
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create necessary directories
