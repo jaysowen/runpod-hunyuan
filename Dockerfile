@@ -3,12 +3,14 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Set environment variables
-ENV SHELL=/bin/bash
-ENV PYTHONUNBUFFERED=1
-ENV DEBIAN_FRONTEND=noninteractive
+# Use RunPod pytorch base image which includes JupyterLab
+FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
-WORKDIR /
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -19,25 +21,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     npm \
     && rm -rf /var/lib/apt/lists/*
 
-# RUN ln -s /usr/bin/python3.11 /usr/bin/python && \
-#     rm /usr/bin/python3 && \
-#     ln -s /usr/bin/python3.11 /usr/bin/python3 && \
-#     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-#     python get-pip.py
-
-# Install Python packages
-RUN pip install --upgrade --no-cache-dir pip && \
-    pip install --upgrade setuptools && \
-    pip install --upgrade wheel && \
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
-
 # Install Python packages
 RUN pip install --upgrade --no-cache-dir pip && \
     pip install --upgrade setuptools wheel && \
     pip install numpy && \
     pip install --no-cache-dir triton sageattention \
     pip install --upgrade setuptools && \
-    pip install --upgrade wheel
+    pip install --upgrade wheel && \
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
 
 # Install code-server (VS Code)
 RUN curl -fsSL https://code-server.dev/install.sh | sh
