@@ -67,14 +67,18 @@ RUN cd ComfyUI/custom_nodes && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
 
-# Automatically search and install requirements.txt files
-RUN find ComfyUI/custom_nodes -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
+# Install requirements for all nodes
+RUN cd ComfyUI/custom_nodes && \
+    find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
 
-# Automatically search and run install.py scripts
-RUN for script in ComfyUI/custom_nodes/*/install.py; do \
-        [ -f "$script" ] && python "$script"; \
+# Run install scripts if they exist
+RUN cd ComfyUI/custom_nodes && \
+    for script in */install.py; do \
+        if [ -f "$script" ]; then \
+            python "$script"; \
+        fi \
     done
 
 # Create model directories
