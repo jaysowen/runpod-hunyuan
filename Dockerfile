@@ -28,23 +28,26 @@ RUN pip install --no-cache-dir -U pip setuptools wheel && \
     pip install --no-cache-dir jupyterlab jupyterlab_widgets ipykernel ipywidgets
 
 # Install ComfyUI
+WORKDIR /
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
-    git checkout tags/${COMFYUI_VERSION} && \
+    if [ "${COMFYUI_VERSION}" != "latest" ]; then \
+        git checkout tags/${COMFYUI_VERSION}; \
+    fi && \
     pip install --no-cache-dir -r requirements.txt
 
 # Install core custom nodes
-RUN cd ComfyUI/custom_nodes && \
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+WORKDIR /ComfyUI/custom_nodes
+RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git
 
 # Install requirements for core nodes
-RUN cd ComfyUI/custom_nodes && \
+RUN cd /ComfyUI/custom_nodes && \
     find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
 
 # Run install scripts for core nodes if they exist
-RUN cd ComfyUI/custom_nodes && \
+RUN cd /ComfyUI/custom_nodes && \
     for script in */install.py; do \
         if [ -f "$script" ]; then \
             python "$script"; \
@@ -56,13 +59,14 @@ FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 rsync openssh-server ffmpeg libgl1 libglib2.0-0 \
+    python3 python3-pip rsync openssh-server ffmpeg libgl1 libglib2.0-0 wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Set runtime environment variables
 ENV PYTHONUNBUFFERED=True
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu
+ENV PATH="/workspace/venv/bin:$PATH"
 
 # Create necessary directories
 RUN mkdir -p /comfy-models/{checkpoints,text_encoder,clip_vision,vae} \
@@ -80,5 +84,8 @@ RUN chmod +x /start.sh /pre_start.sh /install_nodes.sh /download_models.sh
 COPY logo/runpod.txt /etc/runpod.txt
 RUN echo 'cat /etc/runpod.txt' >> /root/.bashrc && \
     echo 'echo -e "\nFor detailed documentation and guides, please visit:\n\033[1;34mhttps://docs.runpod.io/\033[0m and \033[1;34mhttps://blog.runpod.io/\033[0m\n\n"' >> /root/.bashrc
+
+# Set working directory
+WORKDIR /workspace
 
 CMD ["/start.sh"]
