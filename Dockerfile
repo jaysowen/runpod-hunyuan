@@ -66,10 +66,9 @@ RUN cd ComfyUI/custom_nodes && \
     git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
-    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui
 
