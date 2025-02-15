@@ -13,4 +13,4 @@ echo "**** downloading models, please wait ****"
 
 source /workspace/venv/bin/activate
 cd /workspace/ComfyUI
-python main.py --listen --port 3000 $COMFYUI_EXTRA_ARGS &
+python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS &

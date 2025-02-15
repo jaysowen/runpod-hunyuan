@@ -65,7 +65,8 @@ FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 # Install runtime dependencies with cache
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip rsync openssh-server ffmpeg libgl1 libglib2.0-0 wget \
+    python3 python3-pip python3-venv \
+    rsync openssh-server ffmpeg libgl1 libglib2.0-0 wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Set runtime environment variables
@@ -74,13 +75,21 @@ ENV PYTHONUNBUFFERED=True \
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu \
     PATH="/workspace/venv/bin:$PATH"
 
-# Create necessary directories
-RUN mkdir -p /comfy-models/{checkpoints,text_encoder,clip_vision,vae} \
-    /workspace/ComfyUI /workspace/logs
+# Create virtual environment and install dependencies
+RUN python3 -m venv /workspace/venv && \
+    /workspace/venv/bin/pip install --no-cache-dir -U pip setuptools wheel && \
+    /workspace/venv/bin/pip install --no-cache-dir \
+    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 && \
+    /workspace/venv/bin/pip install --no-cache-dir \
+    jupyterlab jupyterlab_widgets ipykernel ipywidgets aiohttp
 
-# Copy from builder
-COPY --from=builder /venv /venv
-COPY --from=builder /ComfyUI /ComfyUI
+# Copy ComfyUI and install its requirements
+COPY --from=builder /ComfyUI /workspace/ComfyUI
+RUN /workspace/venv/bin/pip install --no-cache-dir -r /workspace/ComfyUI/requirements.txt
+
+# Create necessary directories and copy files
+RUN mkdir -p /comfy-models/{checkpoints,text_encoder,clip_vision,vae} \
+    /workspace/logs
 
 # Copy configuration and scripts
 COPY scripts/start.sh scripts/pre_start.sh scripts/install_nodes.sh scripts/download_models.sh /
@@ -91,7 +100,6 @@ COPY logo/runpod.txt /etc/runpod.txt
 RUN echo 'cat /etc/runpod.txt' >> /root/.bashrc && \
     echo 'echo -e "\nFor detailed documentation and guides, please visit:\n\033[1;34mhttps://docs.runpod.io/\033[0m and \033[1;34mhttps://blog.runpod.io/\033[0m\n\n"' >> /root/.bashrc
 
-# Set working directory
 WORKDIR /workspace
 
 CMD ["/start.sh"]
