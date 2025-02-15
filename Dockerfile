@@ -37,9 +37,9 @@ RUN apt-get update --yes && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Install the UV tool from astral-sh
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-ENV PATH="/root/.local/bin/:$PATH"
+# ADD https://astral.sh/uv/install.sh /uv-installer.sh
+# RUN sh /uv-installer.sh && rm /uv-installer.sh
+# ENV PATH="/root/.local/bin/:$PATH"
 
 # Install Python and create virtual environment
 RUN uv python install ${PYTHON_VERSION} --default --preview && \
@@ -65,9 +65,7 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
 RUN cd ComfyUI/custom_nodes && \
     git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
-    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
-    git clone https://github.com/rgthree/rgthree-comfy.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+    git clone https://github.com/crystian/ComfyUI-Crystools.git
 
 # Install requirements for all nodes
 RUN cd ComfyUI/custom_nodes && \

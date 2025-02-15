@@ -72,5 +72,7 @@ clone_if_not_exists "https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
 clone_if_not_exists  "https://github.com/kijai/ComfyUI-KJNodes.git"
 clone_if_not_exists  "https://github.com/chengzeyi/Comfy-WaveSpeed.git"
 clone_if_not_exists  "https://github.com/WASasquatch/was-node-suite-comfyui.git"
+clone_if_not_exists  "ttps://github.com/rgthree/rgthree-comfy.git"
+clone_if_not_exists  "https://github.com/ltdrdata/ComfyUI-Impact-Pack.git"
 
 echo "All additional custom nodes installed successfully"
