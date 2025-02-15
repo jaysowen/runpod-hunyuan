@@ -69,5 +69,8 @@ clone_if_not_exists "https://github.com/M1kep/ComfyLiterals.git"
 clone_if_not_exists "https://github.com/welltop-cn/ComfyUI-TeaCache.git"
 
 clone_if_not_exists "https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git"
+clone_if_not_exists  "https://github.com/kijai/ComfyUI-KJNodes.git"
+clone_if_not_exists  "https://github.com/chengzeyi/Comfy-WaveSpeed.git"
+clone_if_not_exists  "https://github.com/WASasquatch/was-node-suite-comfyui.git"
 
 echo "All additional custom nodes installed successfully"

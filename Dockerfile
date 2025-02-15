@@ -68,9 +68,6 @@ RUN cd ComfyUI/custom_nodes && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
-    git clone https://github.com/WASasquatch/was-node-suite-comfyui
 
 # Automatically search and install requirements.txt files
 RUN find ComfyUI/custom_nodes -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
