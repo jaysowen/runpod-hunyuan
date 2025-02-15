@@ -59,41 +59,38 @@ RUN pip install --no-cache-dir -U \
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
     git checkout tags/${COMFYUI_VERSION} && \
-    pip install --no-cache-dir -r requirements.txt && \
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager && \
-    cd custom_nodes/ComfyUI-Manager && \
     pip install --no-cache-dir -r requirements.txt
 
-# 1. Clone custom nodes repositories
+# Clone custom nodes repositories
 RUN cd ComfyUI/custom_nodes && \
-    git clone --recursive https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git && \
-    git clone --recursive https://github.com/receyuki/comfyui-prompt-reader-node.git && \
-    git clone https://github.com/comfyanonymous/ComfyUI_TensorRT.git && \
-    git clone https://github.com/cubiq/ComfyUI_essentials.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git && \
-    git clone https://github.com/jags111/efficiency-nodes-comfyui.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
-    git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
-    git clone https://github.com/alexopus/ComfyUI-Image-Saver.git
+    git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui
 
-# 2. Automatically search and install requirements.txt files
+# Automatically search and install requirements.txt files
 RUN find ComfyUI/custom_nodes -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
 
-# 3. Automatically search and run install.py scripts
+# Automatically search and run install.py scripts
 RUN for script in ComfyUI/custom_nodes/*/install.py; do \
         [ -f "$script" ] && python "$script"; \
     done
 
 # Ensure some directories are created in advance
-RUN mkdir -p /comfy-models/checkpoints /comfy-models/upscale_models /comfy-models/upscale_models /workspace/ComfyUI /workspace/logs 
+RUN mkdir -p /comfy-models/checkpoints /comfy-models/text_encoder /comfy-models/clip_vision /comfy-models/vae /workspace/ComfyUI /workspace/logs 
 
-RUN wget -q https://huggingface.co/personal1802/NTRMIXillustrious-XLNoob-XL4.0/resolve/main/ntrMIXIllustriousXL_v40.safetensors -P /comfy-models/checkpoints && \
-    wget -q https://huggingface.co/Kim2091/AnimeSharpV3/resolve/main/2x-AnimeSharpV3.pth -P /comfy-models/upscale_models && \
-    wget -q https://huggingface.co/Kim2091/AnimeSharp/resolve/main/4x-AnimeSharp.pth -P /comfy-models/upscale_models
+# Download model files
+RUN wget -q https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors -P /comfy-models/checkpoints && \
+    wget -q https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors -P /comfy-models/text_encoder && \
+    wget -q https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors -P /comfy-models/text_encoder && \
+    wget -q https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors -P /comfy-models/vae && \
+    wget -q https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors -P /comfy-models/clip_vision && \
+    wget -q https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors -P /comfy-models/checkpoints
 
 RUN mv /workspace/venv /
 
