@@ -56,7 +56,7 @@ FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 nginx-light rsync openssh-server ffmpeg libgl1 libglib2.0-0 \
+    python3 rsync openssh-server ffmpeg libgl1 libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set runtime environment variables
@@ -73,8 +73,6 @@ COPY --from=builder /venv /venv
 COPY --from=builder /ComfyUI /ComfyUI
 
 # Copy configuration and scripts
-COPY proxy/nginx.conf /etc/nginx/nginx.conf
-COPY proxy/readme.html /usr/share/nginx/html/readme.html
 COPY scripts/start.sh scripts/pre_start.sh scripts/install_nodes.sh scripts/download_models.sh /
 RUN chmod +x /start.sh /pre_start.sh /install_nodes.sh /download_models.sh
 

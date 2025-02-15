@@ -5,12 +5,6 @@ set -e  # Exit the script if any statement returns a non-true return value
 #                          Function Definitions                                #
 # ---------------------------------------------------------------------------- #
 
-# Start nginx service
-start_nginx() {
-    echo "Starting Nginx service..."
-    service nginx start
-}
-
 # Execute script if exists
 execute_script() {
     local script_path=$1

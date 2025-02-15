@@ -18,14 +18,21 @@ jobs:
       packages: write
 
     steps:
-      - name: Free disk space
+      - name: Free disk space before build
         run: |
+          echo "Disk space before cleanup:"
           df -h
+          sudo swapoff -a
+          sudo rm -rf /swapfile
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo apt-get clean
           sudo docker system prune -af
+          echo "Disk space after cleanup:"
           df -h
 
       - name: Checkout repository
@@ -37,6 +44,7 @@ jobs:
           driver-opts: |
             image=moby/buildkit:latest
             network=host
+          buildkitd-flags: --debug
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -72,3 +80,6 @@ jobs:
           build-contexts: |
             app=.
           provenance: false
+          allow: |
+            network.host
+          network: host
