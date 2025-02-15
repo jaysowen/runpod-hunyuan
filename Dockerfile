@@ -3,8 +3,8 @@ FROM nvidia/cuda:12.4.0-devel-ubuntu22.04 as builder
 
 # Install Python and build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.12 \
-    python3.12-venv \
+    python3.10 \
+    python3.10-venv \
     python3-pip \
     git \
     wget && \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean
 
 # Create virtual environment
-RUN python3.12 -m venv /workspace/venv
+RUN python3.10 -m venv /workspace/venv
 ENV PATH="/workspace/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
@@ -50,8 +50,9 @@ FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.12 \
-    python3.12-venv \
+    python3.10 \
+    python3.10-venv \
+    python3-pip \
     ffmpeg \
     libgl1 \
     libglib2.0-0 \
@@ -61,8 +62,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean
 
 # Create symlinks
-RUN ln -sf /usr/bin/python3.12 /usr/bin/python && \
-    ln -sf /usr/bin/python3.12 /usr/bin/python3
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
+    ln -sf /usr/bin/python3.10 /usr/bin/python3
 
 # Copy virtual environment and application
 COPY --from=builder /workspace /workspace
