@@ -14,11 +14,11 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv \
     git wget curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && python3 -m venv /venv
+    && rm -rf /var/lib/apt/lists/*
 
-# Set environment for builder
-ENV PATH="/venv/bin:$PATH" \
+# Create and activate venv directly in workspace
+RUN python3 -m venv /workspace/venv
+ENV PATH="/workspace/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -U pip setuptools wheel && \
     pip install torch==${TORCH_VERSION} torchvision torchaudio \
     --extra-index-url https://download.pytorch.org/whl/${CUDA_VERSION} && \
-    pip install jupyterlab jupyterlab_widgets ipykernel ipywidgets
+    pip install jupyterlab jupyterlab_widgets ipykernel ipywidgets aiohttp
 
 # Install ComfyUI with cache mounting
 WORKDIR /
@@ -75,19 +75,11 @@ ENV PYTHONUNBUFFERED=True \
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu \
     PATH="/workspace/venv/bin:$PATH"
 
-# Create virtual environment and install dependencies
-RUN python3 -m venv /workspace/venv && \
-    /workspace/venv/bin/pip install --no-cache-dir -U pip setuptools wheel && \
-    /workspace/venv/bin/pip install --no-cache-dir \
-    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 && \
-    /workspace/venv/bin/pip install --no-cache-dir \
-    jupyterlab jupyterlab_widgets ipykernel ipywidgets aiohttp
-
-# Copy ComfyUI and install its requirements
+# Copy the built venv and ComfyUI from builder
+COPY --from=builder /workspace/venv /workspace/venv
 COPY --from=builder /ComfyUI /workspace/ComfyUI
-RUN /workspace/venv/bin/pip install --no-cache-dir -r /workspace/ComfyUI/requirements.txt
 
-# Create necessary directories and copy files
+# Create necessary directories
 RUN mkdir -p /comfy-models/{checkpoints,text_encoder,clip_vision,vae} \
     /workspace/logs
 
