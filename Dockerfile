@@ -10,41 +10,46 @@ ARG CUDA_VERSION=cu124
 ARG COMFYUI_VERSION=latest
 
 # Install essential packages in a single layer
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv \
     git wget curl \
     && rm -rf /var/lib/apt/lists/* \
     && python3 -m venv /venv
 
 # Set environment for builder
-ENV PATH="/venv/bin:$PATH"
-ENV PYTHONUNBUFFERED=1
-ENV PIP_NO_CACHE_DIR=1
+ENV PATH="/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
-# Install Python packages in a single layer
-RUN pip install --no-cache-dir -U pip setuptools wheel && \
-    pip install --no-cache-dir torch==${TORCH_VERSION} torchvision torchaudio \
+# Install Python packages in a single layer with buildkit cache
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -U pip setuptools wheel && \
+    pip install torch==${TORCH_VERSION} torchvision torchaudio \
     --extra-index-url https://download.pytorch.org/whl/${CUDA_VERSION} && \
-    pip install --no-cache-dir jupyterlab jupyterlab_widgets ipykernel ipywidgets
+    pip install jupyterlab jupyterlab_widgets ipykernel ipywidgets
 
-# Install ComfyUI
+# Install ComfyUI with cache mounting
 WORKDIR /
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
     if [ "${COMFYUI_VERSION}" != "latest" ]; then \
-        git checkout tags/${COMFYUI_VERSION}; \
+        git fetch --depth=1 origin tag ${COMFYUI_VERSION} && \
+        git checkout ${COMFYUI_VERSION}; \
     fi && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install -r requirements.txt
 
-# Install core custom nodes
+# Install core custom nodes with shallow clones
 WORKDIR /ComfyUI/custom_nodes
-RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
-    git clone https://github.com/crystian/ComfyUI-Crystools.git
+RUN git clone --depth=1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone --depth=1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone --depth=1 https://github.com/crystian/ComfyUI-Crystools.git
 
-# Install requirements for core nodes
-RUN cd /ComfyUI/custom_nodes && \
-    find . -name "requirements.txt" -exec pip install --no-cache-dir -r {} \;
+# Install requirements for core nodes with cache
+RUN --mount=type=cache,target=/root/.cache/pip \
+    cd /ComfyUI/custom_nodes && \
+    find . -name "requirements.txt" -exec pip install -r {} \;
 
 # Run install scripts for core nodes if they exist
 RUN cd /ComfyUI/custom_nodes && \
@@ -57,16 +62,17 @@ RUN cd /ComfyUI/custom_nodes && \
 # Runtime stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install runtime dependencies with cache
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip rsync openssh-server ffmpeg libgl1 libglib2.0-0 wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Set runtime environment variables
-ENV PYTHONUNBUFFERED=True
-ENV DEBIAN_FRONTEND=noninteractive
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu
-ENV PATH="/workspace/venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=True \
+    DEBIAN_FRONTEND=noninteractive \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu \
+    PATH="/workspace/venv/bin:$PATH"
 
 # Create necessary directories
 RUN mkdir -p /comfy-models/{checkpoints,text_encoder,clip_vision,vae} \

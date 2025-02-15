@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ github.repository }}
+  DOCKER_BUILDKIT: 1
 
 jobs:
   build:
@@ -23,15 +24,10 @@ jobs:
           echo "Disk space before cleanup:"
           df -h
           sudo swapoff -a
-          sudo rm -rf /swapfile
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          sudo rm -rf /usr/local/share/boost
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          sudo rm -rf /swapfile /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
           sudo apt-get clean
           sudo docker system prune -af
+          docker builder prune -af
           echo "Disk space after cleanup:"
           df -h
 
@@ -43,7 +39,6 @@ jobs:
         with:
           driver-opts: |
             image=moby/buildkit:latest
-            network=host
           buildkitd-flags: --debug
 
       - name: Log in to Docker Hub
@@ -52,7 +47,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -73,13 +68,12 @@ jobs:
             TORCH_VERSION=${{ vars.TORCH_VERSION }}
             CUDA_VERSION=${{ vars.CUDA_VERSION }}
             COMFYUI_VERSION=${{ vars.COMFYUI_VERSION }}
-          cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,mode=max,scope=${{ github.workflow }}
+          cache-from: |
+            type=gha,scope=${{ github.workflow }}
+            type=registry,ref=dihan/hunyuan-runpod:buildcache
+          cache-to: |
+            type=gha,mode=max,scope=${{ github.workflow }}
+            type=registry,ref=dihan/hunyuan-runpod:buildcache,mode=max
           platforms: linux/amd64
           outputs: type=docker
-          build-contexts: |
-            app=.
           provenance: false
-          allow: |
-            network.host
-          network: host
