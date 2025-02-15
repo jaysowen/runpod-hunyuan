@@ -97,7 +97,6 @@ RUN mv /workspace/venv /
 # NGINX Proxy Configuration
 COPY proxy/nginx.conf /etc/nginx/nginx.conf
 COPY proxy/readme.html /usr/share/nginx/html/readme.html
-COPY README.md /usr/share/nginx/html/README.md
 
 # Copy and set execution permissions for start scripts
 COPY scripts/start.sh /
