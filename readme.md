@@ -1,4 +1,4 @@
-# Hunyuan Video Generation on RunPod - Setup Guide
+# Hunyuan Video Generation on RunPod 2.0 - Setup Guide
 
 This guide will walk you through setting up and running the Hunyuan Video Generation environment on RunPod.
 
