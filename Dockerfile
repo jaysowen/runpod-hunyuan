@@ -37,9 +37,9 @@ RUN apt-get update --yes && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Install the UV tool from astral-sh
-# ADD https://astral.sh/uv/install.sh /uv-installer.sh
-# RUN sh /uv-installer.sh && rm /uv-installer.sh
-# ENV PATH="/root/.local/bin/:$PATH"
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+RUN sh /uv-installer.sh && rm /uv-installer.sh
+ENV PATH="/root/.local/bin/:$PATH"
 
 # Install Python and create virtual environment
 RUN uv python install ${PYTHON_VERSION} --default --preview && \
