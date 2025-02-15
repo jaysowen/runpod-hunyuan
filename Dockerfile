@@ -81,16 +81,8 @@ RUN for script in ComfyUI/custom_nodes/*/install.py; do \
         [ -f "$script" ] && python "$script"; \
     done
 
-# Ensure some directories are created in advance
-RUN mkdir -p /comfy-models/checkpoints /comfy-models/text_encoder /comfy-models/clip_vision /comfy-models/vae /workspace/ComfyUI /workspace/logs 
-
-# Download model files
-RUN wget -q https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors -P /comfy-models/checkpoints && \
-    wget -q https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors -P /comfy-models/text_encoder && \
-    wget -q https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors -P /comfy-models/text_encoder && \
-    wget -q https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors -P /comfy-models/vae && \
-    wget -q https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors -P /comfy-models/clip_vision && \
-    wget -q https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors -P /comfy-models/checkpoints
+# Create model directories
+RUN mkdir -p /comfy-models/checkpoints /comfy-models/text_encoder /comfy-models/clip_vision /comfy-models/vae /workspace/ComfyUI /workspace/logs
 
 RUN mv /workspace/venv /
 
@@ -98,15 +90,15 @@ RUN mv /workspace/venv /
 COPY proxy/nginx.conf /etc/nginx/nginx.conf
 COPY proxy/readme.html /usr/share/nginx/html/readme.html
 
-# Copy and set execution permissions for start scripts
+# Copy scripts
 COPY scripts/start.sh /
 COPY scripts/pre_start.sh /
-RUN chmod +x /start.sh /pre_start.sh
+COPY scripts/download_models.sh /
+RUN chmod +x /start.sh /pre_start.sh /download_models.sh
 
-# Welcome Message displayed upon login
+# Welcome Message
 COPY logo/runpod.txt /etc/runpod.txt
 RUN echo 'cat /etc/runpod.txt' >> /root/.bashrc
 RUN echo 'echo -e "\nFor detailed documentation and guides, please visit:\n\033[1;34mhttps://docs.runpod.io/\033[0m and \033[1;34mhttps://blog.runpod.io/\033[0m\n\n"' >> /root/.bashrc
 
-# Set entrypoint to the start script
 CMD ["/start.sh"]

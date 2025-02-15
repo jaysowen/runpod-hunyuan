@@ -7,7 +7,9 @@ rsync -au --remove-source-files /venv/ /workspace/venv/ && rm -rf /venv
 
 echo "**** syncing ComfyUI to workspace, please wait ****"
 rsync -au --remove-source-files /ComfyUI/ /workspace/ComfyUI/ && rm -rf /ComfyUI
-rsync -au --remove-source-files /comfy-models/ /workspace/ComfyUI/models/ && rm -rf /ComfyUI /comfy-models
+
+echo "**** downloading models, please wait ****"
+/download_models.sh
 
 source /workspace/venv/bin/activate
 cd /workspace/ComfyUI
