@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-MODEL_DIR=/workspace/ComfyUI/models"
+MODEL_DIR="/workspace/ComfyUI/models"
 mkdir -p ${MODEL_DIR}/{checkpoints,text_encoder,clip_vision,vae}
 
 download_if_not_exists() {

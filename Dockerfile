@@ -80,7 +80,7 @@ COPY --from=builder /workspace/venv /workspace/venv
 COPY --from=builder /ComfyUI /workspace/ComfyUI
 
 # Create necessary directories
-RUN mkdir -p /comfy-models/{checkpoints,text_encoder,clip_vision,vae} \
+RUN mkdir -p /workspace/ComfyUI/models/{checkpoints,text_encoder,clip_vision,vae} \
     /workspace/logs
 
 # Copy configuration and scripts
