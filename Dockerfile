@@ -75,7 +75,6 @@ COPY --from=builder /ComfyUI /ComfyUI
 # Copy configuration and scripts
 COPY proxy/nginx.conf /etc/nginx/nginx.conf
 COPY proxy/readme.html /usr/share/nginx/html/readme.html
-COPY README.md /usr/share/nginx/html/README.md
 COPY scripts/start.sh scripts/pre_start.sh scripts/install_nodes.sh scripts/download_models.sh /
 RUN chmod +x /start.sh /pre_start.sh /install_nodes.sh /download_models.sh
 
