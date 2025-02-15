@@ -7,7 +7,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.10-venv \
     python3-pip \
     git \
-    wget && \
+    ffmpeg \
+    libgl1 \
+    libglib2.0-0 \
+    wget \
+    openssh-server && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -30,20 +34,24 @@ RUN pip install --no-cache-dir \
     torchaudio \
     --extra-index-url https://download.pytorch.org/whl/cu124
 
-# Install ComfyUI and essential nodes
+# Create workspace structure
+RUN mkdir -p /workspace/ComfyUI
+
+# Install ComfyUI
 WORKDIR /workspace
 RUN git clone --depth=1 --single-branch --branch master \
-    https://github.com/comfyanonymous/ComfyUI.git && \
-    cd ComfyUI && \
-    pip install --no-cache-dir -r requirements.txt && \
-    rm -rf .git
+    https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI_temp && \
+    cp -r /workspace/ComfyUI_temp/* /workspace/ComfyUI/ && \
+    rm -rf /workspace/ComfyUI_temp && \
+    cd /workspace/ComfyUI && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install only the most essential custom nodes
-WORKDIR /workspace/ComfyUI/custom_nodes
-RUN git clone --depth=1 --single-branch https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+# Install Impact Pack
+RUN mkdir -p /workspace/ComfyUI/custom_nodes && \
+    cd /workspace/ComfyUI/custom_nodes && \
+    git clone --depth=1 --single-branch https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     cd ComfyUI-Impact-Pack && \
-    pip install --no-cache-dir -r requirements.txt && \
-    rm -rf .git
+    pip install --no-cache-dir -r requirements.txt
 
 # Final runtime stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
@@ -53,6 +61,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.10 \
     python3.10-venv \
     python3-pip \
+    git \
     ffmpeg \
     libgl1 \
     libglib2.0-0 \
@@ -65,12 +74,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
     ln -sf /usr/bin/python3.10 /usr/bin/python3
 
-# Copy virtual environment and application
-COPY --from=builder /workspace /workspace
-
 # Set environment variables
 ENV PATH="/workspace/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1
+
+# Create workspace structure
+RUN mkdir -p /workspace
+
+# Copy files from builder
+COPY --from=builder /workspace/venv /workspace/venv
+COPY --from=builder /workspace/ComfyUI /workspace/ComfyUI
 
 # Create model directories
 RUN mkdir -p /workspace/ComfyUI/models/{checkpoints,text_encoder,clip_vision,vae} \
