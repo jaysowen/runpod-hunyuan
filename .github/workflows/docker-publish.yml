@@ -69,7 +69,6 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ github.workflow }}
           platforms: linux/amd64
           outputs: type=docker
-          compression: zstd
           build-contexts: |
             app=.
           provenance: false
