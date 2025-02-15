@@ -34,11 +34,12 @@ RUN git clone --depth=1 --single-branch --branch master \
     cd ComfyUI && \
     pip3 install --no-cache-dir -r requirements.txt
 
-# Install Impact Pack
+# Install ComfyUI-Manager
 RUN cd /workspace/ComfyUI/custom_nodes && \
-    git clone --depth=1 --single-branch https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    cd ComfyUI-Impact-Pack && \
-    pip3 install --no-cache-dir -r requirements.txt
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    cd ComfyUI-Manager && \
+    pip3 install --no-cache-dir -r requirements.txt || true
+
 
 # Final runtime stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
