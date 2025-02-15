@@ -94,7 +94,8 @@ COPY proxy/readme.html /usr/share/nginx/html/readme.html
 COPY scripts/start.sh /
 COPY scripts/pre_start.sh /
 COPY scripts/download_models.sh /
-RUN chmod +x /start.sh /pre_start.sh /download_models.sh
+COPY scripts/install_node.sh /
+RUN chmod +x /start.sh /pre_start.sh /download_models.sh /install_node.sh
 
 # Welcome Message
 COPY logo/runpod.txt /etc/runpod.txt
