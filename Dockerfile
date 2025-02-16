@@ -1,4 +1,4 @@
-# Build stage for installing dependencies and ComfyUI
+# Build stage
 FROM nvidia/cuda:12.4.0-devel-ubuntu22.04 as builder
 
 # Install Python and build dependencies
@@ -16,36 +16,37 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install Python packages
 RUN pip3 install --no-cache-dir \
-    torch==2.2.1 \
-    torchvision \
-    torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/cu124 && \
-    pip3 install --no-cache-dir \
     jupyterlab \
     jupyterlab_widgets \
     ipykernel \
     ipywidgets \
-    aiohttp
+    aiohttp && \
+    pip3 install --no-cache-dir \
+    torch==2.2.1 \
+    torchvision \
+    torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/cu124
 
-# Clone and install ComfyUI
-WORKDIR /build
+# First clone ComfyUI fully
+WORKDIR /workspace
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
-    pip install --no-cache-dir -r requirements.txt && \
-    mkdir -p models/{checkpoints,text_encoder,clip_vision,vae}
-
-# Clone and install ComfyUI-Manager
-RUN cd /build/ComfyUI/custom_nodes && \
-    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    cd ComfyUI-Manager && \
     pip install --no-cache-dir -r requirements.txt
 
-# Download specific model file
-RUN cd /build/ComfyUI/models/vae && \
-    wget -q --show-progress \
-    https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
+# # Then create model directories inside the existing ComfyUI directory
+# RUN cd /workspace/ComfyUI && \
+#     mkdir -p models/checkpoints && \
+#     mkdir -p models/text_encoder && \
+#     mkdir -p models/clip_vision && \
+#     mkdir -p models/vae
 
-# Runtime stage
+# # Install ComfyUI-Manager
+# RUN cd /workspace/ComfyUI/custom_nodes && \
+#     git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+#     cd ComfyUI-Manager && \
+#     pip install --no-cache-dir -r requirements.txt || true
+
+# Final runtime stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 # Install runtime dependencies
@@ -68,20 +69,19 @@ RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Create workspace and copy ComfyUI from builder
+# Create workspace
 WORKDIR /workspace
-COPY --from=builder /build/ComfyUI ./ComfyUI
+
+# Copy the entire ComfyUI directory including all files and models directories
+COPY --from=builder /workspace/ComfyUI /workspace/ComfyUI
 COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
 # Create logs directory
 RUN mkdir -p /workspace/logs
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-cd /workspace/ComfyUI\n\
-python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS\n\
-' > /start.sh && \
-    chmod +x /start.sh
+# Copy essential scripts
+COPY scripts/start.sh scripts/pre_start.sh scripts/install_nodes.sh scripts/download_models.sh /
+RUN chmod +x /start.sh /pre_start.sh /install_nodes.sh /download_models.sh
 
 WORKDIR /workspace
 CMD ["/start.sh"]
