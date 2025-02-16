@@ -28,7 +28,7 @@ RUN pip3 install --no-cache-dir \
     --extra-index-url https://download.pytorch.org/whl/cu124
 
 COPY --chmod=755 start.sh /start.sh
-COPY --chmod=755 comfyui-on-workspace.sh /comfyui-on-workspace.sh
+COPY --chmod=755 script/comfyui-on-workspace.sh /comfyui-on-workspace.sh
 
 # First clone ComfyUI fully
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
