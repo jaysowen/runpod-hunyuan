@@ -9,11 +9,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     wget \
-    openssh-server && \
+    openssh-server \
+    build-essential \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Install Python packages
+RUN pip install --no-cache-dir \
     triton \
-    sageattention \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+    sageattention
 
 # Create symlinks for Python
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
