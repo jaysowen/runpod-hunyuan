@@ -40,7 +40,6 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd ComfyUI-Manager && \
     pip3 install --no-cache-dir -r requirements.txt || true
 
-
 # Final runtime stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
@@ -67,12 +66,16 @@ ENV PYTHONUNBUFFERED=1
 # Create workspace structure
 WORKDIR /workspace
 
-# Copy files from builder
+# Copy ALL ComfyUI files from builder
 COPY --from=builder /workspace/ComfyUI /workspace/ComfyUI
+
+# Copy Python packages
 COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
-# Create model directories
-RUN mkdir -p /workspace/ComfyUI/models/{checkpoints,text_encoder,clip_vision,vae} \
+# Ensure proper permissions and create required directories
+RUN chown -R root:root /workspace/ComfyUI && \
+    chmod -R 755 /workspace/ComfyUI && \
+    mkdir -p /workspace/ComfyUI/models/{checkpoints,text_encoder,clip_vision,vae} \
     /workspace/logs
 
 # Copy essential scripts
