@@ -19,7 +19,7 @@ fi
 ln -s /workspace/ComfyUI /ComfyUI
 
 echo "**** DOWNLOADING MODLES --- PLEASE WAIT ****"
-echo "**** DIHAN'S ALLINONE 2.0 TEMPLATE -- This take a little while, be patient ****"
+echo "**** DIHAN'S ALLINONE 2.0 TEMPLATE -- BE Patient ****"
 /download_models.sh
 
 cd /workspace/ComfyUI
