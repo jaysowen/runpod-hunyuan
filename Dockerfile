@@ -41,7 +41,7 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     pip install --no-cache-dir -r requirements.txt
 
 
-WORKDIR /workspace/ComfyUI/custom_nodes
+WORKDIR /ComfyUI/custom_nodes
 RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     if [ -f ComfyUI-Manager/requirements.txt ]; then pip install -r ComfyUI-Manager/requirements.txt; fi && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
