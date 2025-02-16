@@ -37,4 +37,6 @@ download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/
 # download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors" \
 #     "${MODEL_DIR}/checkpoints/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
 
+execute_script "/install_nodes.sh"
+
 echo "All models downloaded successfully"
