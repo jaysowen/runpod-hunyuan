@@ -18,7 +18,8 @@ fi
 # Then link /ComfyUI folder to /workspace so it's available in that familiar location as well
 ln -s /workspace/ComfyUI /ComfyUI
 
-echo "**** downloading models, please wait ****"
+echo "**** DOWNLOADING MODLES --- PLEASE WAIT ****"
+echo "**** DIHAN'S ALLINONE 2.0 TEMPLATE -- This take a little while, be patient ****"
 /download_models.sh
 
 cd /workspace/ComfyUI

@@ -10,9 +10,9 @@ download_if_not_exists() {
     local filename=$(basename "$dest")
     
     if [ ! -f "$dest" ]; then
-        echo "Downloading $filename..."
+        echo "DOWNLOADING --  $filename..."
         wget -q --show-progress "$url" -O "$dest"
-        echo "Downloaded $filename successfully"
+        echo "COMPLETED $filename successfully"
     else
         echo "$filename already exists, skipping download"
     fi
@@ -20,7 +20,10 @@ download_if_not_exists() {
 
 # Download models
 download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors" \
-    "${MODEL_DIR}/checkpoints/hunyuan_video_720_cfgdistill_bf16.safetensors"
+    "${MODEL_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"
+
+download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors" \
+    "${MODEL_DIR}/unet/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
 
 download_if_not_exists "https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors" \
     "${MODEL_DIR}/text_encoder/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
@@ -33,9 +36,6 @@ download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/
 
 download_if_not_exists "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors" \
     "${MODEL_DIR}/clip_vision/model.safetensors"
-
-download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors" \
-    "${MODEL_DIR}/checkpoints/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
 
 /install_nodes.sh
 

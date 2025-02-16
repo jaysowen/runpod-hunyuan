@@ -11,7 +11,7 @@ clone_if_not_exists() {
     local dir_name=$(basename "$repo_url" .git)
     
     if [ ! -d "$dir_name" ]; then
-        echo "Installing $dir_name..."
+        echo "INSTALLING --  $dir_name..."
         git clone "$repo_url"
         # Install requirements if they exist
         if [ -f "$dir_name/requirements.txt" ]; then
