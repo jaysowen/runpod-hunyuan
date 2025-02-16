@@ -27,8 +27,9 @@ RUN pip3 install --no-cache-dir \
     torchaudio \
     --extra-index-url https://download.pytorch.org/whl/cu124
 
-COPY --chmod=755 start.sh /start.sh
-COPY --chmod=755 script/comfyui-on-workspace.sh /comfyui-on-workspace.sh
+COPY --chmod=755 scripts/start.sh /start.sh
+COPY --chmod=755 scripts/comfyui-in-workspace.sh /comfyui-on-workspace.sh
+COPY --chmod=755 scripts/pre_start.sh /pre_start.sh
 
 # First clone ComfyUI fully
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
