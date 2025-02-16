@@ -27,11 +27,14 @@ RUN pip3 install --no-cache-dir \
     torchaudio \
     --extra-index-url https://download.pytorch.org/whl/cu124
 
+COPY --chmod=755 start.sh /start.sh
+COPY --chmod=755 comfyui-on-workspace.sh /comfyui-on-workspace.sh
+
 # First clone ComfyUI fully
-WORKDIR /workspace
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
     pip install --no-cache-dir -r requirements.txt
+    
 
 # # Then create model directories inside the existing ComfyUI directory
 # RUN cd /workspace/ComfyUI && \
@@ -80,8 +83,8 @@ COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/pytho
 RUN mkdir -p /workspace/logs
 
 # Copy essential scripts
-COPY scripts/start.sh scripts/pre_start.sh scripts/install_nodes.sh scripts/download_models.sh /
-RUN chmod +x /start.sh /pre_start.sh /install_nodes.sh /download_models.sh
+# COPY scripts/start.sh scripts/pre_start.sh scripts/install_nodes.sh scripts/download_models.sh /
+# RUN chmod +x /start.sh /pre_start.sh /install_nodes.sh /download_models.sh
 
 WORKDIR /workspace
 CMD ["/start.sh"]
