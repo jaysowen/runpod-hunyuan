@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 export PYTHONUNBUFFERED=1
 export PATH="/workspace/bin:$PATH"
 
@@ -18,7 +19,7 @@ fi
 ln -s /workspace/ComfyUI /ComfyUI
 
 echo "**** downloading models, please wait ****"
-execute_script "/download_models.sh"
+/download_models.sh
 
 cd /workspace/ComfyUI
 python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS &

@@ -45,8 +45,6 @@ COPY scripts/start.sh /start.sh
 COPY scripts/pre_start.sh /pre_start.sh
 COPY scripts/download_models.sh /download_models.sh
 COPY scripts/install_nodes.sh /install_nodes.sh
-
-
 # Make scripts executable
 RUN chmod +x /*.sh
 
