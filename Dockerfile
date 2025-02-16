@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     wget \
     openssh-server && \
+    triton \
+    sageattention \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
