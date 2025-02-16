@@ -32,6 +32,7 @@ COPY --chmod=755 scripts/comfyui-in-workspace.sh /comfyui-on-workspace.sh
 COPY --chmod=755 scripts/pre_start.sh /pre_start.sh
 
 # First clone ComfyUI fully
+WORKDIR /workspace
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
     pip install --no-cache-dir -r requirements.txt
