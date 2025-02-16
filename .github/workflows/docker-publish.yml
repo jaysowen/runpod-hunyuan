@@ -56,7 +56,42 @@ jobs:
             type=raw,value=${{ github.ref_name }}
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
 
-      - name: Build and push Docker image
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: debug-image:latest
+          build-args: |
+            PYTHON_VERSION=${{ vars.PYTHON_VERSION }}
+            TORCH_VERSION=${{ vars.TORCH_VERSION }}
+            CUDA_VERSION=${{ vars.CUDA_VERSION }}
+            COMFYUI_VERSION=${{ vars.COMFYUI_VERSION }}
+
+      - name: Debug - Inspect container
+        run: |
+          echo "Creating debug container..."
+          container_id=$(docker create debug-image:latest)
+          
+          echo "Container filesystem contents:"
+          docker export $container_id | tar -tv | grep -i comfyui
+          
+          echo "Copying files from container for inspection..."
+          docker cp $container_id:/workspace ./workspace-debug
+          
+          echo "Workspace contents:"
+          ls -la ./workspace-debug
+          
+          if [ -d "./workspace-debug/ComfyUI" ]; then
+            echo "ComfyUI directory contents:"
+            ls -la ./workspace-debug/ComfyUI
+          else
+            echo "ComfyUI directory not found!"
+          fi
+          
+          docker rm $container_id
+
+      - name: Build and push production image
         uses: docker/build-push-action@v5
         with:
           context: .
