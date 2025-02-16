@@ -89,5 +89,4 @@ COPY scripts/install_nodes.sh /install_nodes.sh
 # Make scripts executable
 RUN chmod +x /start.sh /pre_start.sh /download_models.sh /install_nodes.sh
 
-WORKDIR /workspace
 CMD ["/start.sh"]
