@@ -69,10 +69,19 @@ clone_if_not_exists "https://github.com/M1kep/ComfyLiterals.git"
 clone_if_not_exists "https://github.com/welltop-cn/ComfyUI-TeaCache.git"
 
 clone_if_not_exists "https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git"
-# clone_if_not_exists  "https://github.com/kijai/ComfyUI-KJNodes.git"
 clone_if_not_exists  "https://github.com/chengzeyi/Comfy-WaveSpeed.git"
-# clone_if_not_exists  "https://github.com/WASasquatch/was-node-suite-comfyui.git"
-# clone_if_not_exists  "ttps://github.com/rgthree/rgthree-comfy.git"
-# clone_if_not_exists  "https://github.com/ltdrdata/ComfyUI-Impact-Pack.git"
+clone_if_not_exists "https://github.com/ltdrdata/ComfyUI-Manager.git"
+clone_if_not_exists "https://github.com/yolain/ComfyUI-Easy-Use.git"
+clone_if_not_exists "https://github.com/crystian/ComfyUI-Crystools.git"
+clone_if_not_exists "https://github.com/kijai/ComfyUI-KJNodes.git"
+clone_if_not_exists "https://github.com/ltdrdata/ComfyUI-Impact-Pack.git"
+clone_if_not_exists "https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git"
+clone_if_not_exists "https://github.com/rgthree/rgthree-comfy.git"
+clone_if_not_exists "https://github.com/WASasquatch/was-node-suite-comfyui.git"
+
+
+# Copy workflow file and installation scripts
+# COPY AllinOneUltra1.2.json ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+# COPY AllinOneUltra1.3.json ComfyUI/user/default/workflows/AllinOneUltra1.3.json
 
 echo "All additional custom nodes installed successfully"
