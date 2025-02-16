@@ -59,6 +59,10 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui && \
     if [ -f was-node-suite-comfyui/requirements.txt ]; then pip install -r was-node-suite-comfyui/requirements.txt; fi
 
+# Copy workflow file and installation scripts
+COPY AllinOneUltra1.2.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.2.json
+COPY AllinOneUltra1.3.json /workspace/ComfyUI/user/default/workflows/AllinOneUltra1.3.json
+
 # Copy all scripts
 COPY scripts/start.sh /start.sh
 COPY scripts/pre_start.sh /pre_start.sh
