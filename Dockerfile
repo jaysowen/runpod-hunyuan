@@ -1,4 +1,4 @@
-# Build stage
+# Build stage for installing dependencies and ComfyUI
 FROM nvidia/cuda:12.4.0-devel-ubuntu22.04 as builder
 
 # Install Python and build dependencies
@@ -16,31 +16,36 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install Python packages
 RUN pip3 install --no-cache-dir \
+    torch==2.2.1 \
+    torchvision \
+    torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/cu124 && \
+    pip3 install --no-cache-dir \
     jupyterlab \
     jupyterlab_widgets \
     ipykernel \
     ipywidgets \
-    aiohttp && \
-    pip3 install --no-cache-dir \
-    torch==2.2.1 \
-    torchvision \
-    torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/cu124
+    aiohttp
 
-# Create workspace and install ComfyUI
-WORKDIR /workspace
-RUN git clone --depth=1 --single-branch --branch master \
-    https://github.com/comfyanonymous/ComfyUI.git && \
+# Clone and install ComfyUI
+WORKDIR /build
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
-    pip3 install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    mkdir -p models/{checkpoints,text_encoder,clip_vision,vae}
 
-# Install ComfyUI-Manager
-RUN cd /workspace/ComfyUI/custom_nodes && \
+# Clone and install ComfyUI-Manager
+RUN cd /build/ComfyUI/custom_nodes && \
     git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     cd ComfyUI-Manager && \
-    pip3 install --no-cache-dir -r requirements.txt || true
+    pip install --no-cache-dir -r requirements.txt
 
-# Final runtime stage
+# Download specific model file
+RUN cd /build/ComfyUI/models/vae && \
+    wget -q --show-progress \
+    https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
+
+# Runtime stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 # Install runtime dependencies
@@ -63,24 +68,20 @@ RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Create workspace structure
+# Create workspace and copy ComfyUI from builder
 WORKDIR /workspace
-
-# Copy ALL ComfyUI files from builder
-COPY --from=builder /workspace/ComfyUI /workspace/ComfyUI
-
-# Copy Python packages
+COPY --from=builder /build/ComfyUI ./ComfyUI
 COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
 
-# Ensure proper permissions and create required directories
-RUN chown -R root:root /workspace/ComfyUI && \
-    chmod -R 755 /workspace/ComfyUI && \
-    mkdir -p /workspace/ComfyUI/models/{checkpoints,text_encoder,clip_vision,vae} \
-    /workspace/logs
+# Create logs directory
+RUN mkdir -p /workspace/logs
 
-# Copy essential scripts
-COPY scripts/start.sh scripts/pre_start.sh scripts/install_nodes.sh scripts/download_models.sh /
-RUN chmod +x /start.sh /pre_start.sh /install_nodes.sh /download_models.sh
+# Create startup script
+RUN echo '#!/bin/bash\n\
+cd /workspace/ComfyUI\n\
+python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS\n\
+' > /start.sh && \
+    chmod +x /start.sh
 
 WORKDIR /workspace
 CMD ["/start.sh"]
