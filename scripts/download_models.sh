@@ -30,7 +30,7 @@ download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/
     "${MODEL_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"
 
 download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors" \
-    "${MODEL_DIR}/lora/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
+    "${MODEL_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
 
 download_if_not_exists "https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors" \
     "${MODEL_DIR}/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
