@@ -3,7 +3,7 @@
 # Ensure we have /workspace in all scenarios
 mkdir -p /workspace
 
-if [[ ! -d /workspace/ComfyUI ]]; then
+if [[ ! -d /workspace/ComfyUI/app ]]; then
 	# If we don't already have /workspace/ComfyUI, move it there
 	mv /ComfyUI /workspace
 else

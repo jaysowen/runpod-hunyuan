@@ -41,11 +41,12 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy all scripts
+COPY scripts/comfyui-in-workspace.sh /comfyui-on-workspace.sh
 COPY scripts/start.sh /start.sh
 COPY scripts/pre_start.sh /pre_start.sh
 COPY scripts/download_models.sh /download_models.sh
 COPY scripts/install_nodes.sh /install_nodes.sh
-COPY scripts/comfyui-in-workspace.sh /comfyui-on-workspace.sh
+
 
 # Make scripts executable
 RUN chmod +x /*.sh

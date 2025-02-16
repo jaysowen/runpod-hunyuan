@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PYTHONUNBUFFERED=1
-export PATH="/workspace/venv/bin:$PATH"
+export PATH="/workspace/bin:$PATH"
 
 echo "**** downloading models, please wait ****"
 /download_models.sh
