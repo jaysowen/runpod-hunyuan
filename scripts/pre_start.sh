@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 export PYTHONUNBUFFERED=1
 export PATH="/workspace/bin:$PATH"
 

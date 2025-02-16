@@ -19,23 +19,23 @@ download_if_not_exists() {
 }
 
 # Download models
-# download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors" \
-#     "${MODEL_DIR}/checkpoints/hunyuan_video_720_cfgdistill_bf16.safetensors"
+download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors" \
+    "${MODEL_DIR}/checkpoints/hunyuan_video_720_cfgdistill_bf16.safetensors"
 
-# download_if_not_exists "https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors" \
-#     "${MODEL_DIR}/text_encoder/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
+download_if_not_exists "https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors" \
+    "${MODEL_DIR}/text_encoder/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
 
-# download_if_not_exists "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors" \
-#     "${MODEL_DIR}/text_encoder/llava_llama3_fp8_scaled.safetensors"
+download_if_not_exists "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors" \
+    "${MODEL_DIR}/text_encoder/llava_llama3_fp8_scaled.safetensors"
 
 download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors" \
     "${MODEL_DIR}/vae/hunyuan_video_vae_bf16.safetensors"
 
-# download_if_not_exists "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors" \
-#     "${MODEL_DIR}/clip_vision/model.safetensors"
+download_if_not_exists "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors" \
+    "${MODEL_DIR}/clip_vision/model.safetensors"
 
-# download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors" \
-#     "${MODEL_DIR}/checkpoints/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
+download_if_not_exists "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors" \
+    "${MODEL_DIR}/checkpoints/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
 
 execute_script "/install_nodes.sh"
 
