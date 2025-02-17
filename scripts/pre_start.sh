@@ -18,8 +18,6 @@ fi
 # Then link /ComfyUI folder to /workspace so it's available in that familiar location as well
 ln -s /workspace/ComfyUI /ComfyUI
 
-echo "**** downloading models, please wait ****"
-/download_models.sh
+echo "**** DOWNLOAD - INSTALLING NODES ****"
+/install_nodes.sh
 
-cd /workspace/ComfyUI
-python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS &
