@@ -81,9 +81,3 @@ clone_if_not_exists "https://github.com/WASasquatch/was-node-suite-comfyui.git"
 
 
 echo "✨ All custom nodes processing completed successfully"
-
-# Only download models if specifically requested
-if [ "$1" != "install_only" ]; then
-    echo "**** DOWNLOADING MODELS ****"
-    /download_models.sh
-fi

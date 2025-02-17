@@ -20,7 +20,9 @@ fi
 ln -s /workspace/ComfyUI /ComfyUI
 
 echo "**** DOWNLOAD - INSTALLING NODES ****"
-# Call install nodes but don't start ComfyUI
 bash /install_nodes.sh install_only
+
+echo "**** DOWNLOAD -  ADDING MODELS ****"
+bash /download_models.sh
 
 echo "Pre-start completed successfully"
