@@ -18,11 +18,11 @@ RUN python3.10 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Set working directory
-WORKDIR /build
+WORKDIR /
 
 # Copy scripts first to ensure they're available
-COPY scripts/download_models.sh scripts/install_nodes.sh scripts/pre_start.sh scripts/start.sh /build/
-RUN chmod +x /build/*.sh
+COPY scripts/download_models.sh scripts/install_nodes.sh scripts/pre_start.sh scripts/start.sh /
+RUN chmod +x /*.sh
 
 # Clone ComfyUI and install base requirements
 ARG COMFYUI_VERSION=latest
@@ -30,6 +30,9 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
     if [ "$COMFYUI_VERSION" != "latest" ]; then git checkout ${COMFYUI_VERSION}; fi && \
     pip install --no-cache-dir -r requirements.txt
+
+# Copy workflow files directly to ComfyUI
+COPY workflows/AllinOneUltra1.2.json workflows/AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
 
 # Pre-install common custom node dependencies
 ARG TORCH_VERSION=2.2.1
@@ -45,7 +48,7 @@ RUN pip install --no-cache-dir \
     && pip cache purge
 
 # Clone and install frequently used custom nodes during build
-WORKDIR /build/ComfyUI/custom_nodes
+WORKDIR /ComfyUI/custom_nodes
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
     git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
@@ -69,15 +72,14 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 # Copy Python virtual environment and ComfyUI from builder
 COPY --from=builder /opt/venv /opt/venv
-COPY --from=builder /build/ComfyUI /ComfyUI
+COPY --from=builder /ComfyUI /ComfyUI
 
 # Copy scripts
-COPY --from=builder /build/*.sh /
+COPY --from=builder /*.sh /
 RUN chmod +x /*.sh
 
-# Create required directories
-RUN mkdir -p /workspace && \
-    mkdir -p /ComfyUI/models/{unet,text_encoders,clip_vision,vae}
+# Create workspace directory
+RUN mkdir -p /workspace
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
