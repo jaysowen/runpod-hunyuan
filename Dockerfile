@@ -1,6 +1,6 @@
 # Use multi-stage build to optimize size
-ARG PYTHON_VERSION
-ARG CUDA_VERSION
+ARG PYTHON_VERSION=3.10
+ARG CUDA_VERSION=12.4.0
 FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04 as builder
 
 # Install system dependencies
