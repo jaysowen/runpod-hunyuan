@@ -24,7 +24,4 @@ fi
 echo "**** DOWNLOAD - INSTALLING NODES ****"
 bash /install_nodes.sh install_only
 
-echo "**** DOWNLOAD -  ADDING MODELS ****"
-bash /download_models.sh
-
 echo "Pre-start completed successfully"
