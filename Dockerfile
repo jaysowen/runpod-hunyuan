@@ -52,7 +52,7 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     cd ../ComfyUI-Impact-Pack && pip install --no-cache-dir -r requirements.txt
 
 # Final stage
-FROM nvidia/cuda:${CUDA_VERSION}.0-runtime-ubuntu22.04
+FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
 
 # Copy Python virtual environment and ComfyUI from builder
 COPY --from=builder /opt/venv /opt/venv
