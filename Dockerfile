@@ -1,46 +1,52 @@
-ARG CUDA_VERSION=12.4.0
-FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
+FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
-# Install system dependencies
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.10 \
     python3-pip \
     git \
+    ffmpeg \
+    libgl1 \
+    libglib2.0-0 \
     wget \
     openssh-server \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    build-essential \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Set working directory
+# Install Python packages
+RUN pip install --no-cache-dir \
+    triton \
+    sageattention
+
+# Create symlinks for Python
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
+    ln -sf /usr/bin/python3.10 /usr/bin/python3
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+# Install Python packages
+RUN pip3 install --no-cache-dir \
+    jupyterlab \
+    jupyterlab_widgets \
+    ipykernel \
+    ipywidgets \
+    aiohttp && \
+    pip3 install --no-cache-dir \
+    torch==2.2.1 \
+    torchvision \
+    torchaudio \
+    --extra-index-url https://download.pytorch.org/whl/cu124
+
+# Clone ComfyUI to root directory
 WORKDIR /
-
-# Copy scripts
-COPY scripts/download_models.sh scripts/install_nodes.sh scripts/pre_start.sh scripts/start.sh /
-RUN chmod +x /*.sh
-
-# Clone ComfyUI and install base requirements
-ARG COMFYUI_VERSION=latest
-RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git && \
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
-    if [ "$COMFYUI_VERSION" != "latest" ]; then git checkout ${COMFYUI_VERSION}; fi && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy workflow files and create necessary directories
-RUN mkdir -p /ComfyUI/user/default/workflows /ComfyUI/custom_nodes
-COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
-
-# Pre-install dependencies
-ARG TORCH_VERSION=2.2.1
-RUN pip install --no-cache-dir \
-    opencv-python \
-    numpy \
-    torch==${TORCH_VERSION} \
-    torchvision \
-    pillow \
-    transformers \
-    scipy \
-    requests \
-    && pip cache purge
 
 # Install core custom nodes during build
 WORKDIR /ComfyUI/custom_nodes
@@ -58,16 +64,15 @@ RUN cd ComfyUI-Manager && pip install --no-cache-dir -r requirements.txt || true
     cd ../ComfyUI-VideoHelperSuite && pip install --no-cache-dir -r requirements.txt || true && \
     pip cache purge
 
-# Create workspace directory
-WORKDIR /
-RUN mkdir -p /workspace
+# Copy all scripts
+COPY scripts/start.sh /start.sh
+COPY scripts/pre_start.sh /pre_start.sh
+COPY scripts/download_models.sh /download_models.sh
+COPY scripts/install_nodes.sh /install_nodes.sh
+# Make scripts executable
+RUN chmod +x /*.sh
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PATH="/workspace/bin:$PATH" \
-    DEBIAN_FRONTEND=noninteractive
-
-# Expose ports
-EXPOSE 8188 8888 22
+# Create workspace and logs directory
+RUN mkdir -p /workspace/logs
 
 CMD ["/start.sh"]
