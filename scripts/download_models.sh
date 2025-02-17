@@ -42,7 +42,11 @@ download_with_verification() {
     fi
 
     echo "⬇️ Downloading $filename..."
-    wget -q --show-progress "$url" -O "$temp_dest"
+    wget -q --show-progress "$url" -O "$temp_dest" || {
+        echo "❌ Failed to download $filename"
+        rm -f "$temp_dest"
+        return 1
+    }
     
     if [ -z "$sha256" ] || verify_checksum "$temp_dest" "$sha256"; then
         mv "$temp_dest" "$dest"
@@ -60,6 +64,7 @@ download_parallel() {
     local dest=$2
     local sha256=$3
     
+    # Start download in background
     download_with_verification "$url" "$dest" "$sha256" &
     
     ((current_parallel++))
@@ -70,7 +75,7 @@ download_parallel() {
     fi
 }
 
-# Declare model arrays with their details
+# Define model arrays with fixed formatting
 declare -A UNET_MODELS=(
     ["hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
     ["hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
@@ -89,40 +94,21 @@ declare -A CLIP_VISION_MODELS=(
     ["clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
 )
 
-echo "🚀 Starting model downloads..."
+echo "🚀 Starting model downloads... Some files are 25GB so this will take a while"
 
-# Download UNET Models
-echo "⭐ Processing UNET Models..."
-for model in "${!UNET_MODELS[@]}"; do
-    download_parallel "${UNET_MODELS[$model]}" "${MODEL_DIR}/unet/$model"
+# Download each model type with proper error handling
+for model_type in "unet" "text_encoders" "vae" "clip_vision"; do
+    echo "⭐ Processing ${model_type} Models..."
+    declare -n model_array="${model_type^^}_MODELS"
+    
+    for model in "${!model_array[@]}"; do
+        download_parallel "${model_array[$model]}" "${MODEL_DIR}/${model_type}/$model"
+    done
+    wait
+    current_parallel=0
 done
-wait
-current_parallel=0
 
-# Download Text Encoders Models
-echo "📝 Processing Text Encoders Models..."
-for model in "${!TEXT_ENCODERS_MODELS[@]}"; do
-    download_parallel "${TEXT_ENCODERS_MODELS[$model]}" "${MODEL_DIR}/text_encoders/$model"
-done
-wait
-current_parallel=0
-
-# Download VAE Models
-echo "🎨 Processing VAE Models..."
-for model in "${!VAE_MODELS[@]}"; do
-    download_parallel "${VAE_MODELS[$model]}" "${MODEL_DIR}/vae/$model"
-done
-wait
-current_parallel=0
-
-# Download CLIP Vision Models
-echo "👁️ Processing CLIP Vision Models..."
-for model in "${!CLIP_VISION_MODELS[@]}"; do
-    download_parallel "${CLIP_VISION_MODELS[$model]}" "${MODEL_DIR}/clip_vision/$model"
-done
-wait
-
-# Verify all downloads
+# Final verification
 echo "🔍 Verifying all downloads..."
 verify_all_downloads() {
     local all_valid=true
@@ -143,11 +129,16 @@ verify_all_downloads() {
         fi
     done
     
-    return $all_valid
+    if [ "$all_valid" = true ]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 if verify_all_downloads; then
     echo "✨ All models downloaded and verified successfully - NOW GO MAKE SOMETHING COOL"
+    exit 0
 else
     echo "⚠️ Some models may need to be re-downloaded"
     exit 1
