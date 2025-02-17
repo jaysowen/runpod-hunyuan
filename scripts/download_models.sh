@@ -2,7 +2,7 @@
 set -e
 
 MODEL_DIR="/workspace/ComfyUI/models"
-mkdir -p ${MODEL_DIR}/{checkpoints,text_encoder,clip_vision,vae}
+mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae}
 
 download_if_not_exists() {
     local url=$1
