@@ -19,27 +19,11 @@ jobs:
       packages: write
 
     steps:
-      - name: Free disk space before build
-        run: |
-          echo "Disk space before cleanup:"
-          df -h
-          sudo swapoff -a
-          sudo rm -rf /swapfile /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
-          sudo apt-get clean
-          sudo docker system prune -af
-          docker builder prune -af
-          echo "Disk space after cleanup:"
-          df -h
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            image=moby/buildkit:latest
-          buildkitd-flags: --debug
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -51,64 +35,21 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: dihan/hunyuan-runpod
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=${{ github.ref_name }}
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-          tags: debug-image:latest
-          build-args: |
-            PYTHON_VERSION=${{ vars.PYTHON_VERSION }}
-            TORCH_VERSION=${{ vars.TORCH_VERSION }}
-            CUDA_VERSION=${{ vars.CUDA_VERSION }}
-            COMFYUI_VERSION=${{ vars.COMFYUI_VERSION }}
-
-      - name: Debug - Inspect container
-        run: |
-          echo "Creating debug container..."
-          container_id=$(docker create debug-image:latest)
-          
-          echo "Container filesystem contents:"
-          docker export $container_id | tar -tv | grep -i comfyui
-          
-          echo "Copying files from container for inspection..."
-          docker cp $container_id:/workspace ./workspace-debug
-          
-          echo "Workspace contents:"
-          ls -la ./workspace-debug
-          
-          if [ -d "./workspace-debug/ComfyUI" ]; then
-            echo "ComfyUI directory contents:"
-            ls -la ./workspace-debug/ComfyUI
-          else
-            echo "ComfyUI directory not found!"
-          fi
-          
-          docker rm $container_id
-
-      - name: Build and push production image
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            PYTHON_VERSION=${{ vars.PYTHON_VERSION }}
-            TORCH_VERSION=${{ vars.TORCH_VERSION }}
-            CUDA_VERSION=${{ vars.CUDA_VERSION }}
-            COMFYUI_VERSION=${{ vars.COMFYUI_VERSION }}
-          cache-from: |
-            type=gha,scope=${{ github.workflow }}
-            type=registry,ref=dihan/hunyuan-runpod:buildcache
-          cache-to: |
-            type=gha,mode=max,scope=${{ github.workflow }}
-            type=registry,ref=dihan/hunyuan-runpod:buildcache,mode=max
-          platforms: linux/amd64
-          outputs: type=docker
-          provenance: false
+            PYTHON_VERSION=3.12.1
+            TORCH_VERSION=2.2.1
+            CUDA_VERSION=12.4.0
+            COMFYUI_VERSION=latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
