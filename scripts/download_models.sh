@@ -89,7 +89,7 @@ declare -A CLIP_VISION_MODELS=(
     ["clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
 )
 
-echo "🚀 Starting model downloads..."
+echo "🚀 Starting model downloads... Some files are 25GB so this will take while"
 
 # Download UNET Models
 echo "⭐ Processing UNET Models..."
