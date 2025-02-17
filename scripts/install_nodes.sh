@@ -84,4 +84,10 @@ clone_if_not_exists "https://github.com/WASasquatch/was-node-suite-comfyui.git"
 # COPY AllinOneUltra1.2.json ComfyUI/user/default/workflows/AllinOneUltra1.2.json
 # COPY AllinOneUltra1.3.json ComfyUI/user/default/workflows/AllinOneUltra1.3.json
 
-echo "All additional custom nodes installed successfully"
+echo "✨ All custom nodes processing completed successfully"
+
+cd /workspace/ComfyUI
+python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS &
+
+echo "**** DOWNLOADING MODELS ****"
+/download_models.sh
