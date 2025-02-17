@@ -1,23 +1,25 @@
 #!/bin/bash
-
 set -e  # Exit on error
 
 export PYTHONUNBUFFERED=1
 export PATH="/workspace/bin:$PATH"
 
-# Ensure we have /workspace in all scenarios
+# Ensure we have /workspace
 mkdir -p /workspace
 
+# Handle ComfyUI directory
 if [[ ! -d /workspace/ComfyUI ]]; then
-    # If we don't already have /workspace/ComfyUI, move it there
-    mv /ComfyUI /workspace
-else
-    # otherwise delete the default ComfyUI folder which is always re-created on pod start from the Docker
-    rm -rf /ComfyUI
+    if [[ -d /ComfyUI ]]; then
+        mv /ComfyUI /workspace/
+    else
+        git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI
+    fi
 fi
 
-# Then link /ComfyUI folder to /workspace so it's available in that familiar location as well
-ln -s /workspace/ComfyUI /ComfyUI
+# Create symlink if it doesn't exist and isn't already linked
+if [[ ! -L /ComfyUI ]] && [[ ! -d /ComfyUI ]]; then
+    ln -s /workspace/ComfyUI /ComfyUI
+fi
 
 echo "**** DOWNLOAD - INSTALLING NODES ****"
 bash /install_nodes.sh install_only
