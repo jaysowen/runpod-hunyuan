@@ -5,17 +5,11 @@ FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04 as builder
 # Install system dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.10 \
-    python3.10-venv \
     python3-pip \
     git \
     wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Create and activate virtual environment
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3.10 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Set working directory
 WORKDIR /
@@ -32,9 +26,9 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy workflow files directly to ComfyUI
-COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
+COPY workflows/AllinOneUltra1.2.json workflows/AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
 
-# Pre-install common custom node dependencies
+# Pre-install common dependencies
 ARG TORCH_VERSION=2.2.1
 RUN pip install --no-cache-dir \
     opencv-python \
@@ -70,8 +64,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Python virtual environment and ComfyUI from builder
-COPY --from=builder /opt/venv /opt/venv
+# Copy ComfyUI from builder
 COPY --from=builder /ComfyUI /ComfyUI
 
 # Copy scripts
@@ -83,8 +76,7 @@ RUN mkdir -p /workspace
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
-    PATH="/opt/venv/bin:/workspace/bin:$PATH" \
-    VIRTUAL_ENV=/opt/venv \
+    PATH="/workspace/bin:$PATH" \
     DEBIAN_FRONTEND=noninteractive
 
 # Expose ports
