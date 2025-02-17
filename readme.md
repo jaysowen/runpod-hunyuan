@@ -1,4 +1,10 @@
-# Hunyuan Video Generation on RunPod 2.0 - Setup Guide
+# Hunyuan Video Generation on RunPod - BASIC
+
+Use the allinone2.0 for full Ultra 1.3 Workflow
+
+https://runpod.io/console/deploy?template=ni7h67zrdk&ref=0eayrc3z
+
+----------------------------------------------------------------
 
 This guide will walk you through setting up and running the Hunyuan Video Generation environment on RunPod.
 
