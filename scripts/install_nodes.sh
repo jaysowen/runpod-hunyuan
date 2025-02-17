@@ -80,10 +80,6 @@ clone_if_not_exists "https://github.com/rgthree/rgthree-comfy.git"
 clone_if_not_exists "https://github.com/WASasquatch/was-node-suite-comfyui.git"
 
 
-# Copy workflow file and installation scripts
-# COPY AllinOneUltra1.2.json ComfyUI/user/default/workflows/AllinOneUltra1.2.json
-# COPY AllinOneUltra1.3.json ComfyUI/user/default/workflows/AllinOneUltra1.3.json
-
 echo "✨ All custom nodes processing completed successfully"
 
 cd /workspace/ComfyUI

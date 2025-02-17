@@ -86,7 +86,7 @@ declare -A VAE_MODELS=(
 )
 
 declare -A CLIP_VISION_MODELS=(
-    ["model.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
+    ["clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
 )
 
 echo "🚀 Starting model downloads..."
