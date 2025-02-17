@@ -26,7 +26,7 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy workflow files directly to ComfyUI
-COPY workflows/AllinOneUltra1.2.json workflows/AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
+COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
 
 # Pre-install common dependencies
 ARG TORCH_VERSION=2.2.1

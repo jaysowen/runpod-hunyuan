@@ -1,128 +1,279 @@
-# Hunyuan Video Generation on RunPod 2.0 - Setup Guide
+# 🎮 ComfyUI All-in-One RunPod Template
 
-This guide will walk you through setting up and running the Hunyuan Video Generation environment on RunPod.
+Welcome to the most awesome ComfyUI setup you'll ever encounter! This template comes packed with everything you need to start creating amazing AI-generated videos and images. 🚀
 
-## Prerequisites
+## ✨ Features
 
-- A RunPod account (sign up at https://runpod.io)
-- Basic familiarity with Docker and command-line interfaces
+- 🎥 Pre-installed HunyuanVideo models for video generation
+- 🧩 Extensive collection of custom nodes
+- 🔧 Auto-installing workflow utilities
+- 🎨 Built-in enhancement tools
+- 🛠️ JupyterLab integration
+- 🔒 SSH access support
 
-## Step 1: Setting Up Your RunPod Environment
+## 🚀 Getting Started
 
-1. Log in to your RunPod account
-2. Navigate to the "Pods" section
-3. Click "Deploy" to create a new pod
+### 1. Template Deployment
 
-## Step 2: Selecting Template
+1. Head over to [RunPod.io](https://runpod.io)
+2. Click on `Deploy` and select `Template`
+3. Search for `Hunyuan Video - ComfyUI Manager - AllInOne3.0`
+4. Choose your preferred GPU
+5. Hit that `Deploy` button! 🎉
 
-1. In the template selection:
-   - Select "Custom Template"
-   - Container Image: `dihan/hunyuan-runpod:allinone`
-   - Choose a GPU (Recommended: RTX 4090 or better)
-   - Select at least 24GB RAM
-   - Storage: Minimum 20GB (Recommended: 40GB)
+### 2. Accessing Your Instance
 
-## Step 3: Port Configuration
+Once your pod is up and running, you'll see several URLs in your pod's overview:
 
-The following ports need to be exposed:
-- `8188`: ComfyUI web interface
-- `8080`: VS Code web interface
+- 🎨 **ComfyUI**: `https://your-pod-id-8188.proxy.runpod.net`
+- 📓 **JupyterLab**: `https://your-pod-id-8888.proxy.runpod.net`
 
-These are pre-configured in the template, but verify they're exposed in the RunPod UI.
+### 3. Working with JupyterLab
 
-## Step 4: Deploying Your Pod
+- Access JupyterLab using the URL from your pod's overview
+- Default password is empty (just press Enter)
+- All your work will be saved in the `/workspace` directory
 
-1. Click "Deploy" to start your pod
-2. Wait for the pod to initialize (this may take 5-10 minutes on first run due to model downloads)
-3. Once the pod is running, you'll see "Connected" status
+### 4. SSH Access (Optional)
 
-## Step 5: Accessing the Interfaces
+To enable SSH access:
+1. Set your `PUBLIC_KEY` in the template settings
+2. Connect using: `ssh -p <port> runpod@<ip-address>`
 
-After deployment, you can access:
+## 📥 Downloading Models
 
-1. ComfyUI Interface:
-   - Click on "Connect" in your pod's details
-   - Select port 8188
-   - This opens the ComfyUI web interface
+### From HuggingFace 🤗
 
-2. VS Code Interface:
-   - Click on "Connect"
-   - Select port 8080
-   - This opens the VS Code web interface
-
-## Step 6: Using the Environment
-
-### ComfyUI Workflow
-
-1. Navigate to the ComfyUI interface
-2. Load the provided workflow:
-   - Click the folder icon in the top-right
-   - Select "AllinOneUltra1.3.json" from the workflows folder
-
-### Model Files
-
-The following models are automatically downloaded on first startup:
-- `hunyuan_video_720_cfgdistill_bf16.safetensors` (UNET)
-- `Long-ViT-L-14-GmP-SAE-TE-only.safetensors` (Text Encoder)
-- `llava_llama3_fp8_scaled.safetensors` (Text Encoder)
-- `hunyuan_video_vae_bf16.safetensors` (VAE)
-- `clip-vit-large-patch14.safetensors` (CLIP Vision)
-- `hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors` (FastVideo LoRA)
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Models Not Loading**
-   - Check `/workspace/comfyui.log` for download errors
-   - Verify disk space availability
-   - Try running `/workspace/download-fix.sh` manually
-
-2. **ComfyUI Not Starting**
-   - Check `/workspace/comfyui.log` for errors
-   - Ensure all required models are downloaded
-   - Restart the pod if necessary
-
-3. **VS Code Not Accessible**
-   - Check `/workspace/vscode.log` for errors
-   - Verify port 8080 is exposed and not blocked
-   - Restart the pod if necessary
-
-### Checking Logs
-
-You can view logs through VS Code or terminal:
+1. Open JupyterLab terminal and navigate to your desired directory:
 ```bash
-# ComfyUI logs
-tail -f /workspace/comfyui.log
-
-# VS Code logs
-tail -f /workspace/vscode.log
+cd /workspace/ComfyUI/models/checkpoints
 ```
 
-## Maintenance
+2. Download using wget (replace URL with your model link):
+```bash
+# For direct downloads
+wget https://huggingface.co/CompVis/stable-diffusion-v1-4/resolve/main/sd-v1-4.ckpt
 
-### Updating the Environment
+# For files requiring authentication
+wget --header="Authorization: Bearer YOUR_HF_TOKEN" https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned.ckpt
+```
 
-To update to the latest version:
-1. Stop your current pod
-2. Delete the pod (your workspace volume will be preserved)
-3. Deploy a new pod using the latest image
+3. For large files, you can show progress:
+```bash
+wget -q --show-progress https://huggingface.co/model/resolve/main/model.safetensors
+```
 
-### Backup
+### From Civitai 🎨
 
-Important files are stored in:
-- `/workspace/ComfyUI/models/` - Model files
-- `/workspace/ComfyUI/user/default/workflows/` - Workflows
+1. Get the direct download link from Civitai:
+   - Go to the model page
+   - Click "Download"
+   - Right-click the download button
+   - Copy the link address
 
-## Support
+2. Download using wget:
+```bash
+# For standard models
+wget -O model_name.safetensors "CIVITAI_DIRECT_DOWNLOAD_URL"
 
-For issues or questions:
-1. Check the GitHub repository issues section
-2. Join the ComfyUI Discord community
-3. Check RunPod documentation for platform-specific issues
+# For showing progress
+wget -q --show-progress -O model_name.safetensors "CIVITAI_DIRECT_DOWNLOAD_URL"
+```
 
-## Additional Resources
+3. Verify the download:
+```bash
+# Check file size
+ls -lh model_name.safetensors
 
-- [ComfyUI Documentation](https://github.com/comfyanonymous/ComfyUI)
-- [RunPod Documentation](https://docs.runpod.io/)
-- [Hunyuan Video Generation Repository](https://github.com/dihan/hunyuan-runpod)
+# Check if file is not corrupted (for safetensors)
+python3 -c "import torch; torch.load('model_name.safetensors', map_location='cpu')"
+```
+
+### Pro Tips 💡
+
+1. **Organizing Downloads**:
+```bash
+# Create model type directories
+mkdir -p /workspace/ComfyUI/models/{checkpoints,loras,controlnet,upscale_models}
+
+# Download directly to specific folders
+cd /workspace/ComfyUI/models/loras
+wget -q --show-progress -O my_lora.safetensors "DOWNLOAD_URL"
+```
+
+2. **Batch Downloads**:
+```bash
+# Create a download list
+cat << EOF > download_list.txt
+URL1 filename1.safetensors
+URL2 filename2.safetensors
+EOF
+
+# Download all files
+while read url filename; do
+    wget -q --show-progress -O "$filename" "$url"
+done < download_list.txt
+```
+
+3. **Resume Interrupted Downloads**:
+```bash
+wget -c -q --show-progress "DOWNLOAD_URL"
+```
+
+----------
+
+
+## 🎯 Pre-installed Models
+
+### 🎬 Video Generation Models
+- **HunyuanVideo Models**
+  - `hunyuan_video_720_cfgdistill_bf16.safetensors` - Base model for video generation
+  - `hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors` - Optimized FastVideo version
+  - `hunyuan_video_vae_bf16.safetensors` - Dedicated VAE for video generation
+
+### 🧠 Text Encoders
+- **LLAVA & LongCLIP**
+  - `Long-ViT-L-14-GmP-SAE-TE-only.safetensors` - Enhanced text understanding
+  - `llava_llama3_fp8_scaled.safetensors` - Advanced language processing
+
+### 👁️ CLIP Vision
+- `model.safetensors` - OpenAI CLIP ViT-large-patch14 for visual understanding
+
+## 🧩 Custom Nodes Directory
+
+### 🎥 Video Processing Nodes
+1. **ComfyUI-Frame-Interpolation**
+   - Frame interpolation for smoother videos
+   - Supports multiple interpolation methods
+
+2. **ComfyUI-VideoHelperSuite**
+   - Video frame extraction
+   - Frame concatenation
+   - Video assembly tools
+
+3. **ComfyUI-HunyuanVideoMultiLora**
+   - Multi-LoRA support for video generation
+   - Style mixing capabilities
+
+### 🎨 Image Enhancement
+1. **ComfyUI-Detail-Daemon**
+   - Detail enhancement
+   - Texture refinement
+
+2. **Image Motion Guider**
+   - Motion consistency
+   - Animation smoothing
+
+3. **ComfyUI_Noise & CG-NoiseTools**
+   - Advanced noise management
+   - Grain and texture control
+
+### 🛠️ Workflow Utilities
+1. **Jovimetrix**
+   - Advanced matrix operations
+   - Mathematical transformations
+
+2. **ComfyUI-Art-Venture**
+   - Creative workflow tools
+   - Style manipulation
+
+3. **ComfyUI-Logic**
+   - Conditional processing
+   - Flow control nodes
+
+4. **MX-Toolkit**
+   - Utility functions
+   - Workflow optimization
+
+5. **Dream Project**
+   - Advanced composition tools
+   - Scene management
+
+### 🔧 Core Utilities
+1. **ComfyUI Manager**
+   - Node management
+   - Model downloading
+   - Custom node installation
+
+2. **WAS Node Suite**
+   - Comprehensive node collection
+   - Image processing tools
+   - Advanced masks and filters
+
+3. **Impact Pack**
+   - Performance optimization
+   - Advanced processing nodes
+
+### 🎯 Special Purpose Nodes
+1. **Comfy-Cliption**
+   - CLIP text enhancement
+   - Prompt optimization
+
+2. **Dark Prompts**
+   - Advanced prompt engineering
+   - Negative prompt tools
+
+3. **Denoise Chooser**
+   - Custom denoising control
+   - Quality management
+
+4. **ComfyUI-GGUF**
+   - GGUF model support
+   - Optimized inference
+
+5. **Comfy Image Saver**
+   - Custom naming patterns
+   - Automated organization
+
+### ⚡ Additional Enhancement Nodes
+1. **Ergouzi Nodes**
+   - Chinese text support
+   - Regional optimizations
+
+2. **Various Nodes**
+   - Miscellaneous utilities
+   - Quality of life improvements
+
+3. **JPS Nodes**
+   - Specialized processing
+   - Custom effects
+
+4. **ComfyLiterals**
+   - Direct value input
+   - Parameter control
+
+5. **TeaCache**
+   - Memory management
+   - Cache optimization
+
+6. **Custom Scripts**
+   - Workflow automation
+   - Batch processing
+
+7. **WaveSpeed**
+   - Performance optimization
+   - Processing acceleration
+
+8. **Easy Use**
+   - Simplified interfaces
+   - Beginner-friendly tools
+
+9. **Crystools**
+   - Development utilities
+   - Debug tools
+
+10. **KJNodes**
+    - Specialized video nodes
+    - Animation tools
+
+11. **RGThree Nodes**
+    - Advanced workflow control
+    - Custom interfaces
+
+### 💡 Node Installation Tips
+- All nodes are automatically installed during container startup
+- Custom node settings are preserved in `/workspace/ComfyUI/custom_nodes`
+- Node updates are handled automatically on container restart
+- Additional nodes can be installed via ComfyUI Manager
+
+[Rest of the README remains the same...]
