@@ -25,7 +25,8 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git && \
     if [ "$COMFYUI_VERSION" != "latest" ]; then git checkout ${COMFYUI_VERSION}; fi && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy workflow files
+# Copy workflow files and create necessary directories
+RUN mkdir -p /ComfyUI/user/default/workflows /ComfyUI/custom_nodes
 COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
 
 # Pre-install dependencies
@@ -42,20 +43,23 @@ RUN pip install --no-cache-dir \
     && pip cache purge
 
 # Install core custom nodes during build
-RUN cd /ComfyUI/custom_nodes && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
+WORKDIR /ComfyUI/custom_nodes
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
     git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
     git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    cd ComfyUI-Manager && pip install --no-cache-dir -r requirements.txt && \
-    cd ../was-node-suite-comfyui && pip install --no-cache-dir -r requirements.txt && \
-    cd ../ComfyUI-Impact-Pack && pip install --no-cache-dir -r requirements.txt && \
-    cd ../ComfyUI-Frame-Interpolation && pip install --no-cache-dir -r requirements.txt && \
-    cd ../ComfyUI-VideoHelperSuite && pip install --no-cache-dir -r requirements.txt && \
+    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+
+# Install node requirements
+RUN cd ComfyUI-Manager && pip install --no-cache-dir -r requirements.txt || true && \
+    cd ../was-node-suite-comfyui && pip install --no-cache-dir -r requirements.txt || true && \
+    cd ../ComfyUI-Impact-Pack && pip install --no-cache-dir -r requirements.txt || true && \
+    cd ../ComfyUI-Frame-Interpolation && pip install --no-cache-dir -r requirements.txt || true && \
+    cd ../ComfyUI-VideoHelperSuite && pip install --no-cache-dir -r requirements.txt || true && \
     pip cache purge
 
 # Create workspace directory
+WORKDIR /
 RUN mkdir -p /workspace
 
 # Set environment variables
