@@ -82,8 +82,11 @@ clone_if_not_exists "https://github.com/WASasquatch/was-node-suite-comfyui.git"
 
 echo "✨ All custom nodes processing completed successfully"
 
-cd /workspace/ComfyUI
-python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS &
+# Only start ComfyUI and download models if not in install_only mode
+if [ "$1" != "install_only" ]; then
+    cd /workspace/ComfyUI
+    python main.py --listen --port 8188 --enable-cors-header --verbose $COMFYUI_EXTRA_ARGS &
 
-echo "**** DOWNLOADING MODELS ****"
-/download_models.sh
+    echo "**** DOWNLOADING MODELS ****"
+    /download_models.sh
+fi

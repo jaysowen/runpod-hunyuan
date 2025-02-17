@@ -147,7 +147,7 @@ verify_all_downloads() {
 }
 
 if verify_all_downloads; then
-    echo "✨ All models downloaded and verified successfully"
+    echo "✨ All models downloaded and verified successfully - NOW GO MAKE SOMETHING COOL"
 else
     echo "⚠️ Some models may need to be re-downloaded"
     exit 1
