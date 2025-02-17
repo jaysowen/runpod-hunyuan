@@ -1,54 +1,74 @@
-FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
+# Use multi-stage build to optimize size
+ARG PYTHON_VERSION
+ARG CUDA_VERSION
+FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04 as builder
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.10 \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python${PYTHON_VERSION} \
     python3-pip \
     git \
-    ffmpeg \
-    libgl1 \
-    libglib2.0-0 \
     wget \
-    openssh-server && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+    && rm -rf /var/lib/apt/lists/*
 
-# Create symlinks for Python
-RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
-    ln -sf /usr/bin/python3.10 /usr/bin/python3
+# Set working directory
+WORKDIR /build
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
-
-# Install Python packages
-RUN pip3 install --no-cache-dir \
-    jupyterlab \
-    jupyterlab_widgets \
-    ipykernel \
-    ipywidgets \
-    aiohttp && \
-    pip3 install --no-cache-dir \
-    torch==2.2.1 \
-    torchvision \
-    torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/cu124
-
-# Clone ComfyUI to root directory
-WORKDIR /
+# Clone ComfyUI and install base requirements
+ARG COMFYUI_VERSION
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
+    git checkout ${COMFYUI_VERSION} && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy all scripts
-COPY scripts/start.sh /start.sh
-COPY scripts/pre_start.sh /pre_start.sh
-COPY scripts/download_models.sh /download_models.sh
-COPY scripts/install_nodes.sh /install_nodes.sh
-# Make scripts executable
+# Pre-install common custom node dependencies
+RUN pip install --no-cache-dir \
+    opencv-python \
+    numpy \
+    torch \
+    torchvision \
+    pillow \
+    transformers \
+    scipy \
+    requests
+
+# Clone and install frequently used custom nodes during build
+WORKDIR /build/ComfyUI/custom_nodes
+RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    cd ComfyUI-Manager && pip install --no-cache-dir -r requirements.txt && \
+    cd ../was-node-suite-comfyui && pip install --no-cache-dir -r requirements.txt && \
+    cd ../ComfyUI-Impact-Pack && pip install --no-cache-dir -r requirements.txt
+
+# Final stage
+FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
+
+# Copy Python environment and ComfyUI from builder
+COPY --from=builder /usr/local/lib/python3.8 /usr/local/lib/python3.8
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /build/ComfyUI /ComfyUI
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    python${PYTHON_VERSION} \
+    python3-pip \
+    git \
+    wget \
+    openssh-server \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy scripts
+COPY download_models.sh install_nodes.sh pre_start.sh start.sh /
 RUN chmod +x /*.sh
 
-# Create workspace and logs directory
-RUN mkdir -p /workspace/logs
+# Create required directories
+# RUN mkdir -p /workspace && \
+#     mkdir -p /ComfyUI/models/{unet,text_encoder,clip_vision,vae}
+
+EXPOSE 8188 8888 22
+
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/workspace/bin:$PATH"
 
 CMD ["/start.sh"]
