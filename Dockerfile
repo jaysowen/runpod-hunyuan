@@ -1,7 +1,7 @@
 # Use multi-stage build to optimize size
 ARG PYTHON_VERSION
 ARG CUDA_VERSION
-FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04 as builder
+FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 as builder
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -42,7 +42,7 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
     cd ../ComfyUI-Impact-Pack && pip install --no-cache-dir -r requirements.txt
 
 # Final stage
-FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
+FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 # Copy Python environment and ComfyUI from builder
 COPY --from=builder /usr/local/lib/python3.8 /usr/local/lib/python3.8
