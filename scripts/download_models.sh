@@ -152,6 +152,3 @@ else
     echo "⚠️ Some models may need to be re-downloaded"
     exit 1
 fi
-
-# Run the node installation script
-/install_nodes.sh
