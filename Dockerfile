@@ -49,20 +49,23 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
 
 # Install core custom nodes during build
 WORKDIR /ComfyUI/custom_nodes
-RUN for repo in \
-    "https://github.com/ltdrdata/ComfyUI-Manager.git" \
-    "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git" \
-    "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git" \
-    "https://github.com/WASasquatch/was-node-suite-comfyui.git" \
-    "https://github.com/ltdrdata/ComfyUI-Impact-Pack.git"; \
-    do \
-        dir_name=$(basename $repo .git); \
-        git clone --depth 1 $repo && \
-        if [ -f "$dir_name/requirements.txt" ]; then \
-            pip install --no-cache-dir -r "$dir_name/requirements.txt" || true; \
-        fi; \
-    done && \
-    pip cache purge
+RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+
+# Install requirements for each custom node
+RUN cd ComfyUI-Manager && \
+    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
+    cd ../ComfyUI-Frame-Interpolation && \
+    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
+    cd ../ComfyUI-VideoHelperSuite && \
+    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
+    cd ../was-node-suite-comfyui && \
+    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
+    cd ../ComfyUI-Impact-Pack && \
+    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi
 
 # Copy all scripts
 COPY scripts/start.sh /start.sh
