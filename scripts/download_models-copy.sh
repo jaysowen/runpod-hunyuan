@@ -2,10 +2,10 @@
 set -e
 
 MODEL_DIR="/workspace/ComfyUI/models"
-mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae}
+mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
 
 # Maximum number of parallel downloads
-MAX_PARALLEL=3
+MAX_PARALLEL=2
 current_parallel=0
 
 # Function to verify file integrity using SHA256
@@ -78,6 +78,9 @@ download_parallel() {
 # Define model arrays with fixed formatting
 declare -A UNET_MODELS=(
     ["hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
+)
+
+declare -A LORAS_MODELS=(
     ["hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
 )
 
@@ -97,7 +100,7 @@ declare -A CLIP_VISION_MODELS=(
 echo "🚀 Starting model downloads..."
 
 # Download each model type with proper error handling
-for model_type in "unet" "text_encoders" "vae" "clip_vision"; do
+for model_type in "unet" "loras" "text_encoders" "vae" "clip_vision"; do
     echo "⭐ Processing ${model_type} Models..."
     declare -n model_array="${model_type^^}_MODELS"
     
@@ -113,7 +116,7 @@ echo "🔍 Verifying all downloads..."
 verify_all_downloads() {
     local all_valid=true
     
-    for dir in "unet" "text_encoders" "clip_vision" "vae"; do
+    for dir in "unet" "loras" "text_encoders" "clip_vision" "vae"; do
         if [ -d "${MODEL_DIR}/${dir}" ]; then
             echo "Checking ${dir}..."
             for file in "${MODEL_DIR}/${dir}"/*; do
