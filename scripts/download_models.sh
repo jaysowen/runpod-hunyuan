@@ -1,20 +1,8 @@
 #!/bin/bash
 set -e
 
-MODEL_DIR="/ComfyUI/models"
+MODEL_DIR="/workspace/ComfyUI/models"
 mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
-
-# Function to convert bytes to human readable format
-human_readable() {
-    local bytes=$1
-    if [ $bytes -lt 1024 ]; then
-        echo "${bytes}B"
-    elif [ $bytes -lt 1048576 ]; then
-        echo "$(( (bytes + 512)/1024 ))KB"
-    else
-        echo "$(( (bytes + 524288)/1048576 ))MB"
-    fi
-}
 
 # Function to download file
 download_file() {
@@ -49,19 +37,8 @@ download_file() {
             ;;
     esac
 
-    # Get total size first
-    local total_size=$(wget --spider --server-response "$url" 2>&1 | grep "Content-Length" | awk '{print $2}' | tail -1)
-    
-    # Download with custom progress
-    wget "$url" -O "$dest" 2>&1 | \
-    while read line; do
-        if [[ $line =~ ([0-9]+)%\ +([0-9.]+[GMK])\ +([0-9.]+[GMK])/s\ +([0-9hms]+) ]]; then
-            percent="${BASH_REMATCH[1]}"
-            speed="${BASH_REMATCH[2]}/s"
-            eta="${BASH_REMATCH[4]}"
-            printf "\r💾 Progress: %3d%% | Speed: %8s | ETA: %8s" "$percent" "$speed" "$eta"
-        fi
-    done
+    # Simple progress display with wget
+    wget --progress=dot:giga -O "$dest" "$url" 2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" | awk '{printf("\r%4s", $2)}'
     echo -e "\n✨ Successfully downloaded $filename"
     echo "----------------------------------------"
 }
