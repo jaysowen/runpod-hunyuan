@@ -46,6 +46,4 @@ download_if_not_exists "https://huggingface.co/openai/clip-vit-large-patch14/res
     "${MODEL_DIR}/clip_vision/model.safetensors" \
     "clip-vit-large-patch14.safetensors"
 
-/install_nodes.sh
-
-echo "All models downloaded successfully"
+echo "⭐⭐⭐⭐⭐ FINISHED - MODELS AND NODES INSTALLED ⭐⭐⭐⭐⭐"

@@ -7,13 +7,12 @@ export PATH="/workspace/bin:$PATH"
 # Ensure we have /workspace
 mkdir -p /workspace
 
-# Handle ComfyUI directory
 if [[ ! -d /workspace/ComfyUI ]]; then
-    if [[ -d /ComfyUI ]]; then
-        mv /ComfyUI /workspace/
-    else
-        git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI
-    fi
+	# If we don't already have /workspace/ComfyUI, move it there
+	mv /ComfyUI /workspace
+else
+	# otherwise delete the default ComfyUI folder which is always re-created on pod start from the Docker
+	rm -rf /ComfyUI
 fi
 
 # Create symlink if it doesn't exist and isn't already linked

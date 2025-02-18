@@ -94,7 +94,7 @@ declare -A CLIP_VISION_MODELS=(
     ["clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
 )
 
-echo "🚀 Starting model downloads... Some files are 25GB so this will take a while"
+echo "🚀 Starting model downloads..."
 
 # Download each model type with proper error handling
 for model_type in "unet" "text_encoders" "vae" "clip_vision"; do
