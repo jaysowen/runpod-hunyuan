@@ -66,13 +66,39 @@ download_file() {
     while [ $retry_count -lt $max_retries ]; do
         echo "⏳ Download attempt $((retry_count + 1)) of $max_retries"
         
-        if wget --progress=bar:force -O "$dest.tmp" "$url" 2>&1; then
+        # Use wget with dot progress, showing incremental updates
+        if wget --progress=dot:mega \
+                "$url" \
+                -O "$dest.tmp" 2>&1 | \
+            stdbuf -o0 awk '
+            /[0-9]+%/ {
+                # Extract percentage and speed
+                match($0, /([0-9]+)%/)
+                percent = substr($0, RSTART, RLENGTH - 1)
+                
+                # Extract speed if available
+                speed = "N/A"
+                if (match($0, /([0-9.]+[KMG]?B\/s)/)) {
+                    speed = substr($0, RSTART, RLENGTH)
+                }
+                
+                # Print progress
+                printf "\r⏳ Progress: %3d%% | Speed: %s", percent, speed
+                fflush()
+            }
+            # Show dots for activity when no percentage available
+            /[.]/ {
+                printf "."
+                fflush()
+            }'; then
+            
+            echo -e "\n"  # New line after progress
             mv "$dest.tmp" "$dest"
             echo "✨ Successfully downloaded $filename ($formatted_size)"
             echo "----------------------------------------"
             return 0
         else
-            echo "⚠️ Failed download attempt $((retry_count + 1)) for $filename"
+            echo -e "\n⚠️ Failed download attempt $((retry_count + 1)) for $filename"
             rm -f "$dest.tmp"
             retry_count=$((retry_count + 1))
             if [ $retry_count -lt $max_retries ]; then
@@ -106,7 +132,7 @@ current_file=1
 # Download files sequentially
 for dest in "${!downloads[@]}"; do
     url="${downloads[$dest]}"
-    echo "📦 Processing file $current_file of $total_files"
+    echo -e "\n📦 Processing file $current_file of $total_files"
     if ! download_file "$url" "$dest"; then
         download_success=false
         echo "⚠️ Failed to download $(basename "$dest") - continuing with other downloads"
@@ -115,7 +141,7 @@ for dest in "${!downloads[@]}"; do
 done
 
 # Final verification
-echo "🔍 Verifying downloads..."
+echo -e "\n🔍 Verifying downloads..."
 verification_failed=false
 for dir in "unet" "loras" "text_encoders" "clip_vision" "vae"; do
     if [ -d "${MODEL_DIR}/${dir}" ]; then
@@ -135,9 +161,9 @@ for dir in "unet" "loras" "text_encoders" "clip_vision" "vae"; do
 done
 
 if [ "$download_success" = true ] && [ "$verification_failed" = false ]; then
-    echo "✨ All models downloaded and verified successfully"
+    echo -e "\n✨ All models downloaded and verified successfully"
     exit 0
 else
-    echo "⚠️ Some models failed to download or verify"
+    echo -e "\n⚠️ Some models failed to download or verify"
     exit 1
 fi
