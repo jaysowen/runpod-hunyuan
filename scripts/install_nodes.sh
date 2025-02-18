@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-CUSTOM_NODES_DIR="/workspace/ComfyUI/custom_nodes"
+CUSTOM_NODES_DIR="/ComfyUI/custom_nodes"
 mkdir -p "$CUSTOM_NODES_DIR"
 cd "$CUSTOM_NODES_DIR"
 

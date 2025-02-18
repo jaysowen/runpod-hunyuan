@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-MODEL_DIR="/workspace/ComfyUI/models"
+MODEL_DIR="/ComfyUI/models"
 mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
 
 # Function to download file
