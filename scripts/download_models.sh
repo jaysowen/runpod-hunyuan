@@ -9,18 +9,41 @@ download_file() {
     local url=$1
     local dest=$2
     local filename=$(basename "$dest")
+    local model_type=$(basename $(dirname "$dest"))
 
     if [ -f "$dest" ] && [ -s "$dest" ]; then
-        echo "✅ $filename already exists, skipping"
+        echo "✅ $filename already exists in $model_type, skipping"
         return 0
     fi
 
-    echo "⬇️ Downloading $filename..."
+    echo "🔽 Starting download of $filename (${model_type})"
+    case "$filename" in
+        "hunyuan_video_720_cfgdistill_bf16.safetensors")
+            echo "🎭 Downloading Hunyuan Video UNet model..."
+            ;;
+        "hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors")
+            echo "🚀 Downloading Hunyuan FastVideo LoRA..."
+            ;;
+        "Long-ViT-L-14-GmP-SAE-TE-only.safetensors")
+            echo "🧠 Downloading LongCLIP Text Encoder..."
+            ;;
+        "llava_llama3_fp8_scaled.safetensors")
+            echo "🦙 Downloading Llava Text Encoder..."
+            ;;
+        "hunyuan_video_vae_bf16.safetensors")
+            echo "🎨 Downloading Hunyuan Video VAE..."
+            ;;
+        "clip-vit-large-patch14.safetensors")
+            echo "👁️ Downloading CLIP Vision model..."
+            ;;
+    esac
+
     wget -q --show-progress "$url" -O "$dest" || {
         echo "❌ Failed to download $filename"
         return 1
     }
-    echo "✅ Downloaded $filename successfully"
+    echo "✨ Successfully downloaded $filename"
+    echo "----------------------------------------"
 }
 
 echo "🚀 Starting model downloads..."
@@ -67,7 +90,7 @@ for dir in "unet" "loras" "text_encoders" "clip_vision" "vae"; do
                     echo "❌ Error: $(basename "$file") is empty"
                     failed=1
                 else
-                    echo "✅ $(basename "$file") is valid"
+                    echo "✅ $(basename "$file") verified successfully"
                 fi
             fi
         done
