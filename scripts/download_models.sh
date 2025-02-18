@@ -27,14 +27,11 @@ get_hf_file_size() {
     local url="$1"
     local size=0
     
-    # First try to get the final redirect URL
     local redirect_url=$(curl -sIL "$url" | grep -i "location:" | tail -n 1 | awk '{print $2}' | tr -d '\r')
     
     if [ -n "$redirect_url" ]; then
-        # Get size from the final URL
         size=$(curl -sI "$redirect_url" | grep -i content-length | tail -n 1 | awk '{print $2}' | tr -d '\r')
     else
-        # If no redirect, try direct URL
         size=$(curl -sI "$url" | grep -i content-length | tail -n 1 | awk '{print $2}' | tr -d '\r')
     fi
     
@@ -58,7 +55,6 @@ download_file() {
     echo "📥 Downloading: $filename"
     echo "📂 Type: $model_type"
     
-    # Get true file size from Hugging Face
     local size=$(get_hf_file_size "$url")
     local formatted_size=$(format_size "$size")
     echo "📊 Total size: $formatted_size"
@@ -66,33 +62,28 @@ download_file() {
     while [ $retry_count -lt $max_retries ]; do
         echo "⏳ Download attempt $((retry_count + 1)) of $max_retries"
         
-        # Use wget with dot progress, showing incremental updates
         if wget --progress=dot:mega \
                 "$url" \
                 -O "$dest.tmp" 2>&1 | \
             stdbuf -o0 awk '
             /[0-9]+%/ {
-                # Extract percentage and speed
                 match($0, /([0-9]+)%/)
                 percent = substr($0, RSTART, RLENGTH - 1)
                 
-                # Extract speed if available
                 speed = "N/A"
                 if (match($0, /([0-9.]+[KMG]?B\/s)/)) {
                     speed = substr($0, RSTART, RLENGTH)
                 }
                 
-                # Print progress
                 printf "\r⏳ Progress: %3d%% | Speed: %s", percent, speed
                 fflush()
             }
-            # Show dots for activity when no percentage available
             /[.]/ {
                 printf "."
                 fflush()
             }'; then
             
-            echo -e "\n"  # New line after progress
+            echo -e "\n"
             mv "$dest.tmp" "$dest"
             echo "✨ Successfully downloaded $filename ($formatted_size)"
             echo "----------------------------------------"
@@ -114,7 +105,7 @@ download_file() {
 
 echo "🚀 Starting model downloads..."
 
-# Define download tasks
+# Define download tasks with their respective directories
 declare -A downloads=(
     ["${MODEL_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
     ["${MODEL_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
@@ -124,12 +115,10 @@ declare -A downloads=(
     ["${MODEL_DIR}/clip_vision/clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
 )
 
-# Track overall success
 download_success=true
 total_files=${#downloads[@]}
 current_file=1
 
-# Download files sequentially
 for dest in "${!downloads[@]}"; do
     url="${downloads[$dest]}"
     echo -e "\n📦 Processing file $current_file of $total_files"
@@ -140,23 +129,36 @@ for dest in "${!downloads[@]}"; do
     current_file=$((current_file + 1))
 done
 
-# Final verification
+# Fixed verification logic that only checks files in their correct directories
 echo -e "\n🔍 Verifying downloads..."
 verification_failed=false
-for dir in "unet" "loras" "text_encoders" "clip_vision" "vae"; do
-    if [ -d "${MODEL_DIR}/${dir}" ]; then
-        for file in "${MODEL_DIR}/${dir}"/*; do
-            if [ -f "$file" ]; then
-                size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
-                if [ "$size" -eq 0 ]; then
-                    echo "❌ Error: $(basename "$file") is empty"
-                    verification_failed=true
-                else
-                    formatted_size=$(format_size "$size")
-                    echo "✅ $(basename "$file") verified successfully ($formatted_size)"
-                fi
-            fi
-        done
+
+# Create a mapping of files to their expected directories
+declare -A expected_files
+for dest in "${!downloads[@]}"; do
+    dir=$(basename $(dirname "$dest"))
+    file=$(basename "$dest")
+    expected_files["$dir/$file"]=1
+done
+
+# Verify each file in its correct directory
+for dest in "${!downloads[@]}"; do
+    dir=$(basename $(dirname "$dest"))
+    file=$(basename "$dest")
+    full_path="$MODEL_DIR/$dir/$file"
+    
+    if [ -f "$full_path" ]; then
+        size=$(stat -f%z "$full_path" 2>/dev/null || stat -c%s "$full_path")
+        if [ "$size" -eq 0 ]; then
+            echo "❌ Error: $file is empty in $dir directory"
+            verification_failed=true
+        else
+            formatted_size=$(format_size "$size")
+            echo "✅ $file verified successfully in $dir directory ($formatted_size)"
+        fi
+    else
+        echo "❌ Error: $file is missing from $dir directory"
+        verification_failed=true
     fi
 done
 
