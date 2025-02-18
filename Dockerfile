@@ -1,19 +1,14 @@
-FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
+# Build stage
+FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 as builder
 
-# Install runtime dependencies
+# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.10 \
     python3-pip \
     git \
-    ffmpeg \
-    libgl1 \
-    libglib2.0-0 \
-    wget \
-    openssh-server \
     build-essential \
     python3-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    && rm -rf /var/lib/apt/lists/*
 
 # Create symlinks for Python
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
@@ -23,64 +18,101 @@ RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-# Install Python packages
+# Install PyTorch and core dependencies
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir \
-    jupyterlab \
-    jupyterlab_widgets \
-    ipykernel \
-    ipywidgets \
-    aiohttp \
-    triton \
-    sageattention
+    pip3 install --no-cache-dir torch==2.2.1 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124 && \
+    pip3 install --no-cache-dir jupyterlab jupyterlab_widgets ipykernel ipywidgets aiohttp triton sageattention
 
-# Install PyTorch
-RUN pip3 install --no-cache-dir \
-    torch==2.2.1 \
-    torchvision \
-    torchaudio \
-    --extra-index-url https://download.pytorch.org/whl/cu124
-
-# Clone ComfyUI to root directory
+# Clone and setup ComfyUI
 WORKDIR /
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git && \
+RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git && \
     cd ComfyUI && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install core custom nodes during build
+# Install ALL custom nodes during build
 WORKDIR /ComfyUI/custom_nodes
-RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+
+# Video and Frame Processing
+RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
-    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
+    git clone --depth 1 https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
+    # Workflow Tools
+    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git && \
+    git clone --depth 1 https://github.com/sipherxyz/comfyui-art-venture.git && \
+    git clone --depth 1 https://github.com/theUpsider/ComfyUI-Logic.git && \
+    git clone --depth 1 https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
+    git clone --depth 1 https://github.com/alt-key-project/comfyui-dream-project.git && \
+    # Image Enhancement
+    git clone --depth 1 https://github.com/Jonseed/ComfyUI-Detail-Daemon.git && \
+    git clone --depth 1 https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git && \
+    # Noise Tools
+    git clone --depth 1 https://github.com/BlenderNeko/ComfyUI_Noise.git && \
+    git clone --depth 1 https://github.com/chrisgoringe/cg-noisetools.git && \
+    # Utility Nodes
+    git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git && \
+    git clone --depth 1 https://github.com/chrisgoringe/cg-use-everywhere.git && \
+    git clone --depth 1 https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git && \
+    # Special Purpose
+    git clone --depth 1 https://github.com/pharmapsychotic/comfy-cliption.git && \
+    git clone --depth 1 https://github.com/darkpixel/darkprompts.git && \
+    git clone --depth 1 https://github.com/Koushakur/ComfyUI-DenoiseChooser.git && \
+    git clone --depth 1 https://github.com/city96/ComfyUI-GGUF.git && \
+    git clone --depth 1 https://github.com/giriss/comfy-image-saver.git && \
+    # Additional Utilities
+    git clone --depth 1 https://github.com/11dogzi/Comfyui-ergouzi-Nodes.git && \
+    git clone --depth 1 https://github.com/jamesWalker55/comfyui-various.git && \
+    git clone --depth 1 https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
+    git clone --depth 1 https://github.com/M1kep/ComfyLiterals.git && \
+    git clone --depth 1 https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
+    git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone --depth 1 https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
+    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
+    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git
 
+# Install requirements for all nodes
+RUN for dir in */; do \
+    if [ -f "${dir}requirements.txt" ]; then \
+        echo "Installing requirements for ${dir}..." && \
+        pip install --no-cache-dir -r "${dir}requirements.txt" || true; \
+    fi; \
+    if [ -f "${dir}install.py" ]; then \
+        echo "Running install script for ${dir}..." && \
+        python "${dir}install.py" || true; \
+    fi \
+    done
 
-# Install requirements for each custom node
-RUN cd ComfyUI-Manager && \
-    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
-    cd ../ComfyUI-Frame-Interpolation && \
-    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
-    cd ../ComfyUI-VideoHelperSuite && \
-    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
-    cd ../was-node-suite-comfyui && \
-    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi && \
-    cd ../ComfyUI-Impact-Pack && \
-    if [ -f "requirements.txt" ]; then pip install --no-cache-dir -r requirements.txt || true; fi
+# Final stage
+FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
-# Copy workflow files directly to ComfyUI
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.10 \
+    python3-pip \
+    git \
+    ffmpeg \
+    libgl1 \
+    libglib2.0-0 \
+    wget \
+    openssh-server \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python environment from builder
+COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
+COPY --from=builder /ComfyUI /ComfyUI
+
+# Copy workflow files
 COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
 
-# Copy all scripts
-COPY scripts/start.sh /start.sh
-COPY scripts/pre_start.sh /pre_start.sh
-COPY scripts/post_start.sh /post_start.sh
-COPY scripts/download_models.sh /download_models.sh
-COPY scripts/install_nodes.sh /install_nodes.sh
-# Make scripts executable
+# Copy scripts
+COPY scripts/*.sh /
 RUN chmod +x /*.sh
 
-# Create workspace and logs directory
-RUN mkdir -p /workspace/logs
+# Create necessary directories
+RUN mkdir -p /workspace/logs /workspace/ComfyUI/models/{unet,text_encoders,clip_vision,vae,loras}
 
 CMD ["/start.sh"]
