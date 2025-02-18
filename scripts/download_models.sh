@@ -4,6 +4,18 @@ set -e
 MODEL_DIR="/ComfyUI/models"
 mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
 
+# Function to convert bytes to human readable format
+human_readable() {
+    local bytes=$1
+    if [ $bytes -lt 1024 ]; then
+        echo "${bytes}B"
+    elif [ $bytes -lt 1048576 ]; then
+        echo "$(( (bytes + 512)/1024 ))KB"
+    else
+        echo "$(( (bytes + 524288)/1048576 ))MB"
+    fi
+}
+
 # Function to download file
 download_file() {
     local url=$1
@@ -37,15 +49,21 @@ download_file() {
             ;;
     esac
 
-    # Modified wget command to show real-time progress
-    wget -q --show-progress "$url" -O "$dest"
-    if [ $? -eq 0 ]; then
-        echo "✨ Successfully downloaded $filename"
-        echo "----------------------------------------"
-    else
-        echo "❌ Failed to download $filename"
-        return 1
-    fi
+    # Get total size first
+    local total_size=$(wget --spider --server-response "$url" 2>&1 | grep "Content-Length" | awk '{print $2}' | tail -1)
+    
+    # Download with custom progress
+    wget "$url" -O "$dest" 2>&1 | \
+    while read line; do
+        if [[ $line =~ ([0-9]+)%\ +([0-9.]+[GMK])\ +([0-9.]+[GMK])/s\ +([0-9hms]+) ]]; then
+            percent="${BASH_REMATCH[1]}"
+            speed="${BASH_REMATCH[2]}/s"
+            eta="${BASH_REMATCH[4]}"
+            printf "\r💾 Progress: %3d%% | Speed: %8s | ETA: %8s" "$percent" "$speed" "$eta"
+        fi
+    done
+    echo -e "\n✨ Successfully downloaded $filename"
+    echo "----------------------------------------"
 }
 
 echo "🚀 Starting model downloads..."
