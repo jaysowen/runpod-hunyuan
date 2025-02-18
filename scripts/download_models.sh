@@ -17,22 +17,22 @@ download_file() {
     fi
 
     case "$filename" in
-        "hunyuan_video_720_cfgdistill_bf16.safetensors")
+        "hunyuan_video_720_cfgdistill_bf16.safetensors"
             echo "🎭 Downloading Hunyuan Video UNet model..."
             ;;
-        "hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors")
+        "hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
             echo "🚀 Downloading Hunyuan FastVideo LoRA..."
             ;;
-        "Long-ViT-L-14-GmP-SAE-TE-only.safetensors")
+        "Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
             echo "🧠 Downloading LongCLIP Text Encoder..."
             ;;
-        "llava_llama3_fp8_scaled.safetensors")
+        "llava_llama3_fp8_scaled.safetensors"
             echo "🦙 Downloading Llava Text Encoder..."
             ;;
-        "hunyuan_video_vae_bf16.safetensors")
+        "hunyuan_video_vae_bf16.safetensors"
             echo "🎨 Downloading Hunyuan Video VAE..."
             ;;
-        "clip-vit-large-patch14.safetensors")
+        "clip-vit-large-patch14.safetensors"
             echo "👁️ Downloading CLIP Vision model..."
             ;;
     esac
