@@ -89,7 +89,7 @@ RUN for dir in */; do \
 # Final stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
-# Install runtime dependencies only
+# Install runtime dependencies including Python
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.10 \
     python3-pip \
@@ -100,6 +100,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     openssh-server \
     && rm -rf /var/lib/apt/lists/*
+
+# Create Python symlinks in final stage
+RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
+    ln -sf /usr/bin/python3.10 /usr/bin/python3
 
 # Copy Python environment from builder
 COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
