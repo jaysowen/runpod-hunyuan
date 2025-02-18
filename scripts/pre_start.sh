@@ -7,8 +7,8 @@ export PATH="/workspace/bin:$PATH"
 # Ensure we have /workspace
 mkdir -p /workspace
 
-echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
-/install_nodes.sh install_only
+# echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
+# /install_nodes.sh install_only
 
 echo "**** DOWNLOAD - INSTALLING MODELS ****"
 /download_models.sh
