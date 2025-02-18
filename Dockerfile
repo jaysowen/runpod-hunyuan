@@ -1,7 +1,7 @@
 # Build stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 as builder
 
-# Install build dependencies
+# Install build dependencies more comprehensively
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
@@ -11,11 +11,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
     curl \
     wget \
+    gcc \
+    g++ \
+    make \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    CC=gcc \
+    CXX=g++
 
 # Install PyTorch and core dependencies
 RUN pip3 install --no-cache-dir --upgrade pip && \
