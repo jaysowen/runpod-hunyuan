@@ -16,7 +16,6 @@ download_file() {
         return 0
     fi
 
-    echo "🔽 Starting download of $filename (${model_type})"
     case "$filename" in
         "hunyuan_video_720_cfgdistill_bf16.safetensors")
             echo "🎭 Downloading Hunyuan Video UNet model..."
@@ -38,17 +37,19 @@ download_file() {
             ;;
     esac
 
-    wget -q --show-progress "$url" -O "$dest" || {
+    wget -q --show-progress "$url" -O "$dest"
+    if [ $? -eq 0 ]; then
+        echo "✨ Successfully downloaded $filename"
+        echo "----------------------------------------"
+    else
         echo "❌ Failed to download $filename"
         return 1
-    }
-    echo "✨ Successfully downloaded $filename"
-    echo "----------------------------------------"
+    fi
 }
 
 echo "🚀 Starting model downloads..."
 
-# Create array of download tasks
+# Define download tasks
 declare -A downloads=(
     ["${MODEL_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
     ["${MODEL_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
@@ -58,27 +59,11 @@ declare -A downloads=(
     ["${MODEL_DIR}/clip_vision/clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
 )
 
-# Download files in parallel (2 at a time)
-pids=()
-count=0
+# Download files sequentially
 for dest in "${!downloads[@]}"; do
     url="${downloads[$dest]}"
-    download_file "$url" "$dest" &
-    pids+=($!)
-    ((count++))
-    
-    # Wait after every 2 downloads
-    if [ $count -eq 2 ]; then
-        wait "${pids[@]}"
-        pids=()
-        count=0
-    fi
+    download_file "$url" "$dest"
 done
-
-# Wait for any remaining downloads
-if [ ${#pids[@]} -gt 0 ]; then
-    wait "${pids[@]}"
-fi
 
 echo "🔍 Verifying downloads..."
 failed=0
