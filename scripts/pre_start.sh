@@ -8,10 +8,10 @@ export PATH="/workspace/bin:$PATH"
 mkdir -p /workspace
 
 echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
-bash /install_nodes.sh install_only
+/install_nodes.sh install_only
 
 echo "**** DOWNLOAD - INSTALLING MODELS ****"
-bash /download_models.sh
+/download_models.sh
 
 if [[ ! -d /workspace/ComfyUI ]]; then
     # If we don't already have /workspace/ComfyUI, move it there
