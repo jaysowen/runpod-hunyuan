@@ -25,7 +25,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install PyTorch and core dependencies
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir torch==2.2.1 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
+    pip3 install --no-cache-dir torch==2.4 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
 
 # Install Jupyter and related packages explicitly
 RUN pip3 install --no-cache-dir \
