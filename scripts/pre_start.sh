@@ -9,6 +9,7 @@ mkdir -p /workspace
 
 if [[ ! -d /workspace/ComfyUI ]]; then
 	# If we don't already have /workspace/ComfyUI, move it there
+	echo "**** COPY COMFYUI TO WORKSPACE ****"
 	mv /ComfyUI /workspace
 else
 	# otherwise delete the default ComfyUI folder which is always re-created on pod start from the Docker
@@ -23,4 +24,4 @@ fi
 echo "**** DOWNLOAD - INSTALLING NODES ****"
 bash /install_nodes.sh install_only
 
-echo "Pre-start completed successfully"
+echo "✨ Pre-start completed successfully ✨"
