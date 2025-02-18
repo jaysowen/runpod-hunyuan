@@ -1,11 +1,24 @@
 #!/bin/bash
-# Exit on error, unset variables, and pipe failures
 set -euo pipefail
 
-MODEL_DIR="/ComfyUI/models"
+MODEL_DIR="/workspace/ComfyUI/models"
 mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
 
-# Function to download file with retry limit
+# Function to format file size
+format_size() {
+    local size=$1
+    if [ $size -ge 1073741824 ]; then
+        echo "$(awk "BEGIN {printf \"%.1f\", $size/1073741824}") GB"
+    elif [ $size -ge 1048576 ]; then
+        echo "$(awk "BEGIN {printf \"%.1f\", $size/1048576}") MB"
+    elif [ $size -ge 1024 ]; then
+        echo "$(awk "BEGIN {printf \"%.1f\", $size/1024}") KB"
+    else
+        echo "${size} B"
+    fi
+}
+
+# Function to download file with progress
 download_file() {
     local url=$1
     local dest=$2
@@ -20,30 +33,20 @@ download_file() {
     fi
 
     while [ $retry_count -lt $max_retries ]; do
-        case "$filename" in
-            "hunyuan_video_720_cfgdistill_bf16.safetensors")
-                echo "🎭 Downloading Hunyuan Video UNet model..."
-                ;;
-            "hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors")
-                echo "🚀 Downloading Hunyuan FastVideo LoRA..."
-                ;;
-            "Long-ViT-L-14-GmP-SAE-TE-only.safetensors")
-                echo "🧠 Downloading LongCLIP Text Encoder..."
-                ;;
-            "llava_llama3_fp8_scaled.safetensors")
-                echo "🦙 Downloading Llava Text Encoder..."
-                ;;
-            "hunyuan_video_vae_bf16.safetensors")
-                echo "🎨 Downloading Hunyuan Video VAE..."
-                ;;
-            "clip-vit-large-patch14.safetensors")
-                echo "👁️ Downloading CLIP Vision model..."
-                ;;
-        esac
-
-        if wget --progress=dot:giga -O "$dest.tmp" "$url" 2>&1 | grep --line-buffered "%" | sed -u -e "s,\.,,g" | awk '{printf("\r%4s", $2)}'; then
+        echo "📥 Downloading: $filename"
+        echo "📂 Type: $model_type"
+        
+        # Get file size first
+        local size=$(curl -sI "$url" | grep -i content-length | awk '{print $2}' | tr -d '\r')
+        local formatted_size=$(format_size $size)
+        echo "📊 Total size: $formatted_size"
+        
+        # Download with progress bar
+        if wget --progress=bar:force -O "$dest.tmp" "$url" 2>&1 | \
+           stdbuf -o0 awk '/[.] +[0-9][0-9]?[0-9]?%/ { print substr($0,63,3) }' | \
+           stdbuf -o0 awk '{printf("\r⏳ Progress: %s%%", $1)}'; then
             mv "$dest.tmp" "$dest"
-            echo -e "\n✨ Successfully downloaded $filename"
+            echo -e "\n✨ Successfully downloaded $filename ($formatted_size)"
             echo "----------------------------------------"
             return 0
         else
@@ -51,7 +54,7 @@ download_file() {
             rm -f "$dest.tmp"
             retry_count=$((retry_count + 1))
             if [ $retry_count -lt $max_retries ]; then
-                echo "Retrying in 5 seconds..."
+                echo "🔄 Retrying in 5 seconds..."
                 sleep 5
             fi
         fi
@@ -63,7 +66,7 @@ download_file() {
 
 echo "🚀 Starting model downloads..."
 
-# Define download tasks
+# Define download tasks with descriptive names
 declare -A downloads=(
     ["${MODEL_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
     ["${MODEL_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
@@ -75,14 +78,18 @@ declare -A downloads=(
 
 # Track overall success
 download_success=true
+total_files=${#downloads[@]}
+current_file=1
 
-# Download files sequentially
+# Download files sequentially with progress tracking
 for dest in "${!downloads[@]}"; do
     url="${downloads[$dest]}"
+    echo "📦 Processing file $current_file of $total_files"
     if ! download_file "$url" "$dest"; then
         download_success=false
         echo "⚠️ Failed to download $(basename "$dest") - continuing with other downloads"
     fi
+    current_file=$((current_file + 1))
 done
 
 # Final verification
@@ -92,24 +99,23 @@ for dir in "unet" "loras" "text_encoders" "clip_vision" "vae"; do
     if [ -d "${MODEL_DIR}/${dir}" ]; then
         for file in "${MODEL_DIR}/${dir}"/*; do
             if [ -f "$file" ]; then
-                if [ ! -s "$file" ]; then
+                size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
+                if [ "$size" -eq 0 ]; then
                     echo "❌ Error: $(basename "$file") is empty"
                     verification_failed=true
                 else
-                    echo "✅ $(basename "$file") verified successfully"
+                    formatted_size=$(format_size $size)
+                    echo "✅ $(basename "$file") verified successfully ($formatted_size)"
                 fi
             fi
         done
     fi
 done
 
-# Create a status file to prevent re-runs
-touch "${MODEL_DIR}/.downloads_completed"
-
 if [ "$download_success" = true ] && [ "$verification_failed" = false ]; then
-    echo "✨ All models downloaded and verified successfully - Starting ComfyUI..."
+    echo "✨ All models downloaded and verified successfully"
     exit 0
 else
-    echo "⚠️ Some models failed to download but continuing with available models..."
-    exit 0  # Still exit with 0 to allow ComfyUI to start
+    echo "⚠️ Some models failed to download or verify"
+    exit 1
 fi
