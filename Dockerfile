@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     build-essential \
     python3-dev \
+    curl \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
@@ -94,7 +96,7 @@ RUN for dir in */; do \
 # Final stage
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
-# Install runtime dependencies including Python
+# Install runtime dependencies including Python and curl
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
@@ -104,6 +106,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     wget \
+    curl \
     openssh-server \
     nodejs \
     npm \
