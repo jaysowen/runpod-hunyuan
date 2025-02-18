@@ -79,9 +79,4 @@ clone_if_not_exists "https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
 clone_if_not_exists "https://github.com/rgthree/rgthree-comfy.git"
 clone_if_not_exists "https://github.com/WASasquatch/was-node-suite-comfyui.git"
 
-
-# echo "**** DOWNLOAD -  ADDING MODELS ****"
-# bash /download_models.sh install_only
-# Its added to prestart now so dont need here
-
 echo "✨ Install Nodes completed successfully ✨"
