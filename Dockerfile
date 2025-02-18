@@ -3,16 +3,13 @@ FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 as builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.10 \
+    python3 \
     python3-pip \
+    python-is-python3 \
     git \
     build-essential \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# Create symlinks for Python
-RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
-    ln -sf /usr/bin/python3.10 /usr/bin/python3
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -20,8 +17,16 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install PyTorch and core dependencies
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir torch==2.2.1 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124 && \
-    pip3 install --no-cache-dir jupyterlab jupyterlab_widgets ipykernel ipywidgets aiohttp triton sageattention
+    pip3 install --no-cache-dir torch==2.2.1 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
+
+# Install Jupyter and related packages explicitly
+RUN pip3 install --no-cache-dir \
+    jupyterlab \
+    notebook \
+    ipykernel \
+    ipywidgets \
+    jupyter_server \
+    jupyterlab_widgets
 
 # Clone and setup ComfyUI
 WORKDIR /
@@ -91,19 +96,27 @@ FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 
 # Install runtime dependencies including Python
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.10 \
+    python3 \
     python3-pip \
+    python-is-python3 \
     git \
     ffmpeg \
     libgl1 \
     libglib2.0-0 \
     wget \
     openssh-server \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Create Python symlinks in final stage
-RUN ln -sf /usr/bin/python3.10 /usr/bin/python && \
-    ln -sf /usr/bin/python3.10 /usr/bin/python3
+# Install Jupyter and related packages in final stage
+RUN pip3 install --no-cache-dir \
+    jupyterlab \
+    notebook \
+    ipykernel \
+    ipywidgets \
+    jupyter_server \
+    jupyterlab_widgets
 
 # Copy Python environment from builder
 COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
