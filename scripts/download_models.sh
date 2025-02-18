@@ -37,7 +37,8 @@ download_file() {
             ;;
     esac
 
-    wget --progress=bar:force:noscroll "$url" -O "$dest" 2>&1 | grep --line-buffered -o "[0-9]*%" | uniq
+    # Modified wget command to show real-time progress
+    wget -q --show-progress "$url" -O "$dest"
     if [ $? -eq 0 ]; then
         echo "✨ Successfully downloaded $filename"
         echo "----------------------------------------"
