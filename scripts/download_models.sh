@@ -6,37 +6,22 @@ mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
 
 # Maximum number of parallel downloads
 MAX_PARALLEL=2
-current_parallel=0
+current_downloads=0
 
-# Function to verify file integrity using SHA256
-verify_checksum() {
-    local file=$1
-    local expected_sha=$2
-    
-    if [ -f "$file" ]; then
-        local actual_sha=$(sha256sum "$file" | cut -d' ' -f1)
-        if [ "$actual_sha" = "$expected_sha" ]; then
-            return 0
-        fi
-    fi
-    return 1
-}
-
-# Function to download with progress and verification
-download_with_verification() {
+# Function to download with progress
+download_file() {
     local url=$1
     local dest=$2
-    local sha256=$3
     local filename=$(basename "$dest")
     local temp_dest="${dest}.downloading"
     
-    # Check if file exists and is valid
+    # Check if file exists
     if [ -f "$dest" ]; then
-        if [ -z "$sha256" ] || verify_checksum "$dest" "$sha256"; then
-            echo "✅ $filename already exists and is valid, skipping download"
+        if [ -s "$dest" ]; then
+            echo "✅ $filename already exists and is not empty, skipping download"
             return 0
         else
-            echo "🔄 $filename exists but is invalid, re-downloading..."
+            echo "🔄 $filename exists but is empty, re-downloading..."
             rm -f "$dest"
         fi
     fi
@@ -48,68 +33,56 @@ download_with_verification() {
         return 1
     }
     
-    if [ -z "$sha256" ] || verify_checksum "$temp_dest" "$sha256"; then
-        mv "$temp_dest" "$dest"
-        echo "✅ Downloaded and verified $filename successfully"
-    else
-        rm -f "$temp_dest"
-        echo "❌ Failed to verify $filename"
-        return 1
-    fi
+    mv "$temp_dest" "$dest"
+    echo "✅ Downloaded $filename successfully"
 }
 
-# Function to process download in parallel
+# Function to handle parallel downloads
 download_parallel() {
     local url=$1
     local dest=$2
-    local sha256=$3
     
-    # Start download in background
-    download_with_verification "$url" "$dest" "$sha256" &
+    download_file "$url" "$dest" &
     
-    ((current_parallel++))
+    ((current_downloads++))
     
-    if [ $current_parallel -ge $MAX_PARALLEL ]; then
+    if [ $current_downloads -ge $MAX_PARALLEL ]; then
         wait
-        current_parallel=0
+        current_downloads=0
     fi
 }
 
-# Define model arrays with fixed formatting
-declare -A UNET_MODELS=(
-    ["hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
-)
-
-declare -A LORAS_MODELS=(
-    ["hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
-)
-
-declare -A TEXT_ENCODERS_MODELS=(
-    ["Long-ViT-L-14-GmP-SAE-TE-only.safetensors"]="https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
-    ["llava_llama3_fp8_scaled.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors"
-)
-
-declare -A VAE_MODELS=(
-    ["hunyuan_video_vae_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"
-)
-
-declare -A CLIP_VISION_MODELS=(
-    ["clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
-)
-
 echo "🚀 Starting model downloads..."
 
-# Download each model type with proper error handling
-for model_type in "unet" "loras" "text_encoders" "vae" "clip_vision"; do
-    echo "⭐ Processing ${model_type} Models..."
-    declare -n model_array="${model_type^^}_MODELS"
-    
-    for model in "${!model_array[@]}"; do
-        download_parallel "${model_array[$model]}" "${MODEL_DIR}/${model_type}/$model"
-    done
-    wait
-    current_parallel=0
-done
+# Download UNET models
+echo "⭐ Processing UNET models..."
+download_parallel "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors" \
+    "${MODEL_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"
+
+# Download LORAS models
+echo "⭐ Processing LORAS models..."
+download_parallel "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors" \
+    "${MODEL_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
+
+# Download Text Encoder models
+echo "⭐ Processing Text Encoder models..."
+download_parallel "https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors" \
+    "${MODEL_DIR}/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
+download_parallel "https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors" \
+    "${MODEL_DIR}/text_encoders/llava_llama3_fp8_scaled.safetensors"
+
+# Download VAE models
+echo "⭐ Processing VAE models..."
+download_parallel "https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors" \
+    "${MODEL_DIR}/vae/hunyuan_video_vae_bf16.safetensors"
+
+# Download CLIP Vision models
+echo "⭐ Processing CLIP Vision models..."
+download_parallel "https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors" \
+    "${MODEL_DIR}/clip_vision/clip-vit-large-patch14.safetensors"
+
+# Wait for any remaining downloads
+wait
 
 # Final verification
 echo "🔍 Verifying all downloads..."
