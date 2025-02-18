@@ -38,70 +38,101 @@ get_hf_file_size() {
     echo "${size:-0}"
 }
 
-# Function to download file with progress
 download_file() {
     local url="$1"
     local dest="$2"
     local filename=$(basename "$dest")
     local model_type=$(basename $(dirname "$dest"))
-    local max_retries=3
-    local retry_count=0
-
+    
     if [ -f "$dest" ] && [ -s "$dest" ]; then
-        echo "✅ $filename already exists in $model_type, skipping"
+        echo "✅ $filename already exists in $model_type"
         return 0
     fi
 
-    echo "📥 Downloading: $filename"
-    echo "📂 Type: $model_type"
+    echo "📥 Starting download: $filename"
     
-    local size=$(get_hf_file_size "$url")
-    local formatted_size=$(format_size "$size")
-    echo "📊 Total size: $formatted_size"
+    wget --progress=dot:mega \
+         -O "$dest.tmp" \
+         "$url" 2>&1 | \
+    stdbuf -o0 awk '
+    /[0-9]+%/ {
+        # Only print every 10% to reduce log spam
+        match($0, /([0-9]+)%/)
+        current = substr($0, RSTART, RLENGTH - 1)
+        if (current % 10 == 0 && current != last_printed) {
+            last_printed = current
+            printf "⏳ %s: %3d%%\n", FILENAME, current
+        }
+    }'
     
-    while [ $retry_count -lt $max_retries ]; do
-        echo "⏳ Download attempt $((retry_count + 1)) of $max_retries"
-        
-        if wget --progress=dot:mega \
-                "$url" \
-                -O "$dest.tmp" 2>&1 | \
-            stdbuf -o0 awk '
-            /[0-9]+%/ {
-                match($0, /([0-9]+)%/)
-                percent = substr($0, RSTART, RLENGTH - 1)
-                
-                speed = "N/A"
-                if (match($0, /([0-9.]+[KMG]?B\/s)/)) {
-                    speed = substr($0, RSTART, RLENGTH)
-                }
-                
-                printf "\r⏳ Progress: %3d%% | Speed: %s", percent, speed
-                fflush()
-            }
-            /[.]/ {
-                printf "."
-                fflush()
-            }'; then
-            
-            echo -e "\n"
-            mv "$dest.tmp" "$dest"
-            echo "✨ Successfully downloaded $filename ($formatted_size)"
-            echo "----------------------------------------"
-            return 0
-        else
-            echo -e "\n⚠️ Failed download attempt $((retry_count + 1)) for $filename"
-            rm -f "$dest.tmp"
-            retry_count=$((retry_count + 1))
-            if [ $retry_count -lt $max_retries ]; then
-                echo "🔄 Retrying in 5 seconds..."
-                sleep 5
-            fi
-        fi
-    done
-
-    echo "❌ Failed to download $filename after $max_retries attempts"
-    return 1
+    mv "$dest.tmp" "$dest"
+    echo "✨ Completed: $filename"
 }
+
+# Function to download file with progress - Nice Progress on Terminal but not good on Runpod Logs
+# download_file() {
+#     local url="$1"
+#     local dest="$2"
+#     local filename=$(basename "$dest")
+#     local model_type=$(basename $(dirname "$dest"))
+#     local max_retries=3
+#     local retry_count=0
+
+#     if [ -f "$dest" ] && [ -s "$dest" ]; then
+#         echo "✅ $filename already exists in $model_type, skipping"
+#         return 0
+#     fi
+
+#     echo "📥 Downloading: $filename"
+#     echo "📂 Type: $model_type"
+    
+#     local size=$(get_hf_file_size "$url")
+#     local formatted_size=$(format_size "$size")
+#     echo "📊 Total size: $formatted_size"
+    
+#     while [ $retry_count -lt $max_retries ]; do
+#         echo "⏳ Download attempt $((retry_count + 1)) of $max_retries"
+        
+#         if wget --progress=dot:mega \
+#                 "$url" \
+#                 -O "$dest.tmp" 2>&1 | \
+#             stdbuf -o0 awk '
+#             /[0-9]+%/ {
+#                 match($0, /([0-9]+)%/)
+#                 percent = substr($0, RSTART, RLENGTH - 1)
+                
+#                 speed = "N/A"
+#                 if (match($0, /([0-9.]+[KMG]?B\/s)/)) {
+#                     speed = substr($0, RSTART, RLENGTH)
+#                 }
+                
+#                 printf "\r⏳ Progress: %3d%% | Speed: %s", percent, speed
+#                 fflush()
+#             }
+#             /[.]/ {
+#                 printf "."
+#                 fflush()
+#             }'; then
+            
+#             echo -e "\n"
+#             mv "$dest.tmp" "$dest"
+#             echo "✨ Successfully downloaded $filename ($formatted_size)"
+#             echo "----------------------------------------"
+#             return 0
+#         else
+#             echo -e "\n⚠️ Failed download attempt $((retry_count + 1)) for $filename"
+#             rm -f "$dest.tmp"
+#             retry_count=$((retry_count + 1))
+#             if [ $retry_count -lt $max_retries ]; then
+#                 echo "🔄 Retrying in 5 seconds..."
+#                 sleep 5
+#             fi
+#         fi
+#     done
+
+#     echo "❌ Failed to download $filename after $max_retries attempts"
+#     return 1
+# }
 
 echo "🚀 Starting model downloads..."
 
