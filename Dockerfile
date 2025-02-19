@@ -25,7 +25,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install PyTorch and core dependencies
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir torch==2.2.1 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
+    pip3 install --no-cache-dir torch==2.4 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
 
 # Install Jupyter and related packages explicitly
 RUN pip3 install --no-cache-dir \
@@ -116,9 +116,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
     nodejs \
     npm \
-    build-essential \
     gcc \
     g++ \
+    make \
+    cmake \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Jupyter and related packages in final stage
@@ -129,9 +131,8 @@ RUN pip3 install --no-cache-dir \
     ipywidgets \
     jupyter_server \
     jupyterlab_widgets \
-    triton==2.0.0 \
-    sageattention \
-    bitsandbytes==0.41.1
+    triton \
+    sageattention
 
 # Copy Python environment from builder
 COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
