@@ -1,5 +1,5 @@
 # Build stage
-FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 as builder
+FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04 as builder
 
 # Install build dependencies more comprehensively
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -27,28 +27,12 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /
 RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 
-# Install build-time dependencies only
-WORKDIR /ComfyUI/custom_nodes
-
-# Clone and install custom nodes that require compilation
-RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
-
-# Install build requirements for nodes that need compilation
-RUN for dir in */; do \
-    if [ -f "${dir}requirements.txt" ]; then \
-        echo "Installing build requirements for ${dir}..." && \
-        pip install --no-cache-dir -r "${dir}requirements.txt" || true; \
-    fi; \
-    if [ -f "${dir}install.py" ]; then \
-        echo "Running install script for ${dir}..." && \
-        python "${dir}install.py" || true; \
-    fi \
-    done
+# Install ComfyUI requirements
+WORKDIR /ComfyUI
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Final stage
-FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
+FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -73,7 +57,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install PyTorch and core dependencies
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir torch==2.4 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
+    pip3 install --no-cache-dir  torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
 
 # Install runtime Python packages
 RUN pip3 install --no-cache-dir \
@@ -86,10 +70,6 @@ RUN pip3 install --no-cache-dir \
     triton \
     sageattention \
     opencv-python \
-    pillow \
-    numpy \
-    scipy \
-    transformers \
     safetensors \
     aiohttp \
     accelerate \
@@ -130,11 +110,24 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
-    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git
+    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
 
-# Install ComfyUI requirements
-WORKDIR /ComfyUI
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install build requirements for nodes that need compilation
+RUN for dir in */; do \
+    if [ -f "${dir}requirements.txt" ]; then \
+        echo "Installing build requirements for ${dir}..." && \
+        pip install --no-cache-dir -r "${dir}requirements.txt" || true; \
+    fi; \
+    if [ -f "${dir}install.py" ]; then \
+        echo "Running install script for ${dir}..." && \
+        python "${dir}install.py" || true; \
+    fi \
+    done
+
 
 # Copy workflow files
 COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
