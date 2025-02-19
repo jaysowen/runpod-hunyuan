@@ -129,8 +129,9 @@ RUN pip3 install --no-cache-dir \
     ipywidgets \
     jupyter_server \
     jupyterlab_widgets \
-    triton \
-    sageattention
+    triton==2.0.0 \
+    sageattention \
+    bitsandbytes==0.41.1
 
 # Copy Python environment from builder
 COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
