@@ -116,6 +116,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
     nodejs \
     npm \
+    build-essential \
+    gcc \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Jupyter and related packages in final stage
