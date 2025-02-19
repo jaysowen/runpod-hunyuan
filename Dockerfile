@@ -73,7 +73,8 @@ RUN pip3 install --no-cache-dir \
     safetensors \
     aiohttp \
     accelerate \
-    pyyaml
+    pyyaml \
+    torchsde
 
 # Copy ComfyUI and compiled custom nodes from builder
 COPY --from=builder /ComfyUI /ComfyUI
