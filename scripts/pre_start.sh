@@ -4,8 +4,9 @@ set -e  # Exit on error
 export PYTHONUNBUFFERED=1
 export PATH="/workspace/bin:$PATH"
 
-# Ensure workspace directory exists
+# Ensure workspace directory exists with proper permissions
 mkdir -p /workspace
+chmod 755 /workspace
 
 echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
 /install_nodes.sh install_only
@@ -13,19 +14,26 @@ echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
 echo "**** DOWNLOAD - INSTALLING MODELS ****"
 /download_models.sh
 
-# # Create the ComfyUI directory in workspace if it doesn't exist
-mkdir -p /workspace/ComfyUI
-
 echo "MOVING COMFYUI TO WORKSPACE"
+# Ensure clean workspace/ComfyUI directory setup
+if [ -e "/workspace/ComfyUI" ]; then
+    if [ ! -d "/workspace/ComfyUI" ]; then
+        echo "Removing invalid /workspace/ComfyUI"
+        rm -f /workspace/ComfyUI
+    fi
+fi
+
+# Create fresh ComfyUI directory
+mkdir -p /workspace/ComfyUI
+chmod 755 /workspace/ComfyUI
+
 # Check if /ComfyUI exists and is not already a symlink
 if [ -d "/ComfyUI" ] && [ ! -L "/ComfyUI" ]; then
     echo "**** SETTING UP COMFYUI IN WORKSPACE ****"
-    # Remove destination directory if it exists
-    rm -rf /workspace/ComfyUI
-    # Move the entire ComfyUI directory to workspace
-    mv /ComfyUI/* /workspace/ComfyUI/
-    mv /ComfyUI/.* /workspace/ComfyUI/ 2>/dev/null || true
-    rmdir /ComfyUI
+    # Copy files instead of moving to avoid potential issues
+    cp -rf /ComfyUI/* /workspace/ComfyUI/
+    cp -rf /ComfyUI/.??* /workspace/ComfyUI/ 2>/dev/null || true
+    rm -rf /ComfyUI
     # Create symlink
     ln -sf /workspace/ComfyUI /ComfyUI
 fi
