@@ -119,7 +119,7 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone --depth 1 https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
     git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    # git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
