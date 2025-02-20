@@ -16,13 +16,12 @@ RUN apt-get update && \
         g++ \
         make \
         cmake && \
-    # Add deadsnakes PPA for Python 3.12
-    add-apt-repository ppa:deadsnakes/ppa && \
+    # Add deadsnakes PPA non-interactively
+    add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         python3.12 \
         python3.12-dev \
-        python3.12-venv \
         python3.12-distutils && \
     # Install pip for Python 3.12
     curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 && \
@@ -68,13 +67,12 @@ RUN apt-get update && \
         nvidia-cuda-dev \
         gcc \
         g++ && \
-    # Add deadsnakes PPA for Python 3.12
-    add-apt-repository ppa:deadsnakes/ppa && \
+    # Add deadsnakes PPA non-interactively
+    add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         python3.12 \
         python3.12-dev \
-        python3.12-venv \
         python3.12-distutils && \
     # Install pip for Python 3.12
     curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 && \
@@ -117,7 +115,7 @@ RUN pip install --no-cache-dir \
     pyyaml \
     torchsde \
     opencv-python \
-    gdown
+    gdown 
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
