@@ -3,11 +3,9 @@
 # =============================================================================
 FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04 as builder
 
-# Install build dependencies and Python 3.12
+# Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        software-properties-common \
-        gpg-agent \
         wget \
         git \
         build-essential \
@@ -15,20 +13,22 @@ RUN apt-get update && \
         gcc \
         g++ \
         make \
-        cmake && \
-    # Add deadsnakes PPA non-interactively
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-        python3.12 \
-        python3.12-dev \
-        python3.12-distutils && \
-    # Install pip for Python 3.12
-    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 && \
-    # Create symlinks
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 && \
+        cmake \
+        ca-certificates && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Miniconda and Python 3.12
+RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    chmod +x ~/miniconda.sh && \
+    ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh
+
+# Add conda to path
+ENV PATH /opt/conda/bin:$PATH
+
+# Create Python 3.12 environment
+RUN conda install -y python=3.12 pip && \
+    conda clean -ya
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -45,11 +45,9 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
 
-# Install runtime dependencies and Python 3.12
+# Install runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        software-properties-common \
-        gpg-agent \
         wget \
         git \
         ffmpeg \
@@ -66,20 +64,22 @@ RUN apt-get update && \
         build-essential \
         nvidia-cuda-dev \
         gcc \
-        g++ && \
-    # Add deadsnakes PPA non-interactively
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-        python3.12 \
-        python3.12-dev \
-        python3.12-distutils && \
-    # Install pip for Python 3.12
-    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 && \
-    # Create symlinks
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 && \
+        g++ \
+        ca-certificates && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Miniconda and Python 3.12
+RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    chmod +x ~/miniconda.sh && \
+    ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh
+
+# Add conda to path
+ENV PATH /opt/conda/bin:$PATH
+
+# Create Python 3.12 environment
+RUN conda install -y python=3.12 pip && \
+    conda clean -ya
 
 # Add environment variables for compilation
 ENV CC=gcc \
@@ -115,7 +115,7 @@ RUN pip install --no-cache-dir \
     pyyaml \
     torchsde \
     opencv-python \
-    gdown 
+    gdown
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
