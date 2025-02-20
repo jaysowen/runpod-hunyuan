@@ -27,7 +27,7 @@ ENV PYTHONUNBUFFERED=1 \
     CXX=g++
 
 # Clone ComfyUI (source only; no final environment here)
-WORKDIR /ComfyUI
+WORKDIR /
 RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git .
 
 # =============================================================================
