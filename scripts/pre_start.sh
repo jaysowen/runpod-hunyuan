@@ -14,8 +14,9 @@ echo "**** DOWNLOAD - INSTALLING MODELS ****"
 /download_models.sh
 
 # # Create the ComfyUI directory in workspace if it doesn't exist
-# mkdir -p /workspace/ComfyUI
+mkdir -p /workspace/ComfyUI
 
+echo "MOVING COMFYUI TO WORKSPACE"
 # Check if /ComfyUI exists and is not already a symlink
 if [ -d "/ComfyUI" ] && [ ! -L "/ComfyUI" ]; then
     echo "**** SETTING UP COMFYUI IN WORKSPACE ****"
