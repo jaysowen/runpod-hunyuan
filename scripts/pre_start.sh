@@ -16,17 +16,16 @@ echo "**** DOWNLOAD - INSTALLING MODELS ****"
 # Create the ComfyUI directory in workspace if it doesn't exist
 mkdir -p /workspace/ComfyUI
 
-# If /ComfyUI exists (original copy), move its contents to /workspace/ComfyUI
-if [ -d "/ComfyUI" ]; then
-    echo "**** COPY COMFYUI TO WORKSPACE ****"
-    # Use cp instead of mv to preserve original files
-    cp -r /ComfyUI/* /workspace/ComfyUI/
-    # Remove the original ComfyUI directory
-    rm -rf /ComfyUI
-fi
-
-# Create symlink if it doesn't exist
-if [[ ! -L "/ComfyUI" ]]; then
+# Check if /ComfyUI exists and is not already a symlink
+if [ -d "/ComfyUI" ] && [ ! -L "/ComfyUI" ]; then
+    echo "**** SETTING UP COMFYUI IN WORKSPACE ****"
+    # Remove destination directory if it exists
+    rm -rf /workspace/ComfyUI
+    # Move the entire ComfyUI directory to workspace
+    mv /ComfyUI/* /workspace/ComfyUI/
+    mv /ComfyUI/.* /workspace/ComfyUI/ 2>/dev/null || true
+    rmdir /ComfyUI
+    # Create symlink
     ln -sf /workspace/ComfyUI /ComfyUI
 fi
 
