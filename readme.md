@@ -1,8 +1,8 @@
 # Hunyuan Video Generation on RunPod - BASIC
 
-Use the allinone2.0 for full Ultra 1.3 Workflow
+This is a basic setup for Hunyuan Video
 
-https://runpod.io/console/deploy?template=ni7h67zrdk&ref=0eayrc3z
+Use the lastest branch (3.0) for full nodes and models 
 
 ----------------------------------------------------------------
 
