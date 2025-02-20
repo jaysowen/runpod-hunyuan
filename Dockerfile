@@ -33,7 +33,7 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 # 2) FINAL STAGE
 # =============================================================================
-FROM nvidia/cuda:12.6.0-devel-ubuntu22.04   # Changed from runtime to devel
+FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -63,7 +63,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Add environment variables for compilation
 ENV CC=gcc \
     CXX=g++
-    
+
 # Upgrade pip
 RUN pip3 install --no-cache-dir --upgrade pip
 
