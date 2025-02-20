@@ -13,8 +13,8 @@ echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
 echo "**** DOWNLOAD - INSTALLING MODELS ****"
 /download_models.sh
 
-# Create the ComfyUI directory in workspace if it doesn't exist
-mkdir -p /workspace/ComfyUI
+# # Create the ComfyUI directory in workspace if it doesn't exist
+# mkdir -p /workspace/ComfyUI
 
 # Check if /ComfyUI exists and is not already a symlink
 if [ -d "/ComfyUI" ] && [ ! -L "/ComfyUI" ]; then

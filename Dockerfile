@@ -148,7 +148,7 @@ COPY scripts/*.sh /
 RUN chmod +x /*.sh
 
 # (Optional) Create necessary directories
-RUN mkdir -p /workspace/logs /workspace/ComfyUI/models/{unet,text_encoders,clip_vision,vae,loras}
+# RUN mkdir -p /workspace/logs /workspace/ComfyUI/models/{unet,text_encoders,clip_vision,vae,loras}
 
 # Switch back to root or a working directory
 WORKDIR /
