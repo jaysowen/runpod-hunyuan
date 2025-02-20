@@ -10,7 +10,7 @@ This guide will walk you through setting up and running the Hunyuan Video Genera
 
 ## Prerequisites
 
-- A RunPod account (sign up at https://runpod.io)
+- A RunPod account (sign up at [https://runpod.io](https://runpod.io?ref=0eayrc3z))
 - Basic familiarity with Docker and command-line interfaces
 
 ## Step 1: Setting Up Your RunPod Environment
