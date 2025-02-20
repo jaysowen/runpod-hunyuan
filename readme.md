@@ -13,7 +13,7 @@ UPDATE
 - 🧩 Extensive collection of custom nodes
 - 🔧 Auto-installing workflow utilities
 - 🎨 Built-in enhancement tools
-- 🛠️ JupyterLab integration
+- 🛠️ JupyterLab integration (Removed VSCode)
 - 🔒 SSH access support
 
 ## 🚀 Getting Started
