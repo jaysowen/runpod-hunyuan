@@ -33,7 +33,7 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 # 2) FINAL STAGE
 # =============================================================================
-FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04
+FROM nvidia/cuda:12.6.0-devel-ubuntu22.04   # Changed from runtime to devel
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -53,12 +53,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-server \
     nodejs \
     npm \
+    build-essential \
+    python3-dev \
+    nvidia-cuda-dev \
+    gcc \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# If you need runtime compilation of certain nodes, ALSO add:
-# build-essential, python3-dev, etc.
-# RUN apt-get update && apt-get install -y build-essential python3-dev && rm -rf /var/lib/apt/lists/*
-
+# Add environment variables for compilation
+ENV CC=gcc \
+    CXX=g++
+    
 # Upgrade pip
 RUN pip3 install --no-cache-dir --upgrade pip
 
