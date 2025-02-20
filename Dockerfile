@@ -1,54 +1,39 @@
-# Build stage
-FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 as builder
+# =============================================================================
+# 1) BUILDER STAGE
+# =============================================================================
+FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04 as builder
 
-# Install build dependencies more comprehensively
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python-is-python3 \
-    git \
-    build-essential \
-    python3-dev \
-    curl \
-    wget \
-    gcc \
-    g++ \
-    make \
-    cmake \
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-pip \
+        python-is-python3 \
+        git \
+        build-essential \
+        python3-dev \
+        curl \
+        wget \
+        gcc \
+        g++ \
+        make \
+        cmake \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables
+# Environment variables
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     CC=gcc \
     CXX=g++
 
-# Clone ComfyUI
+# Clone ComfyUI (source only; no final environment here)
 WORKDIR /
 RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 
-# Install build-time dependencies only
-WORKDIR /ComfyUI/custom_nodes
-
-# Clone and install custom nodes that require compilation
-RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
-
-# Install build requirements for nodes that need compilation
-RUN for dir in */; do \
-    if [ -f "${dir}requirements.txt" ]; then \
-        echo "Installing build requirements for ${dir}..." && \
-        pip install --no-cache-dir -r "${dir}requirements.txt" || true; \
-    fi; \
-    if [ -f "${dir}install.py" ]; then \
-        echo "Running install script for ${dir}..." && \
-        python "${dir}install.py" || true; \
-    fi \
-    done
-
-# Final stage
-FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
+# =============================================================================
+# 2) FINAL STAGE
+# =============================================================================
+FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -59,23 +44,37 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libgl1 \
     libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgl1-mesa-glx \
     wget \
     curl \
     openssh-server \
     nodejs \
     npm \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgl1-mesa-glx \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PyTorch and core dependencies
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir torch==2.4 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu124
+# If you need runtime compilation of certain nodes, ALSO add:
+# build-essential, python3-dev, etc.
+# RUN apt-get update && apt-get install -y build-essential python3-dev && rm -rf /var/lib/apt/lists/*
 
-# Install runtime Python packages
+# Upgrade pip
+RUN pip3 install --no-cache-dir --upgrade pip
+
+# --- Install PyTorch 2.6 for CUDA 12.6 ---
+# The official command from pytorch.org for 2.6 stable, Linux, pip, Python, CUDA 12.6:
+RUN pip3 install --no-cache-dir torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/cu126
+
+# Copy ComfyUI from builder
+COPY --from=builder /ComfyUI /ComfyUI
+
+# Install ComfyUI requirements
+WORKDIR /ComfyUI
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Install other Python packages (e.g., Jupyter, accelerate, etc.)
 RUN pip3 install --no-cache-dir \
     jupyterlab \
     notebook \
@@ -85,20 +84,14 @@ RUN pip3 install --no-cache-dir \
     jupyterlab_widgets \
     triton \
     sageattention \
-    opencv-python \
-    pillow \
-    numpy \
-    scipy \
-    transformers \
     safetensors \
     aiohttp \
     accelerate \
-    pyyaml
+    pyyaml \
+    torchsde \
+    opencv-python
 
-# Copy ComfyUI and compiled custom nodes from builder
-COPY --from=builder /ComfyUI /ComfyUI
-
-# Install remaining custom nodes that don't require compilation
+# Install custom nodes
 WORKDIR /ComfyUI/custom_nodes
 RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
     git clone --depth 1 https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
@@ -130,11 +123,22 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
-    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git
+    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
 
-# Install ComfyUI requirements
-WORKDIR /ComfyUI
-RUN pip install --no-cache-dir -r requirements.txt
+# Install build requirements for custom nodes that need them
+RUN for dir in */; do \
+    if [ -f "${dir}requirements.txt" ]; then \
+        echo "Installing build requirements for ${dir}..." && \
+        pip3 install --no-cache-dir -r "${dir}requirements.txt" || true; \
+    fi; \
+    if [ -f "${dir}install.py" ]; then \
+        echo "Running install script for ${dir}..." && \
+        python3 "${dir}install.py" || true; \
+    fi \
+    done
 
 # Copy workflow files
 COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
@@ -143,10 +147,10 @@ COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows
 COPY scripts/*.sh /
 RUN chmod +x /*.sh
 
-# Create necessary directories
-RUN mkdir -p /workspace/logs /workspace/ComfyUI/models/{unet,text_encoders,clip_vision,vae,loras}
+# (Optional) Create necessary directories
+# RUN mkdir -p /workspace/logs /workspace/ComfyUI/models/{unet,text_encoders,clip_vision,vae,loras}
 
-# Set working directory
+# Switch back to root or a working directory
 WORKDIR /
 
 CMD ["/start.sh"]

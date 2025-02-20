@@ -1,6 +1,5 @@
 #!/bin/bash
-# Exit on error
-set -e
+set -e  # Exit on error
 
 echo "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
 

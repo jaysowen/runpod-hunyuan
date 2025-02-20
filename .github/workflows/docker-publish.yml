@@ -2,9 +2,9 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ "allinone3.0" ]
+    branches: [ "allinone3test" ]
   pull_request:
-    branches: [ "allinone3.0" ]
+    branches: [ "allinone3test" ]
 
 env:
   REGISTRY: docker.io
