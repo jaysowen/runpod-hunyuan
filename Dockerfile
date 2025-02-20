@@ -28,7 +28,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Clone ComfyUI (source only; no final environment here)
 WORKDIR /
-RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git .
+RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 
 # =============================================================================
 # 2) FINAL STAGE
