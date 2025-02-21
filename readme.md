@@ -3,6 +3,9 @@
 Welcome to the most awesome ComfyUI setup you'll ever encounter! This template comes packed with everything you need to start creating amazing AI-generated videos and images. 🚀
 
 UPDATE
+21/02/25
+- Added download-files.sh - Add your models to files.txt and './download-files.sh' on terminal to download all your files from hugginface
+- Updated Python to comfy recommened 3.12 - Uses Miniconda
 20/02/25
 - Everything working  well now udpated to the latest Pytorch and Cuda (Better performance)
 - One anoying issue is the Easy Setnode refuse to work so I've created an alternative AllinoneUltra1.3 without that node 
