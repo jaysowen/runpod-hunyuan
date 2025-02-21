@@ -9245,87 +9245,6 @@
       }
     },
     {
-      "id": 1810,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        1640,
-        100
-      ],
-      "size": [
-        210,
-        376
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 210,
-      "mode": 4,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 3132
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "meta_batch",
-          "type": "VHS_BatchManager",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null
-        }
-      ],
-      "title": "UPSCALE II° / REFINE",
-      "properties": {
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 24,
-        "loop_count": 0,
-        "filename_prefix": "Hunyuan_refined",
-        "format": "video/h264-mp4",
-        "pix_fmt": "yuv420p",
-        "crf": 13,
-        "save_metadata": true,
-        "trim_to_audio": false,
-        "pingpong": false,
-        "save_output": false,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {
-            "filename": "Hunyuan_refined_00033.mp4",
-            "subfolder": "",
-            "type": "temp",
-            "format": "video/h264-mp4",
-            "frame_rate": 24,
-            "workflow": "Hunyuan_refined_00033.png",
-            "fullpath": "F:\\Comfy2\\ComfyUI\\temp\\Hunyuan_refined_00033.mp4"
-          },
-          "muted": false
-        }
-      },
-      "color": "#222",
-      "bgcolor": "#000"
-    },
-    {
       "id": 1825,
       "type": "SetNode",
       "pos": [
@@ -9728,7 +9647,7 @@
       ],
       "size": [
         152.958984375,
-        20
+        26
       ],
       "flags": {
         "pinned": true,
@@ -11537,87 +11456,6 @@
       ],
       "color": "#233",
       "bgcolor": "#355"
-    },
-    {
-      "id": 1811,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        2240,
-        100
-      ],
-      "size": [
-        210,
-        376
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 211,
-      "mode": 4,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 3133
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "meta_batch",
-          "type": "VHS_BatchManager",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null
-        }
-      ],
-      "title": "INTERPOLATED",
-      "properties": {
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 48,
-        "loop_count": 0,
-        "filename_prefix": "Hunyuan_interpolated",
-        "format": "video/h264-mp4",
-        "pix_fmt": "yuv420p",
-        "crf": 13,
-        "save_metadata": true,
-        "trim_to_audio": false,
-        "pingpong": false,
-        "save_output": false,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {
-            "filename": "Hunyuan_interpolated_00010.mp4",
-            "subfolder": "",
-            "type": "temp",
-            "format": "video/h264-mp4",
-            "frame_rate": 48,
-            "workflow": "Hunyuan_interpolated_00010.png",
-            "fullpath": "F:\\Comfy2\\ComfyUI\\temp\\Hunyuan_interpolated_00010.mp4"
-          },
-          "muted": false
-        }
-      },
-      "color": "#222",
-      "bgcolor": "#000"
     },
     {
       "id": 584,
@@ -15967,87 +15805,6 @@
       "bgcolor": "#fff0"
     },
     {
-      "id": 2285,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        1050,
-        100
-      ],
-      "size": [
-        210,
-        376
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 223,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 3588
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "meta_batch",
-          "type": "VHS_BatchManager",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null
-        }
-      ],
-      "title": "UPSCALE I°",
-      "properties": {
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 24,
-        "loop_count": 0,
-        "filename_prefix": "Hunyuan_upscl_hun",
-        "format": "video/h264-mp4",
-        "pix_fmt": "yuv420p",
-        "crf": 13,
-        "save_metadata": true,
-        "trim_to_audio": false,
-        "pingpong": false,
-        "save_output": false,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {
-            "filename": "Hunyuan_upscl_hun_00001.mp4",
-            "subfolder": "",
-            "type": "temp",
-            "format": "video/h264-mp4",
-            "frame_rate": 24,
-            "workflow": "Hunyuan_upscl_hun_00001.png",
-            "fullpath": "F:\\Comfy2\\ComfyUI\\temp\\Hunyuan_upscl_hun_00001.mp4"
-          },
-          "muted": false
-        }
-      },
-      "color": "#222",
-      "bgcolor": "#000"
-    },
-    {
       "id": 2019,
       "type": "Label (rgthree)",
       "pos": [
@@ -18118,88 +17875,6 @@
       "bgcolor": "#3f5159"
     },
     {
-      "id": 1812,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        450,
-        100
-      ],
-      "size": [
-        235.1999969482422,
-        638.52001953125
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 249,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 3130
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "meta_batch",
-          "type": "VHS_BatchManager",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null,
-          "slot_index": 0
-        }
-      ],
-      "title": "RAW Output (t2v | i2v | v2v)",
-      "properties": {
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 24,
-        "loop_count": 0,
-        "filename_prefix": "Hunyuan_raw",
-        "format": "video/h264-mp4",
-        "pix_fmt": "yuv420p",
-        "crf": 13,
-        "save_metadata": true,
-        "trim_to_audio": false,
-        "pingpong": false,
-        "save_output": false,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {
-            "filename": "Hunyuan_raw_00002.mp4",
-            "subfolder": "",
-            "type": "temp",
-            "format": "video/h264-mp4",
-            "frame_rate": 24,
-            "workflow": "Hunyuan_raw_00002.png",
-            "fullpath": "/workspace/ComfyUI/temp/Hunyuan_raw_00002.mp4"
-          },
-          "muted": false
-        }
-      },
-      "color": "#222",
-      "bgcolor": "#000"
-    },
-    {
       "id": 332,
       "type": "TeaCacheHunyuanVideoSampler",
       "pos": [
@@ -19725,6 +19400,331 @@
       },
       "color": "#290000",
       "bgcolor": "#364d00"
+    },
+    {
+      "id": 1812,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        450,
+        100
+      ],
+      "size": [
+        570.9508056640625,
+        1412.62451171875
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 249,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 3130
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null,
+          "slot_index": 0
+        }
+      ],
+      "title": "RAW Output (t2v | i2v | v2v)",
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "Hunyuan_raw",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 13,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "Hunyuan_raw_00002.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "workflow": "Hunyuan_raw_00002.png",
+            "fullpath": "/workspace/ComfyUI/temp/Hunyuan_raw_00002.mp4"
+          },
+          "muted": false
+        }
+      },
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 2285,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        1050,
+        100
+      ],
+      "size": [
+        566.2498168945312,
+        1401.2884521484375
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 223,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 3588
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "title": "UPSCALE I°",
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "Hunyuan_upscl_hun",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 13,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "Hunyuan_upscl_hun_00001.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "workflow": "Hunyuan_upscl_hun_00001.png",
+            "fullpath": "/workspace/ComfyUI/temp/Hunyuan_upscl_hun_00001.mp4"
+          },
+          "muted": false
+        }
+      },
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 1810,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        1640,
+        100
+      ],
+      "size": [
+        572.0030517578125,
+        1402.814697265625
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 210,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 3132
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "title": "UPSCALE II° / REFINE",
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "Hunyuan_refined",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 13,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "Hunyuan_refined_00033.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "workflow": "Hunyuan_refined_00033.png",
+            "fullpath": "F:\\Comfy2\\ComfyUI\\temp\\Hunyuan_refined_00033.mp4"
+          },
+          "muted": false
+        }
+      },
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 1811,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        2240,
+        100
+      ],
+      "size": [
+        575.4892578125,
+        1401.024169921875
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 211,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 3133
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "title": "INTERPOLATED",
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 48,
+        "loop_count": 0,
+        "filename_prefix": "Hunyuan_interpolated",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 13,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "Hunyuan_interpolated_00010.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 48,
+            "workflow": "Hunyuan_interpolated_00010.png",
+            "fullpath": "F:\\Comfy2\\ComfyUI\\temp\\Hunyuan_interpolated_00010.mp4"
+          },
+          "muted": false
+        }
+      },
+      "color": "#222",
+      "bgcolor": "#000"
     }
   ],
   "links": [
@@ -27164,7 +27164,7 @@
       3709,
       10,
       0,
-      2285,
+      1812,
       3,
       "VAE"
     ],
@@ -27172,7 +27172,7 @@
       3710,
       10,
       0,
-      1812,
+      2285,
       3,
       "VAE"
     ]
@@ -27702,10 +27702,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.45000000000000107,
+      "scale": 0.20992832109438114,
       "offset": [
-        1707.2733821635038,
-        74.35429922474515
+        4405.0331990735085,
+        1704.082602584222
       ]
     },
     "linkExtensions": [
@@ -27816,7 +27816,7 @@
         "type": "VAE"
       },
       {
-        "downstream": 2285,
+        "downstream": 1812,
         "downstream_slot": 3,
         "upstream": "10",
         "upstream_slot": 0,
@@ -27824,7 +27824,7 @@
         "type": "VAE"
       },
       {
-        "downstream": 1812,
+        "downstream": 2285,
         "downstream_slot": 3,
         "upstream": "10",
         "upstream_slot": 0,

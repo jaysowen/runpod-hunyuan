@@ -168,6 +168,9 @@ COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows
 COPY scripts/*.sh /
 RUN chmod +x /*.sh
 
+COPY download-files.sh files.txt /workspace/
+RUN chmod +x /download-files.sh
+
 WORKDIR /
 
 CMD ["/start.sh"]
