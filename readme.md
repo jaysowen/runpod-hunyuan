@@ -23,7 +23,7 @@ This guide will walk you through setting up and running the Hunyuan Video Genera
 
 1. In the template selection:
    - Select "Custom Template"
-   - Container Image: `dihan/hunyuan-runpod:allinone`
+   - Container Image: `dihan/hunyuan-runpod:main`
    - Choose a GPU (Recommended: RTX 4090 or better)
    - Select at least 24GB RAM
    - Storage: Minimum 20GB (Recommended: 40GB)
