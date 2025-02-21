@@ -163,13 +163,12 @@ RUN for dir in */; do \
 
 # Copy workflow files
 COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
-
 # Copy scripts
 COPY scripts/*.sh /
 RUN chmod +x /*.sh
 
 COPY download-files.sh files.txt /workspace/
-RUN chmod +x /download-files.sh
+RUN chmod +x /workspace/download-files.sh
 
 WORKDIR /
 
