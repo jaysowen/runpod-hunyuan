@@ -1,6 +1,15 @@
-# 🎮 ComfyUI All-in-One RunPod Template
+# 🎮 ComfyUI All-in-One RunPod Template 3.0
 
 Welcome to the most awesome ComfyUI setup you'll ever encounter! This template comes packed with everything you need to start creating amazing AI-generated videos and images. 🚀
+
+UPDATE
+21/02/25
+- Added download-files.sh - Add your models to files.txt and './download-files.sh' on terminal to download all your files from hugginface
+- Updated Python to comfy recommened 3.12 - Uses Miniconda
+  
+20/02/25
+- Everything working  well now udpated to the latest Pytorch and Cuda (Better performance)
+- One anoying issue is the Easy Setnode refuse to work so I've created an alternative AllinoneUltra1.3 without that node 
 
 ## ✨ Features
 
@@ -8,14 +17,14 @@ Welcome to the most awesome ComfyUI setup you'll ever encounter! This template c
 - 🧩 Extensive collection of custom nodes
 - 🔧 Auto-installing workflow utilities
 - 🎨 Built-in enhancement tools
-- 🛠️ JupyterLab integration
+- 🛠️ JupyterLab integration (Removed VSCode)
 - 🔒 SSH access support
 
 ## 🚀 Getting Started
 
 ### 1. Template Deployment
 
-1. Head over to [RunPod.io](https://runpod.io)
+1. Head over to [RunPod.io]([https://runpod.io](https://runpod.io?ref=0eayrc3z))
 2. Click on `Deploy` and select `Template`
 3. Search for `Hunyuan Video - ComfyUI Manager - AllInOne3.0`
 4. Choose your preferred GPU
@@ -25,11 +34,14 @@ Welcome to the most awesome ComfyUI setup you'll ever encounter! This template c
 
 Once your pod is up and running, you'll see several URLs in your pod's overview:
 
+- Will take around 25 mins to to download all the models (Will try to make this faster). Give it a few miniutes after "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
+
 - 🎨 **ComfyUI**: `https://your-pod-id-8188.proxy.runpod.net`
 - 📓 **JupyterLab**: `https://your-pod-id-8888.proxy.runpod.net`
 
 ### 3. Working with JupyterLab
 
+- To set a password. on ENV template set JUPYTERLAB_PASSWORD = "password"
 - Access JupyterLab using the URL from your pod's overview
 - Default password is empty (just press Enter)
 - All your work will be saved in the `/workspace` directory
@@ -38,11 +50,11 @@ Once your pod is up and running, you'll see several URLs in your pod's overview:
 
 To enable SSH access:
 1. Set your `PUBLIC_KEY` in the template settings
-2. Connect using: `ssh -p <port> runpod@<ip-address>`
+2. Connect using: `ssh -p <port> runpod@<ip-address>` Full link avaliable on connet button on Runpod
 
 ## 📥 Downloading Models
 
-### From HuggingFace 🤗
+### From HuggingFace 🤗 or ### From Civitai 🎨
 
 1. Open JupyterLab terminal and navigate to your desired directory:
 ```bash
@@ -52,10 +64,10 @@ cd /workspace/ComfyUI/models/checkpoints
 2. Download using wget (replace URL with your model link):
 ```bash
 # For direct downloads
-wget https://huggingface.co/CompVis/stable-diffusion-v1-4/resolve/main/sd-v1-4.ckpt
+wget -O https://huggingface.co/CompVis/stable-diffusion-v1-4/resolve/main/sd-v1-4.ckpt
 
 # For files requiring authentication
-wget --header="Authorization: Bearer YOUR_HF_TOKEN" https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned.ckpt
+wget -O ArcaneJinx.safetensors "https://civitai.com/api/download/models/782002?type=Model&format=SafeTensor&token=xxxxxxxxxxxxxxxxxxxxxxxxxxx""
 ```
 
 3. For large files, you can show progress:
@@ -63,31 +75,7 @@ wget --header="Authorization: Bearer YOUR_HF_TOKEN" https://huggingface.co/runwa
 wget -q --show-progress https://huggingface.co/model/resolve/main/model.safetensors
 ```
 
-### From Civitai 🎨
 
-1. Get the direct download link from Civitai:
-   - Go to the model page
-   - Click "Download"
-   - Right-click the download button
-   - Copy the link address
-
-2. Download using wget:
-```bash
-# For standard models
-wget -O model_name.safetensors "CIVITAI_DIRECT_DOWNLOAD_URL"
-
-# For showing progress
-wget -q --show-progress -O model_name.safetensors "CIVITAI_DIRECT_DOWNLOAD_URL"
-```
-
-3. Verify the download:
-```bash
-# Check file size
-ls -lh model_name.safetensors
-
-# Check if file is not corrupted (for safetensors)
-python3 -c "import torch; torch.load('model_name.safetensors', map_location='cpu')"
-```
 
 ### Pro Tips 💡
 
@@ -98,7 +86,6 @@ mkdir -p /workspace/ComfyUI/models/{checkpoints,loras,controlnet,upscale_models}
 
 # Download directly to specific folders
 cd /workspace/ComfyUI/models/loras
-wget -q --show-progress -O my_lora.safetensors "DOWNLOAD_URL"
 ```
 
 2. **Batch Downloads**:
@@ -275,5 +262,3 @@ wget -c -q --show-progress "DOWNLOAD_URL"
 - Custom node settings are preserved in `/workspace/ComfyUI/custom_nodes`
 - Node updates are handled automatically on container restart
 - Additional nodes can be installed via ComfyUI Manager
-
-[Rest of the README remains the same...]

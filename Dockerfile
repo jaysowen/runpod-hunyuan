@@ -6,19 +6,29 @@ FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04 as builder
 # Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        python3 \
-        python3-pip \
-        python-is-python3 \
+        wget \
         git \
         build-essential \
-        python3-dev \
         curl \
-        wget \
         gcc \
         g++ \
         make \
         cmake \
-    && rm -rf /var/lib/apt/lists/*
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Miniconda and Python 3.12
+RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    chmod +x ~/miniconda.sh && \
+    ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh
+
+# Add conda to path
+ENV PATH /opt/conda/bin:$PATH
+
+# Create Python 3.12 environment
+RUN conda install -y python=3.12 pip && \
+    conda clean -ya
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -33,38 +43,53 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 # 2) FINAL STAGE
 # =============================================================================
-FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04
+FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
 
 # Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    python-is-python3 \
-    git \
-    ffmpeg \
-    libgl1 \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgl1-mesa-glx \
-    wget \
-    curl \
-    openssh-server \
-    nodejs \
-    npm \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        wget \
+        git \
+        ffmpeg \
+        libgl1 \
+        libglib2.0-0 \
+        libsm6 \
+        libxext6 \
+        libxrender-dev \
+        libgl1-mesa-glx \
+        curl \
+        openssh-server \
+        nodejs \
+        npm \
+        build-essential \
+        nvidia-cuda-dev \
+        gcc \
+        g++ \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-# If you need runtime compilation of certain nodes, ALSO add:
-# build-essential, python3-dev, etc.
-# RUN apt-get update && apt-get install -y build-essential python3-dev && rm -rf /var/lib/apt/lists/*
+# Install Miniconda and Python 3.12
+RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    chmod +x ~/miniconda.sh && \
+    ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh
+
+# Add conda to path
+ENV PATH /opt/conda/bin:$PATH
+
+# Create Python 3.12 environment
+RUN conda install -y python=3.12 pip && \
+    conda clean -ya
+
+# Add environment variables for compilation
+ENV CC=gcc \
+    CXX=g++
 
 # Upgrade pip
-RUN pip3 install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
 
 # --- Install PyTorch 2.6 for CUDA 12.6 ---
-# The official command from pytorch.org for 2.6 stable, Linux, pip, Python, CUDA 12.6:
-RUN pip3 install --no-cache-dir torch torchvision torchaudio \
+RUN pip install --no-cache-dir torch torchvision torchaudio \
     --index-url https://download.pytorch.org/whl/cu126
 
 # Copy ComfyUI from builder
@@ -72,10 +97,10 @@ COPY --from=builder /ComfyUI /ComfyUI
 
 # Install ComfyUI requirements
 WORKDIR /ComfyUI
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install other Python packages (e.g., Jupyter, accelerate, etc.)
-RUN pip3 install --no-cache-dir \
+# Install other Python packages
+RUN pip install --no-cache-dir \
     jupyterlab \
     notebook \
     ipykernel \
@@ -89,9 +114,10 @@ RUN pip3 install --no-cache-dir \
     accelerate \
     pyyaml \
     torchsde \
-    opencv-python
+    opencv-python \
+    gdown
 
-# Install custom nodes
+# Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
 RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
     git clone --depth 1 https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
@@ -119,7 +145,6 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone --depth 1 https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
     git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git && \
     git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
@@ -128,29 +153,23 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
 
-# Install build requirements for custom nodes that need them
+# Install requirements for custom nodes (if any)
 RUN for dir in */; do \
     if [ -f "${dir}requirements.txt" ]; then \
-        echo "Installing build requirements for ${dir}..." && \
-        pip3 install --no-cache-dir -r "${dir}requirements.txt" || true; \
-    fi; \
-    if [ -f "${dir}install.py" ]; then \
-        echo "Running install script for ${dir}..." && \
-        python3 "${dir}install.py" || true; \
+        echo "Installing requirements for ${dir}..." && \
+        pip install --no-cache-dir -r "${dir}requirements.txt" || true; \
     fi \
     done
 
 # Copy workflow files
 COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
-
 # Copy scripts
 COPY scripts/*.sh /
 RUN chmod +x /*.sh
 
-# (Optional) Create necessary directories
-# RUN mkdir -p /workspace/logs /workspace/ComfyUI/models/{unet,text_encoders,clip_vision,vae,loras}
+COPY download-files.sh files.txt /workspace/
+RUN chmod +x /workspace/download-files.sh
 
-# Switch back to root or a working directory
 WORKDIR /
 
 CMD ["/start.sh"]
