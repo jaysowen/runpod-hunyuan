@@ -170,7 +170,7 @@ RUN for dir in */; do \
     done
 
 # Copy workflow files
-COPY AllinOneUltra1.2.json AllinOneUltra1.3.json /ComfyUI/user/default/workflows/
+COPY AllinOneUltra1.2.json AllinOneUltra1.3.json AllinOneUltra1.4.json /ComfyUI/user/default/workflows/
 # Copy scripts
 COPY scripts/*.sh /
 RUN chmod +x /*.sh
