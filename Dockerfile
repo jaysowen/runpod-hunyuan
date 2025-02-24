@@ -1,7 +1,7 @@
 # =============================================================================
 # 1) BUILDER STAGE
 # =============================================================================
-FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04 as builder
+FROM nvidia/cuda:12.5.0-runtime-ubuntu22.04 as builder
 
 # Install build dependencies
 RUN apt-get update && \
@@ -43,7 +43,7 @@ RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 # 2) FINAL STAGE
 # =============================================================================
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.5.0-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && \
