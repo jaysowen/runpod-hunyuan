@@ -89,8 +89,7 @@ ENV CC=gcc \
 RUN pip install --no-cache-dir --upgrade pip
 
 # --- Install PyTorch 2.6 for CUDA 12.6 ---
-RUN pip install --no-cache-dir torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cu126
+RUN pip install --no-cache-dir torch torchvision torchaudio
 
 # Copy ComfyUI from builder
 COPY --from=builder /ComfyUI /ComfyUI
