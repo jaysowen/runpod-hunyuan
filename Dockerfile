@@ -151,7 +151,9 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
     git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
+    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git && \
+    git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone --depth 1 https://github.com/kijai/ComfyUI-HunyuanVideoWrapper.git
 
 # Install requirements for custom nodes (if any)
 RUN for dir in */; do \
