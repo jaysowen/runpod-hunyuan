@@ -66,7 +66,18 @@ RUN apt-get update && \
         gcc \
         g++ \
         ca-certificates && \
+        libegl1 \
+        libegl-mesa0 \
+        libgles2-mesa-dev \
+        libglvnd0 \
+        libglx0 \
+        libopengl0 \
+        x11-xserver-utils && \
     rm -rf /var/lib/apt/lists/*
+
+# Set OpenGL environment variables -  libEGL.so not loaded
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
+ENV DISPLAY=:99
 
 # Install Miniconda and Python 3.12
 RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
@@ -88,7 +99,7 @@ ENV CC=gcc \
 # Upgrade pip
 RUN pip install --no-cache-dir --upgrade pip
 
-# --- Install PyTorch 2.6 for CUDA 12.6 ---
+# --- Install PyTorch for CUDA ---
 RUN pip install --no-cache-dir torch torchvision torchaudio
 
 # Copy ComfyUI from builder

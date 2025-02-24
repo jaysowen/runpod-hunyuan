@@ -59,3 +59,8 @@ Sun Feb 23 08:34:32 2025
 +-----------------------------------------------------------------------------------------+
 root@3ae26e36c659a6fd:/workspace/ComfyUI/custom_nodes/ComfyUI-HunyuanLoom# python -c "import torch; print(f'PyTorch Version: {torch.__version__}')"
 PyTorch Version: 2.6.0+cu126
+
+
+libEGL.so not loaded
+https://github.com/akatz-ai/ComfyUI-Depthflow-Nodes/issues/8
+https://claude.ai/chat/31bc1622-41f3-452a-91d8-00ddbb68c317
