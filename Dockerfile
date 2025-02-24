@@ -65,7 +65,7 @@ RUN apt-get update && \
         nvidia-cuda-dev \
         gcc \
         g++ \
-        ca-certificates && \
+        ca-certificates \
         libegl1 \
         libegl-mesa0 \
         libgles2-mesa-dev \
