@@ -56,25 +56,11 @@ To enable SSH access:
 
 ### From HuggingFace 🤗 or ### From Civitai 🎨
 
-1. Open JupyterLab terminal and navigate to your desired directory:
+1. Open JupyterLab terminal and navigate to workspace and edit files.txt and 'run ./download-files.sh':
 ```bash
-cd /workspace/ComfyUI/models/checkpoints
+cd /workspace/files.sh
+cd /workspace/download-files.sh
 ```
-
-2. Download using wget (replace URL with your model link):
-```bash
-# For direct downloads
-wget -O https://huggingface.co/CompVis/stable-diffusion-v1-4/resolve/main/sd-v1-4.ckpt
-
-# For files requiring authentication
-wget -O ArcaneJinx.safetensors "https://civitai.com/api/download/models/782002?type=Model&format=SafeTensor&token=xxxxxxxxxxxxxxxxxxxxxxxxxxx""
-```
-
-3. For large files, you can show progress:
-```bash
-wget -q --show-progress https://huggingface.co/model/resolve/main/model.safetensors
-```
-
 
 
 ### Pro Tips 💡
