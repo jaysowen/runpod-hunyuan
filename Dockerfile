@@ -73,7 +73,11 @@ RUN apt-get update && \
         libglvnd0 \
         libglx0 \
         libopengl0 \
-        x11-xserver-utils && \
+        x11-xserver-utils \
+        ttf-mscorefonts-installer \
+        fonts-liberation \
+        fonts-dejavu \
+        fontconfig && \
     rm -rf /var/lib/apt/lists/*
 
 # Set OpenGL environment variables -  libEGL.so not loaded
@@ -192,15 +196,6 @@ RUN dos2unix /*.sh && \
     dos2unix /workspace/*.sh && \
     chmod +x /*.sh && \
     chmod +x /workspace/*.sh
-
-
-# Install additional fonts to support the TitlePlus node
-RUN apt-get update && apt-get install -y \
-    ttf-mscorefonts-installer \
-    fonts-liberation \
-    fonts-dejavu \
-    fontconfig \
-    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /
 
