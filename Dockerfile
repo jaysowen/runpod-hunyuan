@@ -47,6 +47,8 @@ FROM nvidia/cuda:12.5.0-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && \
+    # Pre-accept the Microsoft font EULA
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
     apt-get install -y --no-install-recommends \
         wget \
         git \
