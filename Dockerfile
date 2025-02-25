@@ -193,6 +193,15 @@ RUN dos2unix /*.sh && \
     chmod +x /*.sh && \
     chmod +x /workspace/*.sh
 
+
+# Install additional fonts to support the TitlePlus node
+RUN apt-get update && apt-get install -y \
+    ttf-mscorefonts-installer \
+    fonts-liberation \
+    fonts-dejavu \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /
 
 CMD ["/start.sh"]
