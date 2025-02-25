@@ -169,6 +169,8 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
     git clone --depth 1 https://github.com/evanspearman/ComfyMath.git && \
     git clone --depth 1 https://github.com/BlueprintCoding/ComfyUI_AIDocsClinicalTools.git && \
+    git clone --depth 1 https://github.com/logtd/ComfyUI-HunyuanLoom.git && \
+    git clone --depth 1 https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
     git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
 
 
