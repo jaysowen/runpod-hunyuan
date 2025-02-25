@@ -66,6 +66,7 @@ RUN apt-get update && \
         gcc \
         g++ \
         ca-certificates \
+        dos2unix \
         libegl1 \
         libegl-mesa0 \
         libgles2-mesa-dev \
@@ -181,12 +182,14 @@ RUN for dir in */; do \
 
 # Copy workflow files
 COPY AllinOneUltra1.2.json AllinOneUltra1.3.json AllinOneUltra1.4.json /ComfyUI/user/default/workflows/
+
 # Copy scripts
 COPY scripts/*.sh /
-RUN chmod +x /*.sh
-
 COPY download-files.sh files.txt /workspace/
-RUN chmod +x /workspace/download-files.sh
+RUN dos2unix /*.sh && \
+    dos2unix /workspace/*.sh && \
+    chmod +x /*.sh && \
+    chmod +x /workspace/*.sh
 
 WORKDIR /
 
