@@ -177,11 +177,11 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/BlueprintCoding/ComfyUI_AIDocsClinicalTools.git && \
     git clone --depth 1 https://github.com/logtd/ComfyUI-HunyuanLoom.git && \
     git clone --depth 1 https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
-    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git \
-    git clone --depth 1 https://github.com/Stability-AI/stability-ComfyUI-nodes.git \
-    git clone --depth 1 https://github.com/DoctorDiffusion/ComfyUI-MediaMixer.git \
-    git clone --depth 1 https://github.com/kijai/ComfyUI-VideoNoiseWarp \
-    git clone --depth 1 https://github.com/spacepxl/ComfyUI-Image-Filters
+    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git && \
+    git clone --depth 1 https://github.com/Stability-AI/stability-ComfyUI-nodes.git && \
+    git clone --depth 1 https://github.com/DoctorDiffusion/ComfyUI-MediaMixer.git && \
+    git clone --depth 1 https://github.com/kijai/ComfyUI-VideoNoiseWarp.git && \
+    git clone --depth 1 https://github.com/spacepxl/ComfyUI-Image-Filters.git
 
 
 # Install requirements for custom nodes (if any)
