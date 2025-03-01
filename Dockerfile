@@ -192,6 +192,13 @@ RUN for dir in */; do \
     fi \
     done
 
+# After cloning all the other repositories:
+WORKDIR /
+RUN git clone --depth 1 https://github.com/dihan/comfyui-output-gallery.git
+
+WORKDIR /comfyui-output-gallery
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Copy workflow files
 COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
 

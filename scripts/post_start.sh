@@ -41,3 +41,8 @@ echo "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
 # Change to ComfyUI directory and start the server
 cd /workspace/ComfyUI
 python main.py --listen --port 8188 --enable-cors-header $COMFYUI_EXTRA_ARGS &
+
+echo "🖼️ Starting ComfyUI Output Gallery..."
+cd /comfyui-output-gallery
+nohup python app.py --root /workspace/ComfyUI/output --port 8181 --host 0.0.0.0 > /workspace/logs/gallery.log 2>&1 &
+echo "ComfyUI Output Gallery started on port 8181"
