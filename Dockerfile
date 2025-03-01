@@ -189,7 +189,9 @@ RUN for dir in */; do \
     done
 
 # Copy workflow files
-COPY AllinOneUltra1.2.json AllinOneUltra1.3.json AllinOneUltra1.4.json /ComfyUI/user/default/workflows/
+COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
+
+COPY comfy-workflows/ManageGallery.ipynb /ComfyUI/output/
 
 # Copy scripts
 COPY scripts/*.sh /
