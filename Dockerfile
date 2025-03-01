@@ -195,17 +195,17 @@ RUN for dir in */; do \
 # Copy workflow files
 COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
 
-# Copy scripts
+# Copy all scripts
 COPY scripts/*.sh /
 
 
-WORKDIR /
+RUN mkdir -p /workspace
 
-# Copy Gallery
 COPY /manage-files/ManageGallery.ipynb /workspace/
 
-# Copy Downlaod files system
-COPY /manage-files/download-files.sh /manage-files/files.txt /workspace/
+COPY /manage-files/download-files.sh /workspace/
+COPY /manage-files/files.txt /workspace/
+
 RUN dos2unix /*.sh && \
     dos2unix /workspace/*.sh && \
     chmod +x /*.sh && \
