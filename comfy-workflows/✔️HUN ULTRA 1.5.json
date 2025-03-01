@@ -1,6 +1,6 @@
 {
-  "last_node_id": 3101,
-  "last_link_id": 5397,
+  "last_node_id": 3108,
+  "last_link_id": 5416,
   "nodes": [
     {
       "id": 673,
@@ -109,7 +109,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 347,
+      "order": 343,
       "mode": 4,
       "inputs": [
         {
@@ -972,7 +972,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 294,
+      "order": 293,
       "mode": 4,
       "inputs": [
         {
@@ -1236,7 +1236,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 288,
+      "order": 287,
       "mode": 0,
       "inputs": [
         {
@@ -1500,7 +1500,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 295,
+      "order": 294,
       "mode": 4,
       "inputs": [
         {
@@ -1576,7 +1576,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 375,
+      "order": 373,
       "mode": 4,
       "inputs": [
         {
@@ -1622,7 +1622,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 327,
+      "order": 323,
       "mode": 0,
       "inputs": [
         {
@@ -1658,7 +1658,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 331,
+      "order": 327,
       "mode": 4,
       "inputs": [
         {
@@ -1857,7 +1857,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 307,
+      "order": 306,
       "mode": 4,
       "inputs": [
         {
@@ -1928,43 +1928,6 @@
       }
     },
     {
-      "id": 1986,
-      "type": "GetNode",
-      "pos": [
-        500,
-        -540
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 17,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            3321
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Get_ALL_W",
-      "properties": {},
-      "widgets_values": [
-        "ALL_W"
-      ],
-      "color": "#1b4669",
-      "bgcolor": "#29699c",
-      "shape": 2
-    },
-    {
       "id": 1207,
       "type": "GetNode",
       "pos": [
@@ -1979,7 +1942,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 18,
+      "order": 17,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -2008,14 +1971,14 @@
         -990
       ],
       "size": [
-        16.6845703125,
+        140,
         30
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 19,
+      "order": 18,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2040,14 +2003,14 @@
         -840
       ],
       "size": [
-        16.6845703125,
+        140,
         30
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 20,
+      "order": 19,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2079,7 +2042,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 21,
+      "order": 20,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2111,7 +2074,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 22,
+      "order": 21,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2143,7 +2106,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 23,
+      "order": 22,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2168,14 +2131,14 @@
         -910
       ],
       "size": [
-        16.6845703125,
+        140,
         30
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 24,
+      "order": 23,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2207,7 +2170,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 25,
+      "order": 24,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2239,7 +2202,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 26,
+      "order": 25,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2271,7 +2234,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 27,
+      "order": 26,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2379,13 +2342,13 @@
       ],
       "size": [
         471.77734375,
-        25
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 28,
+      "order": 27,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -2417,7 +2380,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 29,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
@@ -2551,7 +2514,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 336,
+      "order": 332,
       "mode": 4,
       "inputs": [
         {
@@ -2636,7 +2599,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 30,
+      "order": 29,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2674,7 +2637,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 31,
+      "order": 30,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -2870,7 +2833,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 32,
+      "order": 31,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2908,7 +2871,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 33,
+      "order": 32,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2997,7 +2960,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 34,
+      "order": 33,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -3034,7 +2997,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 35,
+      "order": 34,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -3070,7 +3033,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 36,
+      "order": 35,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3157,7 +3120,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 37,
+      "order": 36,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3195,7 +3158,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 38,
+      "order": 37,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3282,7 +3245,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 39,
+      "order": 38,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3320,7 +3283,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 40,
+      "order": 39,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3627,7 +3590,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 41,
+      "order": 40,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -3961,7 +3924,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 42,
+      "order": 41,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3999,7 +3962,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 43,
+      "order": 42,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -4092,7 +4055,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 44,
+      "order": 43,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -4199,7 +4162,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 45,
+      "order": 44,
       "mode": 2,
       "inputs": [],
       "outputs": [
@@ -4218,7 +4181,7 @@
         "Node name for S&R": "Seed Generator"
       },
       "widgets_values": [
-        191660038977575,
+        191660038977578,
         "increment"
       ],
       "color": "#223",
@@ -4351,10 +4314,9 @@
         82
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 340,
+      "order": 336,
       "mode": 4,
       "inputs": [
         {
@@ -4389,44 +4351,6 @@
       ]
     },
     {
-      "id": 2463,
-      "type": "easy getNode",
-      "pos": [
-        -1520,
-        1270
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 46,
-      "mode": 4,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "*",
-          "type": "*",
-          "links": [
-            4104,
-            4105,
-            5265
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "⬅️*",
-      "properties": {},
-      "widgets_values": [
-        "*"
-      ],
-      "color": "#223",
-      "bgcolor": "#303030"
-    },
-    {
       "id": 2332,
       "type": "SimpleMath+",
       "pos": [
@@ -4441,7 +4365,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 47,
+      "order": 45,
       "mode": 0,
       "inputs": [
         {
@@ -4503,7 +4427,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 48,
+      "order": 46,
       "mode": 4,
       "inputs": [
         {
@@ -4549,7 +4473,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 49,
+      "order": 47,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -4589,7 +4513,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 50,
+      "order": 48,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -4735,7 +4659,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 280,
+      "order": 279,
       "mode": 4,
       "inputs": [
         {
@@ -4773,7 +4697,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 299,
+      "order": 298,
       "mode": 0,
       "inputs": [
         {
@@ -4849,7 +4773,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 51,
+      "order": 49,
       "mode": 4,
       "inputs": [
         {
@@ -5151,7 +5075,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 323,
+      "order": 322,
       "mode": 0,
       "inputs": [
         {
@@ -5188,7 +5112,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 322,
+      "order": 321,
       "mode": 0,
       "inputs": [
         {
@@ -5238,7 +5162,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 52,
+      "order": 50,
       "mode": 4,
       "inputs": [
         {
@@ -5280,14 +5204,14 @@
         1610
       ],
       "size": [
-        117.0556640625,
-        15
+        140,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 53,
+      "order": 51,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -5319,7 +5243,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 54,
+      "order": 52,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -5392,7 +5316,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 55,
+      "order": 53,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -5418,43 +5342,6 @@
       ],
       "color": "#2a363b",
       "bgcolor": "#3f5159"
-    },
-    {
-      "id": 1985,
-      "type": "GetNode",
-      "pos": [
-        500,
-        -570
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 56,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            3322
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Get_ALL_H",
-      "properties": {},
-      "widgets_values": [
-        "ALL_H"
-      ],
-      "color": "#1b4669",
-      "bgcolor": "#29699c",
-      "shape": 2
     },
     {
       "id": 1886,
@@ -5509,7 +5396,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 57,
+      "order": 54,
       "mode": 4,
       "inputs": [
         {
@@ -5556,7 +5443,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 308,
+      "order": 307,
       "mode": 0,
       "inputs": [
         {
@@ -5594,7 +5481,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 58,
+      "order": 55,
       "mode": 0,
       "inputs": [
         {
@@ -5695,7 +5582,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 59,
+      "order": 56,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -5725,7 +5612,7 @@
       ],
       "size": [
         214.7587890625,
-        242
+        238
       ],
       "flags": {
         "collapsed": true,
@@ -6122,7 +6009,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 332,
+      "order": 328,
       "mode": 4,
       "inputs": [
         {
@@ -6160,7 +6047,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 60,
+      "order": 57,
       "mode": 0,
       "inputs": [
         {
@@ -6207,7 +6094,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 61,
+      "order": 58,
       "mode": 4,
       "inputs": [
         {
@@ -6254,7 +6141,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 62,
+      "order": 59,
       "mode": 4,
       "inputs": [
         {
@@ -6339,7 +6226,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 63,
+      "order": 60,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -6364,14 +6251,14 @@
         -450
       ],
       "size": [
-        589.65234375,
-        12
+        907.2000122070312,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 64,
+      "order": 61,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -6402,7 +6289,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 65,
+      "order": 62,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -6442,7 +6329,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 279,
+      "order": 278,
       "mode": 4,
       "inputs": [
         {
@@ -6485,7 +6372,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 66,
+      "order": 63,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -6517,7 +6404,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 376,
+      "order": 374,
       "mode": 4,
       "inputs": [
         {
@@ -6564,7 +6451,7 @@
       "widgets_values": [
         5,
         10,
-        145052030118353,
+        1124429880303164,
         "randomize"
       ]
     },
@@ -6580,10 +6467,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 67,
+      "order": 64,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -6605,43 +6491,6 @@
       "bgcolor": "#593930"
     },
     {
-      "id": 2458,
-      "type": "easy getNode",
-      "pos": [
-        -1930,
-        1200
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 68,
-      "mode": 4,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "*",
-          "type": "*",
-          "links": [
-            4102,
-            4103,
-            4532
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "⬅️*",
-      "properties": {},
-      "widgets_values": [
-        "*"
-      ],
-      "color": "#223"
-    },
-    {
       "id": 729,
       "type": "FluxGuidance",
       "pos": [
@@ -6653,8 +6502,7 @@
         60
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 508,
       "mode": 4,
@@ -6710,7 +6558,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 69,
+      "order": 65,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -6742,7 +6590,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 338,
+      "order": 334,
       "mode": 4,
       "inputs": [
         {
@@ -6803,7 +6651,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 339,
+      "order": 335,
       "mode": 4,
       "inputs": [
         {
@@ -6924,58 +6772,6 @@
       "bgcolor": "#355"
     },
     {
-      "id": 728,
-      "type": "ModelSamplingSD3",
-      "pos": [
-        -1740,
-        1160
-      ],
-      "size": [
-        310,
-        60
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 507,
-      "mode": 4,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 4102
-        },
-        {
-          "name": "shift",
-          "type": "FLOAT",
-          "widget": {
-            "name": "shift"
-          },
-          "link": 5151
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            1432
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Shift",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.15",
-        "Node name for S&R": "ModelSamplingSD3"
-      },
-      "widgets_values": [
-        17
-      ]
-    },
-    {
       "id": 2604,
       "type": "Mute / Bypass Repeater (rgthree)",
       "pos": [
@@ -6990,7 +6786,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 312,
+      "order": 311,
       "mode": 4,
       "inputs": [
         {
@@ -7028,7 +6824,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 70,
+      "order": 66,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -7164,7 +6960,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 71,
+      "order": 67,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -7199,7 +6995,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 364,
+      "order": 380,
       "mode": 4,
       "inputs": [
         {
@@ -7242,7 +7038,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 363,
+      "order": 379,
       "mode": 4,
       "inputs": [
         {
@@ -7292,8 +7088,7 @@
         46
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 509,
       "mode": 4,
@@ -7328,41 +7123,6 @@
         "Node name for S&R": "BasicGuider"
       },
       "widgets_values": []
-    },
-    {
-      "id": 2441,
-      "type": "easy getNode",
-      "pos": [
-        660,
-        -3160
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 72,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "*",
-          "type": "*",
-          "links": [
-            4438
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "⬅️*",
-      "properties": {},
-      "widgets_values": [
-        "*"
-      ],
-      "color": "#223"
     },
     {
       "id": 2422,
@@ -7433,7 +7193,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 73,
+      "order": 68,
       "mode": 4,
       "inputs": [
         {
@@ -7729,7 +7489,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 74,
+      "order": 69,
       "mode": 4,
       "inputs": [
         {
@@ -7868,7 +7628,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 75,
+      "order": 70,
       "mode": 4,
       "inputs": [
         {
@@ -7916,7 +7676,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 356,
+      "order": 352,
       "mode": 0,
       "inputs": [
         {
@@ -8011,7 +7771,7 @@
       ],
       "size": [
         214.7587890625,
-        544.13818359375
+        238
       ],
       "flags": {
         "collapsed": true,
@@ -8071,13 +7831,13 @@
           "hidden": false,
           "paused": false,
           "params": {
-            "filename": "AnimateDiff_00005.gif",
+            "filename": "AnimateDiff_00002.gif",
             "subfolder": "",
             "type": "temp",
             "format": "image/gif",
             "frame_rate": 8,
-            "workflow": "AnimateDiff_00005.png",
-            "fullpath": "F:\\Comfy2\\ComfyUI\\temp\\AnimateDiff_00005.gif"
+            "workflow": "AnimateDiff_00002.png",
+            "fullpath": "/workspace/ComfyUI/temp/AnimateDiff_00002.gif"
           }
         }
       }
@@ -8482,7 +8242,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 4103,
+          "link": 5407,
           "slot_index": 0
         },
         {
@@ -8638,10 +8398,9 @@
         322
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 304,
+      "order": 303,
       "mode": 0,
       "inputs": [
         {
@@ -8781,7 +8540,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 76,
+      "order": 71,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -8880,7 +8639,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 77,
+      "order": 72,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -9251,7 +9010,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 78,
+      "order": 73,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -9476,7 +9235,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 79,
+      "order": 74,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -9514,7 +9273,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 80,
+      "order": 75,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -9552,7 +9311,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 366,
+      "order": 364,
       "mode": 0,
       "inputs": [
         {
@@ -9616,7 +9375,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 286,
+      "order": 285,
       "mode": 0,
       "inputs": [
         {
@@ -9756,7 +9515,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 284,
+      "order": 283,
       "mode": 0,
       "inputs": [
         {
@@ -10120,7 +9879,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 297,
+      "order": 296,
       "mode": 0,
       "inputs": [
         {
@@ -10183,7 +9942,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 298,
+      "order": 297,
       "mode": 0,
       "inputs": [
         {
@@ -10246,7 +10005,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 283,
+      "order": 282,
       "mode": 0,
       "inputs": [
         {
@@ -10309,7 +10068,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 282,
+      "order": 281,
       "mode": 0,
       "inputs": [
         {
@@ -10372,7 +10131,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 81,
+      "order": 76,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10409,7 +10168,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 82,
+      "order": 77,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10447,7 +10206,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 83,
+      "order": 78,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10485,7 +10244,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 84,
+      "order": 79,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10523,7 +10282,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 85,
+      "order": 80,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10617,7 +10376,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 86,
+      "order": 81,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10712,7 +10471,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 87,
+      "order": 82,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10856,7 +10615,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 88,
+      "order": 83,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10894,7 +10653,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 89,
+      "order": 84,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -10934,7 +10693,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 90,
+      "order": 85,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -11078,7 +10837,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 91,
+      "order": 86,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -11115,7 +10874,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 92,
+      "order": 87,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -11580,7 +11339,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 93,
+      "order": 88,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -11691,7 +11450,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 94,
+      "order": 89,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -11727,7 +11486,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 95,
+      "order": 90,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -11765,7 +11524,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 309,
+      "order": 308,
       "mode": 0,
       "inputs": [
         {
@@ -11803,7 +11562,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 96,
+      "order": 91,
       "mode": 0,
       "inputs": [
         {
@@ -11852,7 +11611,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 97,
+      "order": 92,
       "mode": 4,
       "inputs": [
         {
@@ -11899,7 +11658,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 290,
+      "order": 289,
       "mode": 0,
       "inputs": [
         {
@@ -11937,7 +11696,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 98,
+      "order": 93,
       "mode": 4,
       "inputs": [
         {
@@ -11984,7 +11743,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 99,
+      "order": 94,
       "mode": 4,
       "inputs": [
         {
@@ -12031,7 +11790,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 100,
+      "order": 95,
       "mode": 0,
       "inputs": [
         {
@@ -12078,7 +11837,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 291,
+      "order": 290,
       "mode": 0,
       "inputs": [
         {
@@ -12116,7 +11875,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 101,
+      "order": 96,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -12148,7 +11907,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 102,
+      "order": 97,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -12180,7 +11939,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 292,
+      "order": 291,
       "mode": 4,
       "inputs": [
         {
@@ -12249,7 +12008,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 103,
+      "order": 98,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -12285,7 +12044,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 367,
+      "order": 365,
       "mode": 4,
       "inputs": [
         {
@@ -12329,13 +12088,13 @@
       ],
       "size": [
         144.54345703125,
-        25
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 104,
+      "order": 99,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -12367,7 +12126,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 105,
+      "order": 100,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -12403,7 +12162,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 106,
+      "order": 101,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -12428,14 +12187,14 @@
         -1050
       ],
       "size": [
-        151.7578125,
-        12
+        218.39999389648438,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 107,
+      "order": 102,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -12467,7 +12226,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 108,
+      "order": 103,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -12493,13 +12252,13 @@
       ],
       "size": [
         345.80078125,
-        25
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 109,
+      "order": 104,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -12531,7 +12290,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 110,
+      "order": 105,
       "mode": 4,
       "inputs": [
         {
@@ -12785,7 +12544,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 111,
+      "order": 106,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -12820,7 +12579,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 112,
+      "order": 107,
       "mode": 4,
       "inputs": [
         {
@@ -12908,7 +12667,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 113,
+      "order": 108,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -12946,7 +12705,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 114,
+      "order": 109,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -12975,10 +12734,9 @@
         130
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 326,
+      "order": 355,
       "mode": 0,
       "inputs": [
         {
@@ -13569,7 +13327,8 @@
       "title": "🐍",
       "properties": {
         "cnr_id": "comfyui-custom-scripts",
-        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e"
+        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e",
+        "Node name for S&R": "MathExpression|pysssss"
       },
       "widgets_values": [
         "16 * round((a * b) / 16)"
@@ -13590,7 +13349,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 115,
+      "order": 110,
       "mode": 4,
       "inputs": [
         {
@@ -13637,7 +13396,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 330,
+      "order": 326,
       "mode": 4,
       "inputs": [
         {
@@ -13675,7 +13434,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 365,
+      "order": 363,
       "mode": 4,
       "inputs": [
         {
@@ -13732,7 +13491,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 285,
+      "order": 284,
       "mode": 4,
       "inputs": [
         {
@@ -13823,7 +13582,8 @@
       "title": "🐍",
       "properties": {
         "cnr_id": "comfyui-custom-scripts",
-        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e"
+        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e",
+        "Node name for S&R": "MathExpression|pysssss"
       },
       "widgets_values": [
         "round(a / b, 2)"
@@ -13844,7 +13604,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 116,
+      "order": 111,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -14098,7 +13858,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 328,
+      "order": 324,
       "mode": 0,
       "inputs": [
         {
@@ -14136,7 +13896,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 117,
+      "order": 112,
       "mode": 0,
       "inputs": [
         {
@@ -14176,14 +13936,14 @@
         770
       ],
       "size": [
-        312.001953125,
-        10
+        537.5999755859375,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 118,
+      "order": 113,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -14209,7 +13969,7 @@
       ],
       "size": [
         560,
-        624
+        286
       ],
       "flags": {
         "pinned": true
@@ -14623,12 +14383,12 @@
       ],
       "size": [
         210,
-        633
+        334
       ],
       "flags": {
         "pinned": true
       },
-      "order": 368,
+      "order": 366,
       "mode": 4,
       "inputs": [
         {
@@ -14762,7 +14522,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 300,
+      "order": 299,
       "mode": 4,
       "inputs": [
         {
@@ -14906,14 +14666,14 @@
         1610
       ],
       "size": [
-        117.0556640625,
-        15
+        140,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 119,
+      "order": 114,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -14944,7 +14704,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 370,
+      "order": 368,
       "mode": 4,
       "inputs": [
         {
@@ -14997,7 +14757,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 120,
+      "order": 115,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -15067,7 +14827,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 121,
+      "order": 116,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -15190,7 +14950,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 122,
+      "order": 117,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -15227,7 +14987,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 369,
+      "order": 367,
       "mode": 4,
       "inputs": [
         {
@@ -15307,14 +15067,14 @@
         1590
       ],
       "size": [
-        269.103515625,
-        24
+        688.7999877929688,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 123,
+      "order": 118,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -15339,14 +15099,14 @@
         1590
       ],
       "size": [
-        269.103515625,
-        24
+        697.2000122070312,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 124,
+      "order": 119,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -15378,7 +15138,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 125,
+      "order": 120,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -15510,7 +15270,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 126,
+      "order": 121,
       "mode": 4,
       "inputs": [
         {
@@ -15548,12 +15308,12 @@
       ],
       "size": [
         579.5999755859375,
-        334
+        376
       ],
       "flags": {
         "pinned": true
       },
-      "order": 371,
+      "order": 369,
       "mode": 4,
       "inputs": [
         {
@@ -15637,7 +15397,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 127,
+      "order": 122,
       "mode": 0,
       "inputs": [
         {
@@ -15680,7 +15440,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 128,
+      "order": 123,
       "mode": 4,
       "inputs": [
         {
@@ -15855,10 +15615,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 129,
+      "order": 124,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -15882,83 +15641,6 @@
       ]
     },
     {
-      "id": 2572,
-      "type": "Model Switch (JPS)",
-      "pos": [
-        760,
-        -3190
-      ],
-      "size": [
-        315,
-        138
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 442,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model_1",
-          "type": "MODEL",
-          "shape": 7,
-          "link": 4438
-        },
-        {
-          "name": "model_2",
-          "type": "MODEL",
-          "shape": 7,
-          "link": 5036
-        },
-        {
-          "name": "model_3",
-          "type": "MODEL",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "model_4",
-          "type": "MODEL",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "model_5",
-          "type": "MODEL",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "select",
-          "type": "INT",
-          "widget": {
-            "name": "select"
-          },
-          "link": 4443
-        }
-      ],
-      "outputs": [
-        {
-          "name": "model_out",
-          "type": "MODEL",
-          "links": [
-            5033
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "🔀",
-      "properties": {
-        "aux_id": "JPS-GER/ComfyUI_JPS-Nodes",
-        "ver": "0e2a9aca02b17dde91577bfe4b65861df622dcaf",
-        "Node name for S&R": "Model Switch (JPS)"
-      },
-      "widgets_values": [
-        0
-      ]
-    },
-    {
       "id": 2373,
       "type": "Bookmark (rgthree)",
       "pos": [
@@ -15973,7 +15655,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 130,
+      "order": 125,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -16038,14 +15720,14 @@
         750
       ],
       "size": [
-        282.416015625,
-        12
+        411.6000061035156,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 131,
+      "order": 126,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -16074,10 +15756,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 132,
+      "order": 127,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -16115,7 +15796,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 337,
+      "order": 333,
       "mode": 0,
       "inputs": [
         {
@@ -16184,7 +15865,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 380,
+      "order": 378,
       "mode": 0,
       "inputs": [
         {
@@ -16261,7 +15942,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 305,
+      "order": 304,
       "mode": 0,
       "inputs": [
         {
@@ -16511,7 +16192,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 133,
+      "order": 128,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -16549,7 +16230,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 134,
+      "order": 129,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -16580,14 +16261,14 @@
         1120
       ],
       "size": [
-        169.3828125,
-        12
+        260.3999938964844,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 135,
+      "order": 130,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -16605,60 +16286,6 @@
       "bgcolor": "#fff0"
     },
     {
-      "id": 26,
-      "type": "FluxGuidance",
-      "pos": [
-        630,
-        -570
-      ],
-      "size": [
-        211.60000610351562,
-        60
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 481,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 1633
-        },
-        {
-          "name": "guidance",
-          "type": "FLOAT",
-          "widget": {
-            "name": "guidance"
-          },
-          "link": 5146
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "shape": 3,
-          "links": [
-            129
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "GUIDANCE",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.15",
-        "Node name for S&R": "FluxGuidance"
-      },
-      "widgets_values": [
-        7.5
-      ],
-      "shape": 2
-    },
-    {
       "id": 2863,
       "type": "ModelMergeSimple",
       "pos": [
@@ -16673,7 +16300,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 357,
+      "order": 353,
       "mode": 4,
       "inputs": [
         {
@@ -16772,10 +16399,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 136,
+      "order": 131,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -16808,8 +16434,7 @@
         120
       ],
       "flags": {
-        "collapsed": false,
-        "pinned": true
+        "collapsed": false
       },
       "order": 460,
       "mode": 4,
@@ -16862,8 +16487,7 @@
         154
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 456,
       "mode": 4,
@@ -16950,14 +16574,14 @@
         1890
       ],
       "size": [
-        334.25390625,
-        12
+        546,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 137,
+      "order": 132,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -16988,7 +16612,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 138,
+      "order": 133,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -17018,14 +16642,14 @@
         30
       ],
       "size": [
-        236.1328125,
-        12
+        327.6000061035156,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 139,
+      "order": 134,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -17050,14 +16674,14 @@
         310
       ],
       "size": [
-        454.740234375,
+        2200.800048828125,
         48
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 140,
+      "order": 135,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -17089,7 +16713,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 141,
+      "order": 136,
       "mode": 4,
       "inputs": [
         {
@@ -17136,7 +16760,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 353,
+      "order": 349,
       "mode": 4,
       "inputs": [
         {
@@ -17180,7 +16804,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 142,
+      "order": 137,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -17216,7 +16840,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 329,
+      "order": 325,
       "mode": 0,
       "inputs": [
         {
@@ -17253,7 +16877,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 143,
+      "order": 138,
       "mode": 0,
       "inputs": [
         {
@@ -17300,7 +16924,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 144,
+      "order": 139,
       "mode": 0,
       "inputs": [
         {
@@ -17347,7 +16971,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 145,
+      "order": 140,
       "mode": 0,
       "inputs": [
         {
@@ -17394,7 +17018,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 289,
+      "order": 288,
       "mode": 0,
       "inputs": [
         {
@@ -17614,7 +17238,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 355,
+      "order": 351,
       "mode": 0,
       "inputs": [
         {
@@ -17658,7 +17282,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 146,
+      "order": 141,
       "mode": 4,
       "inputs": [
         {
@@ -17705,7 +17329,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 310,
+      "order": 309,
       "mode": 0,
       "inputs": [
         {
@@ -17967,7 +17591,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 352,
+      "order": 348,
       "mode": 0,
       "inputs": [
         {
@@ -18008,7 +17632,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 354,
+      "order": 350,
       "mode": 0,
       "inputs": [
         {
@@ -18559,14 +18183,14 @@
         490
       ],
       "size": [
-        470.724609375,
+        1864.800048828125,
         36
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 147,
+      "order": 142,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -18597,7 +18221,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 148,
+      "order": 143,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -18639,7 +18263,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 149,
+      "order": 144,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -18683,7 +18307,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 306,
+      "order": 305,
       "mode": 0,
       "inputs": [
         {
@@ -18778,8 +18402,7 @@
         60
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 512,
       "mode": 4,
@@ -18822,40 +18445,6 @@
       "bgcolor": "#303030"
     },
     {
-      "id": 2442,
-      "type": "easy setNode",
-      "pos": [
-        -580,
-        -1000
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 479,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "*",
-          "type": "*",
-          "link": 5241
-        }
-      ],
-      "outputs": [],
-      "title": "➡️*",
-      "properties": {
-        "previousName": "*"
-      },
-      "widgets_values": [
-        "*"
-      ],
-      "color": "#223"
-    },
-    {
       "id": 214,
       "type": "ImageResizeKJ",
       "pos": [
@@ -18870,7 +18459,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 374,
+      "order": 372,
       "mode": 4,
       "inputs": [
         {
@@ -18956,7 +18545,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 150,
+      "order": 145,
       "mode": 4,
       "inputs": [
         {
@@ -19003,7 +18592,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 313,
+      "order": 312,
       "mode": 4,
       "inputs": [
         {
@@ -19042,7 +18631,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 151,
+      "order": 146,
       "mode": 4,
       "inputs": [
         {
@@ -19089,7 +18678,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 319,
+      "order": 318,
       "mode": 4,
       "inputs": [
         {
@@ -19128,7 +18717,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 311,
+      "order": 310,
       "mode": 4,
       "inputs": [
         {
@@ -19166,7 +18755,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 320,
+      "order": 319,
       "mode": 4,
       "inputs": [
         {
@@ -19205,7 +18794,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 152,
+      "order": 147,
       "mode": 4,
       "inputs": [
         {
@@ -19253,7 +18842,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 153,
+      "order": 148,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -19287,10 +18876,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 154,
+      "order": 149,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -19324,10 +18912,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 155,
+      "order": 150,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -19361,10 +18948,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 156,
+      "order": 151,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -19398,10 +18984,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 157,
+      "order": 152,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -19434,8 +19019,7 @@
         46
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 511,
       "mode": 4,
@@ -19484,10 +19068,9 @@
         82
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 317,
+      "order": 316,
       "mode": 4,
       "inputs": [
         {
@@ -19534,10 +19117,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 158,
+      "order": 153,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -19559,60 +19141,6 @@
       ],
       "color": "#332922",
       "bgcolor": "#593930"
-    },
-    {
-      "id": 731,
-      "type": "ModelSamplingSD3",
-      "pos": [
-        -1520,
-        1210
-      ],
-      "size": [
-        310,
-        60
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 510,
-      "mode": 4,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 4105
-        },
-        {
-          "name": "shift",
-          "type": "FLOAT",
-          "widget": {
-            "name": "shift"
-          },
-          "link": 5150
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            1435
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Shift",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.15",
-        "Node name for S&R": "ModelSamplingSD3"
-      },
-      "widgets_values": [
-        17
-      ],
-      "color": "#233",
-      "bgcolor": "#303030"
     },
     {
       "id": 2935,
@@ -19682,7 +19210,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 314,
+      "order": 313,
       "mode": 4,
       "inputs": [
         {
@@ -19790,10 +19318,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 159,
+      "order": 154,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -19913,7 +19440,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 160,
+      "order": 155,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -20101,7 +19628,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 161,
+      "order": 156,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -20139,13 +19666,13 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 278,
+      "order": 357,
       "mode": 4,
       "inputs": [
         {
           "name": "model",
           "type": "MODEL",
-          "link": 4532
+          "link": 5408
         }
       ],
       "outputs": [
@@ -20188,7 +19715,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 162,
+      "order": 157,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -20225,7 +19752,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 163,
+      "order": 158,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -20263,7 +19790,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 318,
+      "order": 317,
       "mode": 4,
       "inputs": [
         {
@@ -20457,7 +19984,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 164,
+      "order": 159,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -20489,7 +20016,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 165,
+      "order": 160,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -20521,7 +20048,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 166,
+      "order": 161,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -20547,7 +20074,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 167,
+      "order": 162,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -20572,7 +20099,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 168,
+      "order": 163,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -20610,7 +20137,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 169,
+      "order": 164,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -20641,7 +20168,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 4104,
+          "link": 5401,
           "slot_index": 0
         },
         {
@@ -20700,7 +20227,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 170,
+      "order": 165,
       "mode": 4,
       "inputs": [
         {
@@ -20795,7 +20322,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 5265
+          "link": 5405
         },
         {
           "name": "latent",
@@ -20875,7 +20402,7 @@
         "Node name for S&R": "HunyuanVideoLoraLoader"
       },
       "widgets_values": [
-        "lora Hun\\hyvideo_FastVideo_LoRA-fp8.safetensors",
+        "hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors",
         0.7000000000000001,
         "all"
       ],
@@ -20890,14 +20417,14 @@
         1120
       ],
       "size": [
-        66.017578125,
-        12
+        140,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 171,
+      "order": 166,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -20929,7 +20456,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 172,
+      "order": 167,
       "mode": 4,
       "inputs": [
         {
@@ -20977,7 +20504,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 321,
+      "order": 320,
       "mode": 4,
       "inputs": [
         {
@@ -21016,7 +20543,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 173,
+      "order": 168,
       "mode": 4,
       "inputs": [
         {
@@ -21056,14 +20583,14 @@
         1290
       ],
       "size": [
-        112.03125,
-        12
+        140,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 174,
+      "order": 169,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -21094,7 +20621,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 175,
+      "order": 170,
       "mode": 0,
       "showAdvanced": true,
       "inputs": [],
@@ -21135,7 +20662,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 176,
+      "order": 171,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -21155,7 +20682,7 @@
         "Node name for S&R": "CLIPVisionLoader"
       },
       "widgets_values": [
-        "clip-vit-large-patch14_OPENAI.safetensors"
+        "clip-vit-large-patch14.safetensors"
       ]
     },
     {
@@ -21273,7 +20800,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 177,
+      "order": 172,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -21305,7 +20832,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 178,
+      "order": 173,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -21323,203 +20850,6 @@
       "bgcolor": "#fff0"
     },
     {
-      "id": 2452,
-      "type": "easy getNode",
-      "pos": [
-        500,
-        -700
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 179,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "*",
-          "type": "*",
-          "links": [
-            4109,
-            4110
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "⬅️*",
-      "properties": {},
-      "widgets_values": [
-        "*"
-      ],
-      "color": "#223"
-    },
-    {
-      "id": 513,
-      "type": "GetNode",
-      "pos": [
-        500,
-        -640
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 180,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            2326
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Get_SetSeed",
-      "properties": {},
-      "widgets_values": [
-        "SetSeed"
-      ],
-      "color": "#1b4669",
-      "bgcolor": "#29699c",
-      "shape": 2
-    },
-    {
-      "id": 2014,
-      "type": "GetNode",
-      "pos": [
-        630,
-        -640
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 181,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            3343
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Get_Steps",
-      "properties": {},
-      "widgets_values": [
-        "Steps"
-      ],
-      "color": "#1b4669",
-      "bgcolor": "#29699c",
-      "shape": 2
-    },
-    {
-      "id": 648,
-      "type": "GetNode",
-      "pos": [
-        500,
-        -610
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 182,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            4832
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "Get_Frames",
-      "properties": {},
-      "widgets_values": [
-        "Frames"
-      ],
-      "color": "#1b4669",
-      "bgcolor": "#29699c",
-      "shape": 2
-    },
-    {
-      "id": 22,
-      "type": "BasicGuider",
-      "pos": [
-        630,
-        -610
-      ],
-      "size": [
-        222.3482666015625,
-        46
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 480,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 5086,
-          "slot_index": 0
-        },
-        {
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 129,
-          "slot_index": 1
-        }
-      ],
-      "outputs": [
-        {
-          "name": "GUIDER",
-          "type": "GUIDER",
-          "shape": 3,
-          "links": [
-            4176
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.15",
-        "Node name for S&R": "BasicGuider"
-      },
-      "widgets_values": [],
-      "shape": 2
-    },
-    {
       "id": 1948,
       "type": "Mute / Bypass Relay (rgthree)",
       "pos": [
@@ -21534,7 +20864,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 183,
+      "order": 174,
       "mode": 0,
       "inputs": [
         {
@@ -21581,7 +20911,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 296,
+      "order": 295,
       "mode": 0,
       "inputs": [
         {
@@ -21619,7 +20949,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 287,
+      "order": 286,
       "mode": 0,
       "inputs": [
         {
@@ -21657,7 +20987,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 184,
+      "order": 175,
       "mode": 0,
       "inputs": [
         {
@@ -21705,7 +21035,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 185,
+      "order": 176,
       "mode": 0,
       "inputs": [
         {
@@ -21752,7 +21082,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 186,
+      "order": 177,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -21839,7 +21169,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 350,
+      "order": 346,
       "mode": 0,
       "inputs": [
         {
@@ -21891,7 +21221,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 187,
+      "order": 178,
       "mode": 4,
       "inputs": [
         {
@@ -21938,7 +21268,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 188,
+      "order": 179,
       "mode": 4,
       "inputs": [
         {
@@ -22023,7 +21353,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 281,
+      "order": 280,
       "mode": 4,
       "inputs": [
         {
@@ -22161,7 +21491,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 189,
+      "order": 180,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -22297,7 +21627,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 351,
+      "order": 347,
       "mode": 0,
       "inputs": [
         {
@@ -22348,7 +21678,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 301,
+      "order": 300,
       "mode": 4,
       "inputs": [
         {
@@ -22400,12 +21730,12 @@
       ],
       "size": [
         579.5999755859375,
-        334
+        376
       ],
       "flags": {
         "pinned": true
       },
-      "order": 303,
+      "order": 302,
       "mode": 4,
       "inputs": [
         {
@@ -22489,7 +21819,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 334,
+      "order": 330,
       "mode": 4,
       "inputs": [
         {
@@ -22527,7 +21857,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 190,
+      "order": 181,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -22559,7 +21889,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 191,
+      "order": 182,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -22591,7 +21921,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 192,
+      "order": 183,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -22623,7 +21953,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 193,
+      "order": 184,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -22655,7 +21985,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 194,
+      "order": 185,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -22850,12 +22180,12 @@
       ],
       "size": [
         579.5999755859375,
-        1187.39990234375
+        376
       ],
       "flags": {
         "pinned": true
       },
-      "order": 372,
+      "order": 370,
       "mode": 0,
       "inputs": [
         {
@@ -22939,7 +22269,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 333,
+      "order": 329,
       "mode": 4,
       "inputs": [
         {
@@ -22976,7 +22306,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 195,
+      "order": 186,
       "mode": 4,
       "inputs": [
         {
@@ -23024,7 +22354,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 335,
+      "order": 331,
       "mode": 4,
       "inputs": [
         {
@@ -23090,59 +22420,6 @@
       ],
       "color": "#727272",
       "bgcolor": "#5e5e5e"
-    },
-    {
-      "id": 67,
-      "type": "ModelSamplingSD3",
-      "pos": [
-        580,
-        -700
-      ],
-      "size": [
-        210,
-        60
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 482,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 4109
-        },
-        {
-          "name": "shift",
-          "type": "FLOAT",
-          "widget": {
-            "name": "shift"
-          },
-          "link": 5149
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            5086
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "SHIFT",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.15",
-        "Node name for S&R": "ModelSamplingSD3"
-      },
-      "widgets_values": [
-        7.5
-      ],
-      "shape": 2
     },
     {
       "id": 2501,
@@ -23214,7 +22491,7 @@
         "Node name for S&R": "SamplerCustomAdvanced"
       },
       "widgets_values": [
-        null
+        ""
       ]
     },
     {
@@ -23283,7 +22560,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 196,
+      "order": 187,
       "mode": 4,
       "inputs": [
         {
@@ -23330,7 +22607,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 197,
+      "order": 188,
       "mode": 4,
       "inputs": [
         {
@@ -23483,7 +22760,7 @@
           "dir": 4,
           "shape": 3,
           "links": [
-            5241
+            5398
           ],
           "slot_index": 0
         }
@@ -23511,7 +22788,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 348,
+      "order": 344,
       "mode": 0,
       "inputs": [
         {
@@ -23551,7 +22828,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 379,
+      "order": 377,
       "mode": 0,
       "inputs": [
         {
@@ -23635,7 +22912,7 @@
       },
       "widgets_values": [
         "",
-        "a young woman with long blonde hair, softly lit by the warm sunset glow filtering through a sheer drapes. Her eyes reflect deep emotions, as she offers a hopeful smile. The camera tilts up, capturing the delicate tremble of her lips and the soft motion of her breath. The blurred background enhances the intimacy of the scene, with golden hues enveloping her. The natural lighting emphasizes the delicate texture of her skin, adding realism and depth. Bokeh. Cinematic. Professional videography"
+        "a young woman with short dark hair, softly lit by the warm sunset glow filtering through a sheer drapes. Her eyes reflect deep emotions, as she offers a hopeful smile. The camera tilts up, capturing the delicate tremble of her lips and the soft motion of her breath. The blurred background enhances the intimacy of the scene, with golden hues enveloping her. The natural lighting emphasizes the delicate texture of her skin, adding realism and depth. Bokeh. Cinematic. Professional videography"
       ],
       "color": "#1c1c1c",
       "bgcolor": "#0d0d0d"
@@ -23654,7 +22931,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 198,
+      "order": 189,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -23674,12 +22951,12 @@
       ],
       "size": [
         217.9033203125,
-        242
+        280
       ],
       "flags": {
         "pinned": true
       },
-      "order": 373,
+      "order": 371,
       "mode": 4,
       "inputs": [
         {
@@ -23833,7 +23110,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 315,
+      "order": 314,
       "mode": 4,
       "inputs": [
         {
@@ -23888,7 +23165,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 199,
+      "order": 190,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -23910,7 +23187,7 @@
         "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
-        "hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors",
+        "hunyuan_video_720_cfgdistill_bf16.safetensors",
         "fp8_e4m3fn"
       ],
       "color": "#162527",
@@ -23924,14 +23201,14 @@
         300
       ],
       "size": [
-        175.8984375,
-        24
+        445.20001220703125,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 200,
+      "order": 191,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -23963,7 +23240,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 316,
+      "order": 315,
       "mode": 4,
       "inputs": [
         {
@@ -24104,7 +23381,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 201,
+      "order": 192,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -24136,7 +23413,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 202,
+      "order": 193,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -24168,7 +23445,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 203,
+      "order": 194,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -24200,7 +23477,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 204,
+      "order": 195,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -24232,7 +23509,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 205,
+      "order": 196,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -24253,7 +23530,7 @@
         "Node name for S&R": "RandomNoise"
       },
       "widgets_values": [
-        666714,
+        666717,
         "increment"
       ],
       "color": "#1a121c",
@@ -24273,7 +23550,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 206,
+      "order": 197,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -24310,7 +23587,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 207,
+      "order": 198,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -24406,7 +23683,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 302,
+      "order": 301,
       "mode": 0,
       "inputs": [
         {
@@ -24424,17 +23701,17 @@
           ]
         },
         {
-          "name": "448 width",
+          "name": "width",
           "type": "INT",
           "links": null
         },
         {
-          "name": "672 height",
+          "name": "height",
           "type": "INT",
           "links": null
         },
         {
-          "name": "45 count",
+          "name": "count",
           "type": "INT",
           "links": null
         }
@@ -24464,7 +23741,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 208,
+      "order": 199,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -24495,7 +23772,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 209,
+      "order": 200,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -24534,7 +23811,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 210,
+      "order": 201,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -24627,13 +23904,13 @@
           "hidden": false,
           "paused": false,
           "params": {
-            "filename": "Hunyuan_raw_00005.mp4",
+            "filename": "Hunyuan_raw_00002.mp4",
             "subfolder": "",
             "type": "temp",
             "format": "video/h264-mp4",
             "frame_rate": 24,
-            "workflow": "Hunyuan_raw_00005.png",
-            "fullpath": "F:\\Comfy2\\ComfyUI\\temp\\Hunyuan_raw_00005.mp4"
+            "workflow": "Hunyuan_raw_00002.png",
+            "fullpath": "/workspace/ComfyUI/temp/Hunyuan_raw_00002.mp4"
           },
           "muted": false
         }
@@ -24653,8 +23930,7 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 498,
       "mode": 4,
@@ -24771,7 +24047,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 211,
+      "order": 202,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -24803,7 +24079,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 212,
+      "order": 203,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -24829,13 +24105,13 @@
       ],
       "size": [
         237.51220703125,
-        25
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 213,
+      "order": 204,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -24864,10 +24140,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 214,
+      "order": 205,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -24906,7 +24181,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 215,
+      "order": 206,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -24939,10 +24214,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 216,
+      "order": 207,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -24979,7 +24253,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 217,
+      "order": 208,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -25015,7 +24289,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 218,
+      "order": 209,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -25088,14 +24362,14 @@
         1330
       ],
       "size": [
-        254.642578125,
-        24
+        705.5999755859375,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 219,
+      "order": 210,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -25269,7 +24543,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 341,
+      "order": 337,
       "mode": 4,
       "inputs": [
         {
@@ -25306,7 +24580,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 220,
+      "order": 211,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -25343,7 +24617,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 221,
+      "order": 212,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -25375,7 +24649,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 222,
+      "order": 213,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -25526,7 +24800,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 223,
+      "order": 214,
       "mode": 4,
       "inputs": [
         {
@@ -25573,7 +24847,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 324,
+      "order": 354,
       "mode": 0,
       "inputs": [
         {
@@ -25683,7 +24957,7 @@
         "Node name for S&R": "SamplerCustomAdvanced"
       },
       "widgets_values": [
-        null
+        ""
       ]
     },
     {
@@ -25701,7 +24975,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 224,
+      "order": 215,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -25823,7 +25097,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 225,
+      "order": 216,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -25857,7 +25131,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 226,
+      "order": 217,
       "mode": 4,
       "inputs": [
         {
@@ -25904,7 +25178,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 344,
+      "order": 340,
       "mode": 4,
       "inputs": [
         {
@@ -25942,7 +25216,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 227,
+      "order": 218,
       "mode": 4,
       "inputs": [
         {
@@ -25983,13 +25257,13 @@
       ],
       "size": [
         472.71728515625,
-        25
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 228,
+      "order": 219,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -26090,7 +25364,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 343,
+      "order": 339,
       "mode": 0,
       "inputs": [
         {
@@ -26125,10 +25399,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 229,
+      "order": 220,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -26161,10 +25434,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 230,
+      "order": 221,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -26197,8 +25469,7 @@
         262
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 575,
       "mode": 4,
@@ -26305,10 +25576,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 231,
+      "order": 222,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -26342,10 +25612,9 @@
         322
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 345,
+      "order": 341,
       "mode": 4,
       "inputs": [
         {
@@ -26478,7 +25747,7 @@
       ],
       "size": [
         220,
-        242
+        280
       ],
       "flags": {
         "pinned": true
@@ -26560,8 +25829,7 @@
         150
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 448,
       "mode": 4,
@@ -26612,8 +25880,7 @@
         82
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 400,
       "mode": 4,
@@ -26656,8 +25923,7 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 417,
       "mode": 4,
@@ -26697,8 +25963,7 @@
         106
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 430,
       "mode": 4,
@@ -26845,8 +26110,7 @@
         82
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
       "order": 441,
       "mode": 4,
@@ -26898,10 +26162,9 @@
         58
       ],
       "flags": {
-        "collapsed": true,
-        "pinned": true
+        "collapsed": true
       },
-      "order": 232,
+      "order": 223,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -26932,12 +26195,12 @@
       ],
       "size": [
         570,
-        630
+        328
       ],
       "flags": {
         "pinned": true
       },
-      "order": 346,
+      "order": 342,
       "mode": 4,
       "inputs": [
         {
@@ -27034,7 +26297,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 378,
+      "order": 376,
       "mode": 4,
       "inputs": [
         {
@@ -27084,7 +26347,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 377,
+      "order": 375,
       "mode": 4,
       "inputs": [
         {
@@ -27464,7 +26727,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 233,
+      "order": 224,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -27567,12 +26830,12 @@
       ],
       "size": [
         530,
-        810
+        286
       ],
       "flags": {
         "pinned": true
       },
-      "order": 342,
+      "order": 338,
       "mode": 4,
       "inputs": [
         {
@@ -27668,7 +26931,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 234,
+      "order": 225,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -27750,7 +27013,7 @@
       ],
       "title": "🕹️ Console 🕹️",
       "properties": {
-        "cnr_id": "The-AI-Doctors-Clinical-Tools",
+        "aux_id": "BlueprintCoding/ComfyUI_AIDocsClinicalTools",
         "ver": "b524ae60c100d812b8d339f80209a7fa0e5b551b",
         "activeCount": 15,
         "floatSteps": [
@@ -27886,6 +27149,8 @@
         "minWidth": 250,
         "maxWidth": 1000,
         "showStaticLabelAndLine": false,
+        "Node name for S&R": "MultiFloatNodeAID",
+        "cnr_id": "The-AI-Doctors-Clinical-Tools",
         "bgColor": "#303030",
         "rowBgColor": "#242424",
         "rowSpacing": 2,
@@ -27926,7 +27191,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 235,
+      "order": 226,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -27952,7 +27217,7 @@
       ],
       "size": [
         270,
-        242
+        238
       ],
       "flags": {
         "pinned": true
@@ -28036,7 +27301,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 236,
+      "order": 227,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -28072,7 +27337,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 237,
+      "order": 228,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -28102,14 +27367,14 @@
         10
       ],
       "size": [
-        718.49609375,
+        690.7763671875,
         82.5
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 238,
+      "order": 229,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -28265,7 +27530,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 239,
+      "order": 230,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -28398,7 +27663,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 240,
+      "order": 231,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -28429,7 +27694,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 241,
+      "order": 232,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -28474,7 +27739,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 242,
+      "order": 233,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -28495,7 +27760,7 @@
         "ttNnodeVersion": "1.0.0"
       },
       "widgets_values": [
-        538,
+        541,
         "increment"
       ],
       "color": "#1a121c",
@@ -28516,7 +27781,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 243,
+      "order": 234,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -28537,116 +27802,11 @@
         "Node name for S&R": "RandomNoise"
       },
       "widgets_values": [
-        1276,
+        1279,
         "increment"
       ],
       "color": "#1a121c",
       "bgcolor": "#015b59"
-    },
-    {
-      "id": 17,
-      "type": "BasicScheduler",
-      "pos": [
-        500,
-        -490
-      ],
-      "size": [
-        270,
-        100
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 325,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 4110,
-          "slot_index": 0
-        },
-        {
-          "name": "steps",
-          "type": "INT",
-          "widget": {
-            "name": "steps"
-          },
-          "link": 3343
-        },
-        {
-          "name": "denoise",
-          "type": "FLOAT",
-          "widget": {
-            "name": "denoise"
-          },
-          "link": 5088
-        }
-      ],
-      "outputs": [
-        {
-          "name": "SIGMAS",
-          "type": "SIGMAS",
-          "shape": 3,
-          "links": [
-            4178
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "T2V Scheduler",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.15",
-        "Node name for S&R": "BasicScheduler"
-      },
-      "widgets_values": [
-        "linear_quadratic",
-        9,
-        1
-      ],
-      "color": "#2f2432",
-      "bgcolor": "#015654"
-    },
-    {
-      "id": 16,
-      "type": "KSamplerSelect",
-      "pos": [
-        500,
-        -580
-      ],
-      "size": [
-        270,
-        60
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 244,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "SAMPLER",
-          "type": "SAMPLER",
-          "shape": 3,
-          "links": [
-            4177
-          ],
-          "slot_index": 0
-        }
-      ],
-      "title": "T2V Sampler",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.15",
-        "Node name for S&R": "KSamplerSelect"
-      },
-      "widgets_values": [
-        "gradient_estimation"
-      ],
-      "color": "#2f2432",
-      "bgcolor": "#015654"
     },
     {
       "id": 2508,
@@ -28724,7 +27884,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 245,
+      "order": 235,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -28823,7 +27983,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 246,
+      "order": 236,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -28861,7 +28021,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 247,
+      "order": 237,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -28893,7 +28053,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 248,
+      "order": 238,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -28925,7 +28085,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 249,
+      "order": 239,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -28950,14 +28110,14 @@
         -1090
       ],
       "size": [
-        34.75341796875,
-        25
+        140,
+        26
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 250,
+      "order": 240,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -28989,7 +28149,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 251,
+      "order": 241,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -29081,7 +28241,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 349,
+      "order": 345,
       "mode": 0,
       "inputs": [
         {
@@ -29121,7 +28281,7 @@
         "a young woman with {long|short|wavy} {blonde|dark} hair, softly lit by the warm sunset glow filtering through a sheer drapes. Her eyes reflect deep emotions, as she offers a hopeful smile. The camera tilts up, capturing the delicate tremble of her lips and the soft motion of her breath. The blurred background enhances the intimacy of the scene, with golden hues enveloping her. The natural lighting emphasizes the delicate texture of her skin, adding realism and depth. Bokeh. Cinematic. Professional videography",
         "Select the LoRA to add to the text",
         "Select the Wildcard to add to the text",
-        792,
+        795,
         "increment",
         false
       ],
@@ -29143,7 +28303,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 252,
+      "order": 242,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -29170,7 +28330,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 253,
+      "order": 243,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -29218,7 +28378,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 254,
+      "order": 244,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -29266,7 +28426,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 255,
+      "order": 245,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -29316,7 +28476,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 256,
+      "order": 246,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -29365,7 +28525,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 257,
+      "order": 247,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -29414,7 +28574,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 258,
+      "order": 248,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -29462,7 +28622,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 259,
+      "order": 249,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -29529,20 +28689,20 @@
       ],
       "title": "PAUSE BEFORE UPSCALE 1",
       "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "31fde1ae34900ef999b027a4e587513e13b45542",
         "values": [
           0
         ],
-        "cnr_id": "comfyui-easy-use",
-        "ver": "31fde1ae34900ef999b027a4e587513e13b45542",
         "Node name for S&R": "easy imageChooser"
       },
       "widgets_values": [
-        "Always Pause",
+        "Keep Last Selection",
         "",
         ""
       ],
       "color": "#000000",
-      "bgcolor": "#272526"
+      "bgcolor": "hsla(330, 2.6%, 14.9%, 1)"
     },
     {
       "id": 3101,
@@ -29558,7 +28718,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 293,
+      "order": 292,
       "mode": 0,
       "inputs": [
         {
@@ -29574,8 +28734,811 @@
         "ver": "0.3.15",
         "Node name for S&R": "PreviewImage"
       },
+      "widgets_values": [],
       "color": "#333333",
       "bgcolor": "#272526"
+    },
+    {
+      "id": 513,
+      "type": "GetNode",
+      "pos": [
+        500,
+        -640
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 250,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            2326
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get_SetSeed",
+      "properties": {},
+      "widgets_values": [
+        "SetSeed"
+      ],
+      "color": "#1b4669",
+      "bgcolor": "#29699c",
+      "shape": 2
+    },
+    {
+      "id": 2014,
+      "type": "GetNode",
+      "pos": [
+        630,
+        -640
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 251,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            3343
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get_Steps",
+      "properties": {},
+      "widgets_values": [
+        "Steps"
+      ],
+      "color": "#1b4669",
+      "bgcolor": "#29699c",
+      "shape": 2
+    },
+    {
+      "id": 22,
+      "type": "BasicGuider",
+      "pos": [
+        627.272705078125,
+        -611.818115234375
+      ],
+      "size": [
+        222.3482666015625,
+        46
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 480,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 5086,
+          "slot_index": 0
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 129,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "shape": 3,
+          "links": [
+            4176
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.15",
+        "Node name for S&R": "BasicGuider"
+      },
+      "widgets_values": [],
+      "shape": 2
+    },
+    {
+      "id": 17,
+      "type": "BasicScheduler",
+      "pos": [
+        495.9020080566406,
+        -499.56219482421875
+      ],
+      "size": [
+        270,
+        100
+      ],
+      "flags": {},
+      "order": 356,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 5400,
+          "slot_index": 0
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": 3343
+        },
+        {
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": 5088
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "shape": 3,
+          "links": [
+            4178
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "T2V Scheduler",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.15",
+        "Node name for S&R": "BasicScheduler"
+      },
+      "widgets_values": [
+        "linear_quadratic",
+        9,
+        1
+      ],
+      "color": "#2f2432",
+      "bgcolor": "#015654"
+    },
+    {
+      "id": 26,
+      "type": "FluxGuidance",
+      "pos": [
+        630,
+        -570
+      ],
+      "size": [
+        211.60000610351562,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 481,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 1633
+        },
+        {
+          "name": "guidance",
+          "type": "FLOAT",
+          "widget": {
+            "name": "guidance"
+          },
+          "link": 5146
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "shape": 3,
+          "links": [
+            129
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "GUIDANCE",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.15",
+        "Node name for S&R": "FluxGuidance"
+      },
+      "widgets_values": [
+        7.5
+      ],
+      "shape": 2
+    },
+    {
+      "id": 67,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        627.1548461914062,
+        -671.5906982421875
+      ],
+      "size": [
+        210,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 482,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 5399
+        },
+        {
+          "name": "shift",
+          "type": "FLOAT",
+          "widget": {
+            "name": "shift"
+          },
+          "link": 5149
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            5086
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "SHIFT",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.15",
+        "Node name for S&R": "ModelSamplingSD3"
+      },
+      "widgets_values": [
+        7.5
+      ],
+      "shape": 2
+    },
+    {
+      "id": 1986,
+      "type": "GetNode",
+      "pos": [
+        500,
+        -540
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 252,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            3321
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get_ALL_W",
+      "properties": {},
+      "widgets_values": [
+        "ALL_W"
+      ],
+      "color": "#1b4669",
+      "bgcolor": "#29699c",
+      "shape": 2
+    },
+    {
+      "id": 16,
+      "type": "KSamplerSelect",
+      "pos": [
+        497.1776428222656,
+        -588.4669799804688
+      ],
+      "size": [
+        270,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 253,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "shape": 3,
+          "links": [
+            4177
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "T2V Sampler",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.15",
+        "Node name for S&R": "KSamplerSelect"
+      },
+      "widgets_values": [
+        "gradient_estimation"
+      ],
+      "color": "#2f2432",
+      "bgcolor": "#015654"
+    },
+    {
+      "id": 1985,
+      "type": "GetNode",
+      "pos": [
+        500,
+        -570
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 254,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            3322
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get_ALL_H",
+      "properties": {},
+      "widgets_values": [
+        "ALL_H"
+      ],
+      "color": "#1b4669",
+      "bgcolor": "#29699c",
+      "shape": 2
+    },
+    {
+      "id": 648,
+      "type": "GetNode",
+      "pos": [
+        500,
+        -610
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 255,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            4832
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get_Frames",
+      "properties": {},
+      "widgets_values": [
+        "Frames"
+      ],
+      "color": "#1b4669",
+      "bgcolor": "#29699c",
+      "shape": 2
+    },
+    {
+      "id": 3104,
+      "type": "GetNode",
+      "pos": [
+        498.6768493652344,
+        -702.2639770507812
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 256,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            5399,
+            5400
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get__MODEL",
+      "properties": {},
+      "widgets_values": [
+        "_MODEL"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 731,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        -1520,
+        1210
+      ],
+      "size": [
+        310,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 510,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 5402
+        },
+        {
+          "name": "shift",
+          "type": "FLOAT",
+          "widget": {
+            "name": "shift"
+          },
+          "link": 5150
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1435
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Shift",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.15",
+        "Node name for S&R": "ModelSamplingSD3"
+      },
+      "widgets_values": [
+        17
+      ],
+      "color": "#233",
+      "bgcolor": "#303030"
+    },
+    {
+      "id": 3105,
+      "type": "GetNode",
+      "pos": [
+        -1522.1549072265625,
+        1269.342529296875
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 257,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            5401,
+            5402,
+            5405
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get__MODEL",
+      "properties": {},
+      "widgets_values": [
+        "_MODEL"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 728,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        -1740,
+        1160
+      ],
+      "size": [
+        310,
+        60
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 507,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 5406
+        },
+        {
+          "name": "shift",
+          "type": "FLOAT",
+          "widget": {
+            "name": "shift"
+          },
+          "link": 5151
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1432
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Shift",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.15",
+        "Node name for S&R": "ModelSamplingSD3"
+      },
+      "widgets_values": [
+        17
+      ]
+    },
+    {
+      "id": 3107,
+      "type": "GetNode",
+      "pos": [
+        -1934.8411865234375,
+        1200.785888671875
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 258,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            5406,
+            5407,
+            5408
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get__MODEL",
+      "properties": {},
+      "widgets_values": [
+        "_MODEL"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 3102,
+      "type": "SetNode",
+      "pos": [
+        -593.5187377929688,
+        -1003.858642578125
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 479,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "link": 5398
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "Set__MODEL",
+      "properties": {
+        "previousName": "_MODEL"
+      },
+      "widgets_values": [
+        "_MODEL"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 2572,
+      "type": "Model Switch (JPS)",
+      "pos": [
+        760,
+        -3190
+      ],
+      "size": [
+        315,
+        138
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 442,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model_1",
+          "type": "MODEL",
+          "shape": 7,
+          "link": 5409
+        },
+        {
+          "name": "model_2",
+          "type": "MODEL",
+          "shape": 7,
+          "link": 5036
+        },
+        {
+          "name": "model_3",
+          "type": "MODEL",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "model_4",
+          "type": "MODEL",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "model_5",
+          "type": "MODEL",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "select",
+          "type": "INT",
+          "widget": {
+            "name": "select"
+          },
+          "link": 4443
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model_out",
+          "type": "MODEL",
+          "links": [
+            5033
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "🔀",
+      "properties": {
+        "aux_id": "JPS-GER/ComfyUI_JPS-Nodes",
+        "ver": "0e2a9aca02b17dde91577bfe4b65861df622dcaf",
+        "Node name for S&R": "Model Switch (JPS)"
+      },
+      "widgets_values": [
+        0
+      ]
+    },
+    {
+      "id": 3108,
+      "type": "GetNode",
+      "pos": [
+        668.5216674804688,
+        -3140.56494140625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 259,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            5409
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get__MODEL",
+      "properties": {},
+      "widgets_values": [
+        "_MODEL"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
     }
   ],
   "links": [
@@ -36620,54 +36583,6 @@
       "MODEL"
     ],
     [
-      4102,
-      2458,
-      0,
-      728,
-      0,
-      "MODEL"
-    ],
-    [
-      4103,
-      2458,
-      0,
-      245,
-      0,
-      "MODEL"
-    ],
-    [
-      4104,
-      2463,
-      0,
-      242,
-      0,
-      "MODEL"
-    ],
-    [
-      4105,
-      2463,
-      0,
-      731,
-      0,
-      "MODEL"
-    ],
-    [
-      4109,
-      2452,
-      0,
-      67,
-      0,
-      "MODEL"
-    ],
-    [
-      4110,
-      2452,
-      0,
-      17,
-      0,
-      "MODEL"
-    ],
-    [
       4120,
       73,
       0,
@@ -37964,14 +37879,6 @@
       "MODEL"
     ],
     [
-      4438,
-      2441,
-      0,
-      2572,
-      0,
-      "MODEL"
-    ],
-    [
       4441,
       2576,
       0,
@@ -38442,14 +38349,6 @@
       238,
       2,
       "INT"
-    ],
-    [
-      4532,
-      2458,
-      0,
-      2615,
-      0,
-      "MODEL"
     ],
     [
       4534,
@@ -41812,14 +41711,6 @@
       "INT"
     ],
     [
-      5241,
-      1105,
-      0,
-      2442,
-      0,
-      "*"
-    ],
-    [
       5245,
       2864,
       0,
@@ -41946,14 +41837,6 @@
       2948,
       0,
       "INT"
-    ],
-    [
-      5265,
-      2463,
-      0,
-      2938,
-      0,
-      "MODEL"
     ],
     [
       5271,
@@ -42842,6 +42725,142 @@
       1812,
       3,
       "VAE"
+    ],
+    [
+      5398,
+      1105,
+      0,
+      3102,
+      0,
+      "*"
+    ],
+    [
+      5399,
+      3104,
+      0,
+      67,
+      0,
+      "MODEL"
+    ],
+    [
+      5400,
+      3104,
+      0,
+      17,
+      0,
+      "MODEL"
+    ],
+    [
+      5401,
+      3105,
+      0,
+      242,
+      0,
+      "MODEL"
+    ],
+    [
+      5402,
+      3105,
+      0,
+      731,
+      0,
+      "MODEL"
+    ],
+    [
+      5405,
+      3105,
+      0,
+      2938,
+      0,
+      "MODEL"
+    ],
+    [
+      5406,
+      3107,
+      0,
+      728,
+      0,
+      "MODEL"
+    ],
+    [
+      5407,
+      3107,
+      0,
+      245,
+      0,
+      "MODEL"
+    ],
+    [
+      5408,
+      3107,
+      0,
+      2615,
+      0,
+      "MODEL"
+    ],
+    [
+      5409,
+      3108,
+      0,
+      2572,
+      0,
+      "MODEL"
+    ],
+    [
+      5410,
+      10,
+      0,
+      2535,
+      3,
+      "VAE"
+    ],
+    [
+      5411,
+      10,
+      0,
+      2541,
+      1,
+      "VAE"
+    ],
+    [
+      5412,
+      2477,
+      0,
+      2797,
+      0,
+      "IMAGE"
+    ],
+    [
+      5413,
+      11,
+      0,
+      44,
+      0,
+      "CLIP"
+    ],
+    [
+      5414,
+      10,
+      0,
+      2656,
+      1,
+      "VAE"
+    ],
+    [
+      5415,
+      10,
+      0,
+      2499,
+      3,
+      "VAE"
+    ],
+    [
+      5416,
+      10,
+      0,
+      1812,
+      3,
+      "VAE"
     ]
   ],
   "groups": [
@@ -43603,11 +43622,11 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.7700000000000004,
-      "offset": [
-        983.5558061727903,
-        216.80549816827988
-      ]
+      "scale": 0.4665073802097333,
+      "offset": {
+        "0": 2247.950439453125,
+        "1": 743.6312255859375
+      }
     },
     "linkExtensions": [
       {

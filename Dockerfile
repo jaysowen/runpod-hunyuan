@@ -177,7 +177,11 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/BlueprintCoding/ComfyUI_AIDocsClinicalTools.git && \
     git clone --depth 1 https://github.com/logtd/ComfyUI-HunyuanLoom.git && \
     git clone --depth 1 https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
-    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git
+    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git \
+    git clone --depth 1 https://github.com/Stability-AI/stability-ComfyUI-nodes.git \
+    git clone --depth 1 https://github.com/DoctorDiffusion/ComfyUI-MediaMixer.git \
+    git clone --depth 1 https://github.com/kijai/ComfyUI-VideoNoiseWarp \
+    git clone --depth 1 https://github.com/spacepxl/ComfyUI-Image-Filters \
 
 
 # Install requirements for custom nodes (if any)
@@ -191,16 +195,20 @@ RUN for dir in */; do \
 # Copy workflow files
 COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
 
-COPY comfy-workflows/ManageGallery.ipynb /ComfyUI/output/
-
 # Copy scripts
 COPY scripts/*.sh /
-COPY download-files.sh files.txt /workspace/
+
+
+WORKDIR /
+
+# Copy Gallery
+COPY /manage-files/ManageGallery.ipynb /workspace/
+
+# Copy Downlaod files system
+COPY /manage-files/download-files.sh /manage-files/files.txt /workspace/
 RUN dos2unix /*.sh && \
     dos2unix /workspace/*.sh && \
     chmod +x /*.sh && \
     chmod +x /workspace/*.sh
-
-WORKDIR /
 
 CMD ["/start.sh"]

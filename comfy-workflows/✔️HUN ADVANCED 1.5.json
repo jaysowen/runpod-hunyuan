@@ -1,6 +1,6 @@
 {
-  "last_node_id": 3141,
-  "last_link_id": 5530,
+  "last_node_id": 3143,
+  "last_link_id": 5537,
   "nodes": [
     {
       "id": 1288,
@@ -759,7 +759,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 261,
+      "order": 262,
       "mode": 4,
       "inputs": [
         {
@@ -1032,7 +1032,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 302,
+      "order": 303,
       "mode": 4,
       "inputs": [
         {
@@ -1656,7 +1656,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 304,
+      "order": 305,
       "mode": 4,
       "inputs": [
         {
@@ -1700,7 +1700,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 301,
+      "order": 302,
       "mode": 4,
       "inputs": [
         {
@@ -2463,7 +2463,7 @@
       ],
       "size": [
         214.7587890625,
-        544.13818359375
+        238
       ],
       "flags": {
         "collapsed": true,
@@ -3965,7 +3965,7 @@
       ],
       "size": [
         214.7587890625,
-        544.13818359375
+        238
       ],
       "flags": {
         "collapsed": true,
@@ -4987,7 +4987,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 256,
+      "order": 257,
       "mode": 0,
       "inputs": [
         {
@@ -5331,7 +5331,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 267,
+      "order": 268,
       "mode": 0,
       "inputs": [
         {
@@ -5380,7 +5380,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 268,
+      "order": 269,
       "mode": 0,
       "inputs": [
         {
@@ -5429,7 +5429,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 290,
+      "order": 291,
       "mode": 0,
       "inputs": [
         {
@@ -5492,7 +5492,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 291,
+      "order": 292,
       "mode": 0,
       "inputs": [
         {
@@ -5996,7 +5996,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 277,
+      "order": 278,
       "mode": 0,
       "inputs": [
         {
@@ -6091,7 +6091,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 285,
+      "order": 286,
       "mode": 0,
       "inputs": [
         {
@@ -6185,7 +6185,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 292,
+      "order": 293,
       "mode": 0,
       "inputs": [
         {
@@ -6242,7 +6242,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 266,
+      "order": 267,
       "mode": 0,
       "inputs": [
         {
@@ -6435,7 +6435,6 @@
         {
           "name": "any_05",
           "type": "LATENT",
-          "dir": 3,
           "link": null
         }
       ],
@@ -6588,7 +6587,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 296,
+      "order": 297,
       "mode": 0,
       "inputs": [
         {
@@ -6737,7 +6736,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 295,
+      "order": 296,
       "mode": 0,
       "inputs": [
         {
@@ -6886,7 +6885,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 284,
+      "order": 285,
       "mode": 4,
       "inputs": [
         {
@@ -6951,7 +6950,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 283,
+      "order": 284,
       "mode": 4,
       "inputs": [
         {
@@ -7736,7 +7735,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 275,
+      "order": 276,
       "mode": 4,
       "inputs": [
         {
@@ -7775,7 +7774,8 @@
       "title": "🐍",
       "properties": {
         "cnr_id": "comfyui-custom-scripts",
-        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e"
+        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e",
+        "Node name for S&R": "MathExpression|pysssss"
       },
       "widgets_values": [
         "16 * round((a * b) / 16)"
@@ -7881,7 +7881,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 255,
+      "order": 256,
       "mode": 4,
       "inputs": [
         {
@@ -7987,7 +7987,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 265,
+      "order": 266,
       "mode": 4,
       "inputs": [
         {
@@ -8029,7 +8029,8 @@
       "title": "🐍",
       "properties": {
         "cnr_id": "comfyui-custom-scripts",
-        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e"
+        "ver": "bbda5e52ad580c13ceaa53136d9c2bed9137bd2e",
+        "Node name for S&R": "MathExpression|pysssss"
       },
       "widgets_values": [
         "round(a / b, 2)"
@@ -8428,7 +8429,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 303,
+      "order": 304,
       "mode": 4,
       "inputs": [
         {
@@ -8590,7 +8591,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 305,
+      "order": 306,
       "mode": 4,
       "inputs": [
         {
@@ -8673,12 +8674,12 @@
       ],
       "size": [
         579.5999755859375,
-        334
+        376
       ],
       "flags": {
         "pinned": true
       },
-      "order": 257,
+      "order": 258,
       "mode": 4,
       "inputs": [
         {
@@ -9349,7 +9350,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 276,
+      "order": 277,
       "mode": 0,
       "inputs": [
         {
@@ -9880,7 +9881,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 282,
+      "order": 283,
       "mode": 0,
       "inputs": [
         {
@@ -9935,7 +9936,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 289,
+      "order": 290,
       "mode": 0,
       "inputs": [
         {
@@ -10338,7 +10339,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 269,
+      "order": 270,
       "mode": 4,
       "inputs": [
         {
@@ -10390,7 +10391,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 260,
+      "order": 261,
       "mode": 4,
       "inputs": [
         {
@@ -11967,7 +11968,7 @@
       ],
       "size": [
         579.5999755859375,
-        334
+        376
       ],
       "flags": {
         "pinned": true
@@ -12414,12 +12415,12 @@
       ],
       "size": [
         579.5999755859375,
-        1187.39990234375
+        376
       ],
       "flags": {
         "pinned": true
       },
-      "order": 258,
+      "order": 259,
       "mode": 4,
       "inputs": [
         {
@@ -12641,9 +12642,7 @@
         "ver": "0.3.15",
         "Node name for S&R": "SamplerCustomAdvanced"
       },
-      "widgets_values": [
-        null
-      ]
+      "widgets_values": []
     },
     {
       "id": 2505,
@@ -12910,7 +12909,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 264,
+      "order": 265,
       "mode": 0,
       "inputs": [
         {
@@ -12964,7 +12963,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 274,
+      "order": 275,
       "mode": 0,
       "inputs": [
         {
@@ -13415,7 +13414,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 298,
+      "order": 299,
       "mode": 4,
       "inputs": [
         {
@@ -13466,7 +13465,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 271,
+      "order": 272,
       "mode": 4,
       "inputs": [
         {
@@ -13510,7 +13509,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 279,
+      "order": 280,
       "mode": 4,
       "inputs": [
         {
@@ -13588,7 +13587,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 287,
+      "order": 288,
       "mode": 4,
       "inputs": [
         {
@@ -13649,7 +13648,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 280,
+      "order": 281,
       "mode": 4,
       "inputs": [
         {
@@ -13695,7 +13694,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 293,
+      "order": 294,
       "mode": 4,
       "inputs": [
         {
@@ -13747,7 +13746,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 288,
+      "order": 289,
       "mode": 0,
       "inputs": [
         {
@@ -14180,12 +14179,12 @@
       ],
       "size": [
         217.9033203125,
-        499.379150390625
+        280
       ],
       "flags": {
         "pinned": true
       },
-      "order": 259,
+      "order": 260,
       "mode": 4,
       "inputs": [
         {
@@ -14723,7 +14722,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 286,
+      "order": 287,
       "mode": 4,
       "inputs": [
         {
@@ -14771,7 +14770,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 309,
+      "order": 308,
       "mode": 4,
       "inputs": [
         {
@@ -15538,12 +15537,12 @@
       ],
       "size": [
         250,
-        391.7713623046875
+        280
       ],
       "flags": {
         "pinned": true
       },
-      "order": 297,
+      "order": 298,
       "mode": 0,
       "inputs": [
         {
@@ -15623,7 +15622,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 272,
+      "order": 273,
       "mode": 4,
       "inputs": [
         {
@@ -15757,7 +15756,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 270,
+      "order": 271,
       "mode": 4,
       "inputs": [
         {
@@ -15964,7 +15963,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 278,
+      "order": 279,
       "mode": 4,
       "inputs": [
         {
@@ -16264,7 +16263,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 263,
+      "order": 264,
       "mode": 4,
       "inputs": [
         {
@@ -16308,7 +16307,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 273,
+      "order": 274,
       "mode": 0,
       "inputs": [
         {
@@ -16443,7 +16442,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 281,
+      "order": 282,
       "mode": 0,
       "inputs": [
         {
@@ -16570,7 +16569,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 306,
+      "order": 307,
       "mode": 4,
       "inputs": [
         {
@@ -16584,15 +16583,14 @@
           "name": "model",
           "type": "MODEL",
           "links": [
-            5382,
-            5465,
             5473,
             5474,
             5519,
             5521,
             5522,
             5523,
-            5524
+            5524,
+            5531
           ],
           "slot_index": 0
         }
@@ -16919,13 +16917,13 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 308,
+      "order": 255,
       "mode": 0,
       "inputs": [
         {
           "name": "model",
           "type": "MODEL",
-          "link": 5465
+          "link": 5532
         }
       ],
       "outputs": [
@@ -16956,39 +16954,6 @@
       ]
     },
     {
-      "id": 2441,
-      "type": "easy getNode",
-      "pos": [
-        1050,
-        -3210
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 136,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "links": [],
-          "slot_index": 0
-        }
-      ],
-      "title": "⬅️model",
-      "properties": {},
-      "widgets_values": [
-        "model"
-      ],
-      "color": "#223"
-    },
-    {
       "id": 2974,
       "type": "Label (rgthree)",
       "pos": [
@@ -17003,7 +16968,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 137,
+      "order": 136,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17035,7 +17000,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 138,
+      "order": 137,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17067,7 +17032,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 139,
+      "order": 138,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17099,7 +17064,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 140,
+      "order": 139,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17131,7 +17096,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 141,
+      "order": 140,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17163,7 +17128,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 142,
+      "order": 141,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17188,7 +17153,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 300,
+      "order": 301,
       "mode": 4,
       "inputs": [
         {
@@ -17292,9 +17257,7 @@
         "ver": "0.3.15",
         "Node name for S&R": "SamplerCustomAdvanced"
       },
-      "widgets_values": [
-        null
-      ]
+      "widgets_values": []
     },
     {
       "id": 67,
@@ -17417,40 +17380,6 @@
       "shape": 2
     },
     {
-      "id": 2442,
-      "type": "easy setNode",
-      "pos": [
-        -960,
-        -460
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {
-        "collapsed": true,
-        "pinned": true
-      },
-      "order": 307,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 5382
-        }
-      ],
-      "outputs": [],
-      "title": "➡️model",
-      "properties": {
-        "previousName": "model"
-      },
-      "widgets_values": [
-        "model"
-      ],
-      "color": "#223"
-    },
-    {
       "id": 707,
       "type": "RandomNoise",
       "pos": [
@@ -17465,7 +17394,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 143,
+      "order": 142,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -17501,7 +17430,7 @@
       ],
       "size": [
         570,
-        630
+        328
       ],
       "flags": {
         "pinned": true
@@ -17603,7 +17532,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 262,
+      "order": 263,
       "mode": 0,
       "inputs": [
         {
@@ -17729,7 +17658,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 144,
+      "order": 143,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17761,7 +17690,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 145,
+      "order": 144,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17793,7 +17722,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 146,
+      "order": 145,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17825,7 +17754,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 147,
+      "order": 146,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17857,7 +17786,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 148,
+      "order": 147,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17889,7 +17818,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 149,
+      "order": 148,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17921,7 +17850,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 150,
+      "order": 149,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -17952,7 +17881,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 151,
+      "order": 150,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -17988,7 +17917,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 299,
+      "order": 300,
       "mode": 4,
       "inputs": [
         {
@@ -18033,7 +17962,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 152,
+      "order": 151,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -18065,7 +17994,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 153,
+      "order": 152,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -18216,7 +18145,7 @@
       ],
       "size": [
         579.5999755859375,
-        1187.39990234375
+        376
       ],
       "flags": {
         "pinned": true
@@ -18366,7 +18295,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 154,
+      "order": 153,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -18440,7 +18369,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 155,
+      "order": 154,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -18580,7 +18509,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 156,
+      "order": 155,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -18795,7 +18724,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 157,
+      "order": 156,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -18822,7 +18751,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 294,
+      "order": 295,
       "mode": 4,
       "inputs": [
         {
@@ -18922,7 +18851,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 158,
+      "order": 157,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -18963,7 +18892,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 159,
+      "order": 158,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -19045,7 +18974,7 @@
       ],
       "title": "🕹️ Console 🕹️",
       "properties": {
-        "cnr_id": "The-AI-Doctors-Clinical-Tools",
+        "aux_id": "BlueprintCoding/ComfyUI_AIDocsClinicalTools",
         "ver": "b524ae60c100d812b8d339f80209a7fa0e5b551b",
         "activeCount": 15,
         "floatSteps": [
@@ -19181,6 +19110,8 @@
         "minWidth": 250,
         "maxWidth": 1000,
         "showStaticLabelAndLine": false,
+        "Node name for S&R": "MultiFloatNodeAID",
+        "cnr_id": "The-AI-Doctors-Clinical-Tools",
         "bgColor": "#212121",
         "rowBgColor": "#1a1a1a",
         "rowSpacing": 2,
@@ -19283,7 +19214,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 160,
+      "order": 159,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -19322,7 +19253,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 161,
+      "order": 160,
       "mode": 4,
       "inputs": [],
       "outputs": [],
@@ -19415,7 +19346,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 162,
+      "order": 161,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -19442,7 +19373,7 @@
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 163,
+      "order": 162,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -19608,9 +19539,7 @@
         "ver": "0.3.15",
         "Node name for S&R": "SamplerCustomAdvanced"
       },
-      "widgets_values": [
-        null
-      ],
+      "widgets_values": [],
       "color": "#233",
       "bgcolor": "#303030"
     },
@@ -19629,7 +19558,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 164,
+      "order": 163,
       "mode": 4,
       "inputs": [
         {
@@ -19669,7 +19598,7 @@
         70
       ],
       "size": [
-        268.79998779296875,
+        140,
         46
       ],
       "flags": {
@@ -19714,7 +19643,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 165,
+      "order": 164,
       "mode": 0,
       "inputs": [
         {
@@ -19760,7 +19689,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 166,
+      "order": 165,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -19797,7 +19726,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 167,
+      "order": 166,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -19834,7 +19763,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 168,
+      "order": 167,
       "mode": 4,
       "inputs": [
         {
@@ -19966,7 +19895,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 169,
+      "order": 168,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20003,7 +19932,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 170,
+      "order": 169,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20040,7 +19969,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 171,
+      "order": 170,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20088,7 +20017,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 172,
+      "order": 171,
       "mode": 4,
       "inputs": [],
       "outputs": [
@@ -20136,7 +20065,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 173,
+      "order": 172,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20186,7 +20115,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 174,
+      "order": 173,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20235,7 +20164,7 @@
         "collapsed": false,
         "pinned": true
       },
-      "order": 175,
+      "order": 174,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20283,7 +20212,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 176,
+      "order": 175,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20323,14 +20252,14 @@
         -120
       ],
       "size": [
-        718.49609375,
+        690.7763671875,
         82.5
       ],
       "flags": {
         "pinned": true,
         "allow_interaction": false
       },
-      "order": 177,
+      "order": 176,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -20429,17 +20358,17 @@
           "slot_index": 0
         },
         {
-          "name": "320 width",
+          "name": "width",
           "type": "INT",
           "links": null
         },
         {
-          "name": "480 height",
+          "name": "height",
           "type": "INT",
           "links": null
         },
         {
-          "name": "65 count",
+          "name": "count",
           "type": "INT",
           "links": null
         }
@@ -20533,7 +20462,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 178,
+      "order": 177,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20591,17 +20520,17 @@
           ]
         },
         {
-          "name": "448 width",
+          "name": "width",
           "type": "INT",
           "links": null
         },
         {
-          "name": "672 height",
+          "name": "height",
           "type": "INT",
           "links": null
         },
         {
-          "name": "65 count",
+          "name": "count",
           "type": "INT",
           "links": null
         }
@@ -20692,7 +20621,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 179,
+      "order": 178,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -20714,6 +20643,77 @@
       ],
       "color": "#2f2432",
       "bgcolor": "#015654"
+    },
+    {
+      "id": 3142,
+      "type": "SetNode",
+      "pos": [
+        -923.4127197265625,
+        -440.8191833496094
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 309,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "link": 5531
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "Set__MODEL",
+      "properties": {
+        "previousName": "_MODEL"
+      },
+      "widgets_values": [
+        "_MODEL"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 3143,
+      "type": "GetNode",
+      "pos": [
+        940.2394409179688,
+        -3209.792236328125
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 179,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            5532
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Get__MODEL",
+      "properties": {},
+      "widgets_values": [
+        "_MODEL"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
     }
   ],
   "links": [
@@ -32038,14 +32038,6 @@
       "MODEL"
     ],
     [
-      5382,
-      258,
-      0,
-      2442,
-      0,
-      "*"
-    ],
-    [
       5397,
       11,
       0,
@@ -32308,14 +32300,6 @@
       17,
       2,
       "FLOAT"
-    ],
-    [
-      5465,
-      258,
-      0,
-      2484,
-      0,
-      "MODEL"
     ],
     [
       5471,
@@ -32759,6 +32743,62 @@
     ],
     [
       5530,
+      10,
+      0,
+      1812,
+      3,
+      "VAE"
+    ],
+    [
+      5531,
+      258,
+      0,
+      3142,
+      0,
+      "*"
+    ],
+    [
+      5532,
+      3143,
+      0,
+      2484,
+      0,
+      "MODEL"
+    ],
+    [
+      5533,
+      11,
+      0,
+      44,
+      0,
+      "CLIP"
+    ],
+    [
+      5534,
+      10,
+      0,
+      73,
+      1,
+      "VAE"
+    ],
+    [
+      5535,
+      10,
+      0,
+      1576,
+      3,
+      "VAE"
+    ],
+    [
+      5536,
+      10,
+      0,
+      238,
+      1,
+      "VAE"
+    ],
+    [
+      5537,
       10,
       0,
       1812,
@@ -33304,11 +33344,11 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.6363636363636491,
-      "offset": [
-        1522.006291094742,
-        324.382264412989
-      ]
+      "scale": 0.23939204936916347,
+      "offset": {
+        "0": 4645.50146484375,
+        "1": 3330.18603515625
+      }
     },
     "linkExtensions": [
       {
@@ -34503,7 +34543,7 @@
         "type": "VAE"
       }
     ],
-    "VHS_latentpreview": true,
+    "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "node_versions": {
       "ComfyUI-KJNodes": "f653a8e45e72e5d7af9a91a2ff66c75ec44639f9",

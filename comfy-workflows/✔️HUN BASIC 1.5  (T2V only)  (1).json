@@ -436,7 +436,7 @@
         "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
-        "hunyuan_video_720_cfgdistill_fp8_e4m3fn.safetensors",
+        "hunyuan_video_720_cfgdistill_bf16.safetensors",
         "fp8_e4m3fn"
       ],
       "color": "#223",
@@ -2385,7 +2385,7 @@
         "Node name for S&R": "HunyuanVideoLoraLoader"
       },
       "widgets_values": [
-        "lora Hun\\hyvideo_FastVideo_LoRA-fp8.safetensors",
+        "hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors",
         0,
         "all"
       ],
@@ -3802,10 +3802,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.42409761837248483,
+      "scale": 1.1,
       "offset": {
-        "0": 2969.099365234375,
-        "1": 617.756591796875
+        "0": 2281.838623046875,
+        "1": -432.0414733886719
       }
     },
     "groupNodes": {},
