@@ -1,24 +1,38 @@
 #!/bin/bash
 set -e  # Exit on error
 
-# Check if download-files.sh and files.txt exist in /workspace
-if [ ! -f "/workspace/download-files.sh" ] || [ ! -f "/workspace/files.txt" ]; then
-    echo "🔄 Copying missing download-files.sh and/or files.txt to /workspace"
-    
-    # Check if files exist in the /manage-files/ directory
-    if [ -f "/manage-files/download-files.sh" ]; then
-        cp /manage-files/download-files.sh /workspace/
+# Ensure we're starting in a valid directory
+cd /
+
+# Check if files exist in workspace, copy from root if not
+if [ ! -f "/workspace/download-files.sh" ]; then
+    echo "🔄 Copying download-files.sh to workspace"
+    if [ -f "/download-files.sh" ]; then
+        cp /download-files.sh /workspace/
         chmod +x /workspace/download-files.sh
-        echo "✅ Copied download-files.sh to /workspace"
+        echo "✅ Copied download-files.sh to workspace"
     else
         echo "❌ download-files.sh not found in root directory"
     fi
-    
-    if [ -f "/manage-files/files.txt" ]; then
-        cp /manage-files/files.txt /workspace/
-        echo "✅ Copied files.txt to /workspace"
+fi
+
+if [ ! -f "/workspace/files.txt" ]; then
+    echo "🔄 Copying files.txt to workspace"
+    if [ -f "/files.txt" ]; then
+        cp /files.txt /workspace/
+        echo "✅ Copied files.txt to workspace"
     else
         echo "❌ files.txt not found in root directory"
+    fi
+fi
+
+if [ ! -f "/workspace/ManageGallery.ipynb" ]; then
+    echo "🔄 Copying ManageGallery.ipynb to workspace"
+    if [ -f "/ManageGallery.ipynb" ]; then
+        cp /ManageGallery.ipynb /workspace/
+        echo "✅ Copied ManageGallery.ipynb to workspace"
+    else
+        echo "❌ ManageGallery.ipynb not found in root directory"
     fi
 fi
 

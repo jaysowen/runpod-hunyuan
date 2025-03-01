@@ -198,13 +198,18 @@ COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
 # Copy all scripts
 COPY scripts/*.sh /
 
+# Copy files to container root directory
+COPY manage-files/download-files.sh /
+COPY manage-files/files.txt /
+COPY manage-files/ManageGallery.ipynb /
 
+# Also create workspace directory structure
 RUN mkdir -p /workspace
 
-COPY /manage-files/ManageGallery.ipynb /workspace/
-
-COPY /manage-files/download-files.sh /workspace/
-COPY /manage-files/files.txt /workspace/
+# Copy files to container root directory
+COPY manage-files/download-files.sh /workspace/
+COPY manage-files/files.txt /workspace/
+COPY manage-files/ManageGallery.ipynb /workspace/
 
 RUN dos2unix /*.sh && \
     dos2unix /workspace/*.sh && \
