@@ -181,7 +181,7 @@ RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.
     git clone --depth 1 https://github.com/Stability-AI/stability-ComfyUI-nodes.git \
     git clone --depth 1 https://github.com/DoctorDiffusion/ComfyUI-MediaMixer.git \
     git clone --depth 1 https://github.com/kijai/ComfyUI-VideoNoiseWarp \
-    git clone --depth 1 https://github.com/spacepxl/ComfyUI-Image-Filters \
+    git clone --depth 1 https://github.com/spacepxl/ComfyUI-Image-Filters
 
 
 # Install requirements for custom nodes (if any)
