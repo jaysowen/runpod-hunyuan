@@ -212,7 +212,7 @@ RUN mkdir -p /workspace
 WORKDIR /workspace
 RUN git clone --depth 1 https://github.com/zanllp/sd-webui-infinite-image-browsing.git
 
-WORKDIR /sd-webui-infinite-image-browsing
+WORKDIR /workspace/sd-webui-infinite-image-browsing
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY manage-files/run_image_browser.sh /workspace/
