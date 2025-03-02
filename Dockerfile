@@ -192,12 +192,6 @@ RUN for dir in */; do \
     fi \
     done
 
-# After cloning all the other repositories:
-WORKDIR /
-RUN git clone --depth 1 https://github.com/dihan/comfyui-output-gallery.git
-
-WORKDIR /comfyui-output-gallery
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy workflow files
 COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
@@ -212,6 +206,13 @@ COPY manage-files/ManageGallery.ipynb /
 
 # Also create workspace directory structure
 RUN mkdir -p /workspace
+
+# After cloning all the other repositories:
+WORKDIR /workspace
+RUN git clone --depth 1 https://github.com/dihan/comfyui-output-gallery.git
+
+WORKDIR /comfyui-output-gallery
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy files to container root directory
 COPY manage-files/download-files.sh /workspace/
