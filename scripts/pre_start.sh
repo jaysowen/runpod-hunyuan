@@ -41,4 +41,30 @@ fi
 # Ensure proper permissions
 chmod -R 755 /workspace/ComfyUI
 
+
+echo "MOVING SD GALLERY to worksapce"
+# Ensure clean workspace/ComfyUI directory setup
+if [ -e "/workspace/sd-webui-infinite-image-browsing" ]; then
+    if [ ! -d "/workspace/sd-webui-infinite-image-browsing" ]; then
+        echo "Removing invalid /workspace/sd-webui-infinite-image-browsing"
+        rm -f /workspace/sd-webui-infinite-image-browsing
+    fi
+fi
+
+# Create fresh ComfyUI directory
+mkdir -p /workspace/sd-webui-infinite-image-browsing
+chmod 755 /workspace/sd-webui-infinite-image-browsing
+
+# Check if /ComfyUI exists and is not already a symlink
+if [ -d "/sd-webui-infinite-image-browsing" ] && [ ! -L "/sd-webui-infinite-image-browsing" ]; then
+    echo "**** SETTING UP sd-webui-infinite-image-browsing IN WORKSPACE ****"
+    # Copy files instead of moving to avoid potential issues
+    cp -rf /sd-webui-infinite-image-browsing/* /workspace/sd-webui-infinite-image-browsing/
+    cp -rf /sd-webui-infinite-image-browsing/.??* /workspace/sd-webui-infinite-image-browsing/ 2>/dev/null || true
+    rm -rf /sd-webui-infinite-image-browsing
+    # Create symlink
+    ln -sf /workspace/sd-webui-infinite-image-browsing /sd-webui-infinite-image-browsing
+fi
+
+
 echo "✨ Pre-start completed successfully ✨"

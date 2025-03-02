@@ -39,6 +39,8 @@ ENV PYTHONUNBUFFERED=1 \
 # Clone ComfyUI (source only; no final environment here)
 WORKDIR /
 RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
+RUN git clone --depth 1 https://github.com/zanllp/sd-webui-infinite-image-browsing.git
+
 
 # =============================================================================
 # 2) FINAL STAGE
@@ -196,6 +198,14 @@ RUN for dir in */; do \
 # Copy workflow files
 COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
 
+
+# Copy sd-webui from builder
+COPY --from=builder /sd-webui-infinite-image-browsing /sd-webui-infinite-image-browsing
+
+# Install sd-webui requirements
+WORKDIR /sd-webui-infinite-image-browsing
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Copy all scripts
 COPY scripts/*.sh /
 
@@ -207,13 +217,6 @@ COPY manage-files/ComfyUI_Image_Browser.ipynb /
 
 # Also create workspace directory structure
 RUN mkdir -p /workspace
-
-# After cloning all the other repositories:
-WORKDIR /workspace
-RUN git clone --depth 1 https://github.com/zanllp/sd-webui-infinite-image-browsing.git
-
-WORKDIR /workspace/sd-webui-infinite-image-browsing
-RUN pip install --no-cache-dir -r requirements.txt
 
 COPY manage-files/run_image_browser.sh /workspace/
 COPY manage-files/ComfyUI_Image_Browser.ipynb /workspace/
