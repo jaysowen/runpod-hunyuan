@@ -26,13 +26,19 @@ if [ ! -f "/workspace/files.txt" ]; then
     fi
 fi
 
-if [ ! -f "/workspace/ManageGallery.ipynb" ]; then
-    echo "🔄 Copying ManageGallery.ipynb to workspace"
-    if [ -f "/ManageGallery.ipynb" ]; then
-        cp /ManageGallery.ipynb /workspace/
-        echo "✅ Copied ManageGallery.ipynb to workspace"
+# Add this to post_start.sh
+if [ ! -f "/workspace/run_image_browser.sh" ]; then
+    echo "🔄 Copying run_image_browser.sh to workspace"
+    if [ -f "/run_image_browser.sh" ]; then
+        cp /run_image_browser.sh /workspace/
+        chmod +x /workspace/run_image_browser.sh
+        echo "✅ Copied run_image_browser.sh to workspace"
+    elif [ -f "/manage-files/run_image_browser.sh" ]; then
+        cp /manage-files/run_image_browser.sh /workspace/
+        chmod +x /workspace/run_image_browser.sh
+        echo "✅ Copied run_image_browser.sh from manage-files to workspace"
     else
-        echo "❌ ManageGallery.ipynb not found in root directory"
+        echo "❌ run_image_browser.sh not found"
     fi
 fi
 
@@ -42,7 +48,7 @@ echo "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
 cd /workspace/ComfyUI
 python main.py --listen --port 8188 --enable-cors-header $COMFYUI_EXTRA_ARGS &
 
-echo "🖼️ Starting ComfyUI Output Gallery..."
-cd /comfyui-output-gallery
-nohup python app.py --root /workspace/ComfyUI/output --port 8181 --host 0.0.0.0 > /workspace/logs/gallery.log 2>&1 &
-echo "ComfyUI Output Gallery started on port 8181"
+echo "🖼️ Starting Infinite Image Browser..."
+chmod +x /workspace/run_image_browser.sh
+nohup /workspace/run_image_browser.sh
+echo "Infinite Image Browser started on port 8181"

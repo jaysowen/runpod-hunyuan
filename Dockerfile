@@ -202,7 +202,8 @@ COPY scripts/*.sh /
 # Copy files to container root directory
 COPY manage-files/download-files.sh /
 COPY manage-files/files.txt /
-COPY manage-files/ManageGallery.ipynb /
+COPY manage-files/run_image_browser.sh /
+COPY manage-files/ComfyUI_Image_Browser.ipynb /
 
 # Also create workspace directory structure
 RUN mkdir -p /workspace
@@ -214,10 +215,13 @@ RUN git clone --depth 1 https://github.com/zanllp/sd-webui-infinite-image-browsi
 WORKDIR /sd-webui-infinite-image-browsing
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY manage-files/run_image_browser.sh /workspace/
+COPY manage-files/ComfyUI_Image_Browser.ipynb /workspace/
+RUN chmod +x /workspace/run_image_browser.sh
+
 # Copy files to container root directory
 COPY manage-files/download-files.sh /workspace/
 COPY manage-files/files.txt /workspace/
-COPY manage-files/ManageGallery.ipynb /workspace/
 
 RUN dos2unix /*.sh && \
     dos2unix /workspace/*.sh && \
