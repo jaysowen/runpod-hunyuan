@@ -209,9 +209,9 @@ RUN mkdir -p /workspace
 
 # After cloning all the other repositories:
 WORKDIR /workspace
-RUN git clone --depth 1 https://github.com/dihan/comfyui-output-gallery.git
+RUN git clone --depth 1 https://github.com/zanllp/sd-webui-infinite-image-browsing.git
 
-WORKDIR /comfyui-output-gallery
+WORKDIR /sd-webui-infinite-image-browsing
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy files to container root directory
