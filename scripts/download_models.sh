@@ -2,7 +2,7 @@
 set -euo pipefail
 
 MODEL_DIR="/ComfyUI/models"
-mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
+mkdir -p ${MODEL_DIR}/{diffusion_models,text_encoders,clip_vision,vae,loras}
 
 # Function to format file size
 format_size() {
@@ -69,81 +69,14 @@ download_file() {
     echo "✨ Completed: $filename"
 }
 
-# Function to download file with progress - Nice Progress on Terminal but not good on Runpod Logs
-# download_file() {
-#     local url="$1"
-#     local dest="$2"
-#     local filename=$(basename "$dest")
-#     local model_type=$(basename $(dirname "$dest"))
-#     local max_retries=3
-#     local retry_count=0
-
-#     if [ -f "$dest" ] && [ -s "$dest" ]; then
-#         echo "✅ $filename already exists in $model_type, skipping"
-#         return 0
-#     fi
-
-#     echo "📥 Downloading: $filename"
-#     echo "📂 Type: $model_type"
-    
-#     local size=$(get_hf_file_size "$url")
-#     local formatted_size=$(format_size "$size")
-#     echo "📊 Total size: $formatted_size"
-    
-#     while [ $retry_count -lt $max_retries ]; do
-#         echo "⏳ Download attempt $((retry_count + 1)) of $max_retries"
-        
-#         if wget --progress=dot:mega \
-#                 "$url" \
-#                 -O "$dest.tmp" 2>&1 | \
-#             stdbuf -o0 awk '
-#             /[0-9]+%/ {
-#                 match($0, /([0-9]+)%/)
-#                 percent = substr($0, RSTART, RLENGTH - 1)
-                
-#                 speed = "N/A"
-#                 if (match($0, /([0-9.]+[KMG]?B\/s)/)) {
-#                     speed = substr($0, RSTART, RLENGTH)
-#                 }
-                
-#                 printf "\r⏳ Progress: %3d%% | Speed: %s", percent, speed
-#                 fflush()
-#             }
-#             /[.]/ {
-#                 printf "."
-#                 fflush()
-#             }'; then
-            
-#             echo -e "\n"
-#             mv "$dest.tmp" "$dest"
-#             echo "✨ Successfully downloaded $filename ($formatted_size)"
-#             echo "----------------------------------------"
-#             return 0
-#         else
-#             echo -e "\n⚠️ Failed download attempt $((retry_count + 1)) for $filename"
-#             rm -f "$dest.tmp"
-#             retry_count=$((retry_count + 1))
-#             if [ $retry_count -lt $max_retries ]; then
-#                 echo "🔄 Retrying in 5 seconds..."
-#                 sleep 5
-#             fi
-#         fi
-#     done
-
-#     echo "❌ Failed to download $filename after $max_retries attempts"
-#     return 1
-# }
-
-echo "🚀 Starting model downloads..."
+echo "🚀 Starting WAN model downloads..."
 
 # Define download tasks with their respective directories
 declare -A downloads=(
-    ["${MODEL_DIR}/unet/hunyuan_video_720_cfgdistill_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_720_cfgdistill_bf16.safetensors"
-    ["${MODEL_DIR}/loras/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_FastVideo_720_fp8_e4m3fn.safetensors"
-    ["${MODEL_DIR}/text_encoders/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"]="https://huggingface.co/zer0int/LongCLIP-SAE-ViT-L-14/resolve/main/Long-ViT-L-14-GmP-SAE-TE-only.safetensors"
-    ["${MODEL_DIR}/text_encoders/llava_llama3_fp8_scaled.safetensors"]="https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors"
-    ["${MODEL_DIR}/vae/hunyuan_video_vae_bf16.safetensors"]="https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors"
-    ["${MODEL_DIR}/clip_vision/clip-vit-large-patch14.safetensors"]="https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/model.safetensors"
+    ["${MODEL_DIR}/diffusion_models/Wan2_1-I2V-14B-720P_fp8_e4m3fn.safetensors"]="https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1-I2V-14B-720P_fp8_e4m3fn.safetensors"
+    ["${MODEL_DIR}/clip_vision/clip_vision_h.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors?download=true"
+    ["${MODEL_DIR}/text_encoders/umt5_xxl_fp16.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp16.safetensors"
+    ["${MODEL_DIR}/vae/wan_2.1_vae.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors"
 )
 
 download_success=true
