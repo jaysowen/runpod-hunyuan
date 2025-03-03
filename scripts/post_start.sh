@@ -26,21 +26,6 @@ if [ ! -f "/workspace/files.txt" ]; then
     fi
 fi
 
-# Add this to post_start.sh
-if [ ! -f "/workspace/run_image_browser.sh" ]; then
-    echo "🔄 Copying run_image_browser.sh to workspace"
-    if [ -f "/run_image_browser.sh" ]; then
-        cp /run_image_browser.sh /workspace/
-        chmod +x /workspace/run_image_browser.sh
-        echo "✅ Copied run_image_browser.sh to workspace"
-    elif [ -f "/manage-files/run_image_browser.sh" ]; then
-        cp /manage-files/run_image_browser.sh /workspace/
-        chmod +x /workspace/run_image_browser.sh
-        echo "✅ Copied run_image_browser.sh from manage-files to workspace"
-    else
-        echo "❌ run_image_browser.sh not found"
-    fi
-fi
 
 echo "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
 
@@ -49,6 +34,5 @@ cd /workspace/ComfyUI
 python main.py --listen --port 8188 --enable-cors-header $COMFYUI_EXTRA_ARGS &
 
 echo "🖼️ Starting Infinite Image Browser..."
-chmod +x /workspace/run_image_browser.sh
-nohup /workspace/run_image_browser.sh
-echo "Infinite Image Browser started on port 8181"
+cd /workspace/sd-webui-infinite-image-browsing
+python app.py --port=8181 --extra_paths /workspace/ComfyUI/output --host=0.0.0.0

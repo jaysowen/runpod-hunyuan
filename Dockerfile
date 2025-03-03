@@ -212,15 +212,9 @@ COPY scripts/*.sh /
 # Copy files to container root directory
 COPY manage-files/download-files.sh /
 COPY manage-files/files.txt /
-COPY manage-files/run_image_browser.sh /
-COPY manage-files/ComfyUI_Image_Browser.ipynb /
 
 # Also create workspace directory structure
 RUN mkdir -p /workspace
-
-COPY manage-files/run_image_browser.sh /workspace/
-COPY manage-files/ComfyUI_Image_Browser.ipynb /workspace/
-RUN chmod +x /workspace/run_image_browser.sh
 
 # Copy files to container root directory
 COPY manage-files/download-files.sh /workspace/
