@@ -2,9 +2,9 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ "wavvideo1.0" ]
+    branches: [ "wanvideo1.0" ]
   pull_request:
-    branches: [ "wavvideo1.0" ]
+    branches: [ "wanvideo1.0" ]
 
 env:
   REGISTRY: docker.io
