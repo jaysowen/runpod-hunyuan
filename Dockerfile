@@ -147,6 +147,8 @@ RUN git clone --depth 1 https://github.com/chrisgoringe/cg-use-everywhere.git &&
     git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
     git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials && \
+    git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite && \
     git clone --depth 1 https://github.com/kijai/ComfyUI-WanVideoWrapper.git
 
 # Install requirements for custom nodes (if any)
