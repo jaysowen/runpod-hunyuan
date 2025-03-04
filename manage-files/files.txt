@@ -4,28 +4,22 @@
 # filename: the name you want to save the file as
 # url: the download URL
 # Remove the # hashtag in front to download
-# Remove the # hashtag in front to download
 
 # Example Hugging Face model
-#normal|checkpoints|model1.safetensors|https://huggingface.co/org/model/resolve/main/model1.safetensors
 #normal|checkpoints|model1.safetensors|https://huggingface.co/org/model/resolve/main/model1.safetensors
 
 # Example Civitai model
 #normal|loras|lora1.safetensors|https://civitai.com/api/download/models/12345
-#normal|loras|lora1.safetensors|https://civitai.com/api/download/models/12345
 
 # Example Google Drive model
 #gdrive|loras|lora_from_drive.safetensors|https://drive.google.com/uc?id=your_file_id
-#gdrive|loras|lora_from_drive.safetensors|https://drive.google.com/uc?id=your_file_id
 
 # Example Unet model
-#normal|unet|unet_model.safetensors|https://huggingface.co/path/to/unet.safetensors
 #normal|unet|unet_model.safetensors|https://huggingface.co/path/to/unet.safetensors
 
 
 # WAN Kajai's Workflow
 normal|diffusion_models|Wan2_1-I2V-14B-480P_fp8_e4m3fn.safetensors|https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1-I2V-14B-480P_fp8_e4m3fn.safetensors
-normal|clip_vision|open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors|https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors
+normal|text_encoders|open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors|https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors
 normal|text_encoders|umt5-xxl-enc-bf16.safetensors|https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5-xxl-enc-bf16.safetensors
 normal|vae|Wan2_1_VAE_bf16.safetensors|https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1_VAE_bf16.safetensors
-
