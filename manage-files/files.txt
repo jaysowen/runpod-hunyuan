@@ -5,15 +5,23 @@
 # url: the download URL
 
 # Example Hugging Face model
-normal|checkpoints|model1.safetensors|https://huggingface.co/org/model/resolve/main/model1.safetensors
+#normal|checkpoints|model1.safetensors|https://huggingface.co/org/model/resolve/main/model1.safetensors
 
 # Example Civitai model
-normal|loras|lora1.safetensors|https://civitai.com/api/download/models/12345
+#normal|loras|lora1.safetensors|https://civitai.com/api/download/models/12345
 
 # Example Google Drive model
-gdrive|loras|lora_from_drive.safetensors|https://drive.google.com/uc?id=your_file_id
+#gdrive|loras|lora_from_drive.safetensors|https://drive.google.com/uc?id=your_file_id
 
 # Example Unet model
-normal|unet|unet_model.safetensors|https://huggingface.co/path/to/unet.safetensors
+#normal|unet|unet_model.safetensors|https://huggingface.co/path/to/unet.safetensors
 
 # You can add more models by following the same format
+
+
+
+# Kijai's Image to Video Models
+normal|diffusion_models|hunyuan_video_I2V_fp8_e4m3fn.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_I2V_fp8_e4m3fn.safetensors
+#normal|diffusion_models|hunyuan_video_I2V_fp8_e5m2.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/blob/main/hunyuan_video_I2V_fp8_e5m2.safetensors
+#normal|loras|hyvid_I2V_lora_embrace.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hyvid_I2V_lora_embrace.safetensors
+#normal|loras|hyvid_I2V_lora_hair_growth.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hyvid_I2V_lora_hair_growth.safetensors
