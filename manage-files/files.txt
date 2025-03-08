@@ -23,12 +23,13 @@
 normal|clip_vision|llava_llama3_vision.safetensors|https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/clip_vision/llava_llama3_vision.safetensors
 normal|diffusion_models|hunyuan_video_I2V_720_fixed_bf16.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_I2V_720_fixed_bf16.safetensors
 #normal|diffusion_models|hunyuan_video_I2V_720_fixed_fp8_e4m3fn.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_I2V_720_fixed_fp8_e4m3fn.safetensors
-#NOT might be diff to comfy? normal|vae|hunyuan_video_vae_bf16.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
+#normal|vae|kajai_hunyuan_video_vae_bf16.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_vae_bf16.safetensors
 #normal|loras|hyvid_I2V_lora_hair_growth.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hyvid_I2V_lora_hair_growth.safetensors
+#normal|loras|hyvid_I2V_lora_embrace.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hyvid_I2V_lora_embrace.safetensors
 
 #normal|diffusion_models|hunyuan_video_I2V_fp8_e4m3fn.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_I2V_fp8_e4m3fn.safetensors
 #normal|diffusion_models|hunyuan_video_I2V_fp8_e5m2.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/blob/main/hunyuan_video_I2V_fp8_e5m2.safetensors
-#normal|loras|hyvid_I2V_lora_embrace.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hyvid_I2V_lora_embrace.safetensors
+
 
 
 

@@ -1,6 +1,6 @@
 {
-  "last_node_id": 96,
-  "last_link_id": 182,
+  "last_node_id": 97,
+  "last_link_id": 185,
   "nodes": [
     {
       "id": 5,
@@ -14,7 +14,7 @@
         150
       ],
       "flags": {},
-      "order": 24,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
@@ -85,7 +85,7 @@
         86
       ],
       "flags": {},
-      "order": 25,
+      "order": 26,
       "mode": 0,
       "inputs": [
         {
@@ -105,13 +105,13 @@
         },
         {
           "name": "width",
-          "label": "640 width",
+          "label": "800 width",
           "type": "INT",
           "links": null
         },
         {
           "name": "height",
-          "label": "1344 height",
+          "label": "1152 height",
           "type": "INT",
           "links": null
         },
@@ -288,7 +288,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 20,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -361,7 +361,7 @@
         26
       ],
       "flags": {},
-      "order": 15,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -387,29 +387,6 @@
       }
     },
     {
-      "id": 69,
-      "type": "Note",
-      "pos": [
-        -1338.4915771484375,
-        -570.17236328125
-      ],
-      "size": [
-        275.66656494140625,
-        88
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "block swap is a manual way to do cpu offloading, use this to trade speed with memory use"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
       "id": 62,
       "type": "Note",
       "pos": [
@@ -421,7 +398,7 @@
         88
       ],
       "flags": {},
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -444,7 +421,7 @@
         88
       ],
       "flags": {},
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -467,7 +444,7 @@
         88
       ],
       "flags": {},
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -490,7 +467,7 @@
         222
       ],
       "flags": {},
-      "order": 21,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
@@ -541,7 +518,7 @@
         78
       ],
       "flags": {},
-      "order": 17,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -578,24 +555,24 @@
       ]
     },
     {
-      "id": 57,
-      "type": "HyVideoTorchCompileSettings",
+      "id": 91,
+      "type": "HyVideoEnhanceAVideo",
       "pos": [
-        -1440,
-        -920
+        256.133056640625,
+        -481.41058349609375
       ],
       "size": [
-        441,
-        274
+        352.79998779296875,
+        154
       ],
       "flags": {},
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [],
       "outputs": [
         {
-          "name": "torch_compile_args",
-          "type": "COMPILEARGS",
+          "name": "feta_args",
+          "type": "FETAARGS",
           "links": [],
           "slot_index": 0
         }
@@ -603,19 +580,346 @@
       "properties": {
         "cnr_id": "comfyui-hunyuanvideowrapper",
         "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
-        "Node name for S&R": "HyVideoTorchCompileSettings"
+        "Node name for S&R": "HyVideoEnhanceAVideo"
       },
       "widgets_values": [
-        "inductor",
-        false,
-        "default",
-        false,
-        64,
+        2,
         true,
         true,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 52,
+      "type": "ImageConcatMulti",
+      "pos": [
+        775.3333740234375,
+        182.66668701171875
+      ],
+      "size": [
+        210,
+        150
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_1",
+          "type": "IMAGE",
+          "link": 173
+        },
+        {
+          "name": "image_2",
+          "type": "IMAGE",
+          "link": 135
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            133
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "68db110554d5f1d9bef8d027a111a49fd7f85e1b"
+      },
+      "widgets_values": [
+        2,
+        "right",
         false,
-        false,
-        false
+        null
+      ]
+    },
+    {
+      "id": 84,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        1050.051513671875,
+        -275.9307861328125
+      ],
+      "size": [
+        662.8809204101562,
+        810.874267578125
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 133
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "3a96e87951f498ebcbb6d5bf685f6b0014c8f591",
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "HunyuanVideoWrapper_I2V",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": true,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "HunyuanVideoWrapper_I2V_00003.mp4",
+            "subfolder": "",
+            "type": "output",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "workflow": "HunyuanVideoWrapper_I2V_00003.png",
+            "fullpath": "/workspace/ComfyUI/output/HunyuanVideoWrapper_I2V_00003.mp4"
+          },
+          "muted": false
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "HyVideoVAELoader",
+      "pos": [
+        -930,
+        -710
+      ],
+      "size": [
+        379.166748046875,
+        82
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "compile_args",
+          "type": "COMPILEARGS",
+          "shape": 7,
+          "link": 183
+        }
+      ],
+      "outputs": [
+        {
+          "name": "vae",
+          "type": "VAE",
+          "links": [
+            174
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-hunyuanvideowrapper",
+        "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
+        "Node name for S&R": "HyVideoVAELoader"
+      },
+      "widgets_values": [
+        "hunyuan_video_vae_bf16.safetensors",
+        "bf16"
+      ]
+    },
+    {
+      "id": 87,
+      "type": "GetImageSizeAndCount",
+      "pos": [
+        -696.3228759765625,
+        480.2991943359375
+      ],
+      "size": [
+        277.20001220703125,
+        86
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 161
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            144,
+            145
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "width",
+          "label": "800 width",
+          "type": "INT",
+          "links": [
+            169
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "height",
+          "label": "1152 height",
+          "type": "INT",
+          "links": [
+            170
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "count",
+          "label": "1 count",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "68db110554d5f1d9bef8d027a111a49fd7f85e1b",
+        "Node name for S&R": "GetImageSizeAndCount"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 72,
+      "type": "LoadImage",
+      "pos": [
+        -1689.248779296875,
+        162.35377502441406
+      ],
+      "size": [
+        456.52972412109375,
+        499.45269775390625
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            128,
+            160
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.24",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "FluxTxt2Img.png",
+        "image"
+      ]
+    },
+    {
+      "id": 77,
+      "type": "HyVideoI2VEncode",
+      "pos": [
+        -238.791748046875,
+        160.3931884765625
+      ],
+      "size": [
+        434.1623840332031,
+        253.68370056152344
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_encoders",
+          "type": "HYVIDTEXTENCODER",
+          "link": 114
+        },
+        {
+          "name": "clip_l",
+          "type": "CLIP",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 145
+        },
+        {
+          "name": "hyvid_cfg",
+          "type": "HYVID_CFG",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "hyvid_embeds",
+          "type": "HYVIDEMBEDS",
+          "links": [
+            163
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-hunyuanvideowrapper",
+        "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
+        "Node name for S&R": "HyVideoI2VEncode"
+      },
+      "widgets_values": [
+        "a woman dancing in the street",
+        true,
+        "I2V_video",
+        4
       ]
     },
     {
@@ -649,20 +953,20 @@
         "Node name for S&R": "HyVideoTeaCache"
       },
       "widgets_values": [
-        0.15000000000000002,
+        0.3,
         "offload_device"
       ]
     },
     {
-      "id": 91,
-      "type": "HyVideoEnhanceAVideo",
+      "id": 57,
+      "type": "HyVideoTorchCompileSettings",
       "pos": [
-        256.133056640625,
-        -481.41058349609375
+        -1440,
+        -920
       ],
       "size": [
-        352.79998779296875,
-        154
+        441,
+        274
       ],
       "flags": {},
       "order": 11,
@@ -670,23 +974,89 @@
       "inputs": [],
       "outputs": [
         {
-          "name": "feta_args",
-          "type": "FETAARGS",
-          "links": [],
+          "name": "torch_compile_args",
+          "type": "COMPILEARGS",
+          "links": [
+            183
+          ],
           "slot_index": 0
         }
       ],
       "properties": {
         "cnr_id": "comfyui-hunyuanvideowrapper",
         "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
-        "Node name for S&R": "HyVideoEnhanceAVideo"
+        "Node name for S&R": "HyVideoTorchCompileSettings"
       },
       "widgets_values": [
-        2,
+        "inductor",
+        false,
+        "default",
+        false,
+        64,
         true,
         true,
-        0,
-        1
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 1,
+      "type": "HyVideoModelLoader",
+      "pos": [
+        -950,
+        -420
+      ],
+      "size": [
+        426.1773986816406,
+        242
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "compile_args",
+          "type": "COMPILEARGS",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "block_swap_args",
+          "type": "BLOCKSWAPARGS",
+          "shape": 7,
+          "link": 185
+        },
+        {
+          "name": "lora",
+          "type": "HYVIDLORA",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "HYVIDEOMODEL",
+          "links": [
+            162
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-hunyuanvideowrapper",
+        "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
+        "Node name for S&R": "HyVideoModelLoader"
+      },
+      "widgets_values": [
+        "hunyuan_video_I2V_720_fixed_bf16.safetensors",
+        "bf16",
+        "fp8_e4m3fn",
+        "offload_device",
+        "sageattn_varlen",
+        false,
+        true
       ]
     },
     {
@@ -701,7 +1071,7 @@
         1000.0737915039062
       ],
       "flags": {},
-      "order": 23,
+      "order": 24,
       "mode": 0,
       "inputs": [
         {
@@ -784,7 +1154,7 @@
       "widgets_values": [
         512,
         512,
-        65,
+        165,
         30,
         6,
         7.000000000000002,
@@ -799,230 +1169,27 @@
       ]
     },
     {
-      "id": 1,
-      "type": "HyVideoModelLoader",
+      "id": 97,
+      "type": "Note",
       "pos": [
-        -950,
-        -420
+        -2778.417236328125,
+        139.34219360351562
       ],
       "size": [
-        426.1773986816406,
-        242
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "compile_args",
-          "type": "COMPILEARGS",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "block_swap_args",
-          "type": "BLOCKSWAPARGS",
-          "shape": 7,
-          "link": 182
-        },
-        {
-          "name": "lora",
-          "type": "HYVIDLORA",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "model",
-          "type": "HYVIDEOMODEL",
-          "links": [
-            162
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-hunyuanvideowrapper",
-        "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
-        "Node name for S&R": "HyVideoModelLoader"
-      },
-      "widgets_values": [
-        "hunyuan_video_I2V_720_fixed_bf16.safetensors",
-        "bf16",
-        "fp8_e4m3fn",
-        "offload_device",
-        "sageattn_varlen",
-        false,
-        true
-      ]
-    },
-    {
-      "id": 52,
-      "type": "ImageConcatMulti",
-      "pos": [
-        775.3333740234375,
-        182.66668701171875
-      ],
-      "size": [
-        210,
-        150
-      ],
-      "flags": {},
-      "order": 26,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image_1",
-          "type": "IMAGE",
-          "link": 173
-        },
-        {
-          "name": "image_2",
-          "type": "IMAGE",
-          "link": 135
-        }
-      ],
-      "outputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "links": [
-            133
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-kjnodes",
-        "ver": "68db110554d5f1d9bef8d027a111a49fd7f85e1b"
-      },
-      "widgets_values": [
-        2,
-        "right",
-        false,
-        null
-      ]
-    },
-    {
-      "id": 84,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        1050.051513671875,
-        -275.9307861328125
-      ],
-      "size": [
-        662.8809204101562,
-        1023.0249633789062
-      ],
-      "flags": {},
-      "order": 27,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 133
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "meta_batch",
-          "type": "VHS_BatchManager",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-videohelpersuite",
-        "ver": "3a96e87951f498ebcbb6d5bf685f6b0014c8f591",
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 24,
-        "loop_count": 0,
-        "filename_prefix": "HunyuanVideoWrapper_I2V",
-        "format": "video/h264-mp4",
-        "pix_fmt": "yuv420p",
-        "crf": 19,
-        "save_metadata": true,
-        "trim_to_audio": false,
-        "pingpong": false,
-        "save_output": true,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {
-            "filename": "HunyuanVideoWrapper_I2V_00001.mp4",
-            "subfolder": "",
-            "type": "output",
-            "format": "video/h264-mp4",
-            "frame_rate": 24,
-            "workflow": "HunyuanVideoWrapper_I2V_00001.png",
-            "fullpath": "/workspace/ComfyUI/output/HunyuanVideoWrapper_I2V_00001.mp4"
-          },
-          "muted": false
-        }
-      }
-    },
-    {
-      "id": 7,
-      "type": "HyVideoVAELoader",
-      "pos": [
-        -930,
-        -710
-      ],
-      "size": [
-        379.166748046875,
-        82
+        1049.4013671875,
+        1872.3607177734375
       ],
       "flags": {},
       "order": 12,
       "mode": 0,
-      "inputs": [
-        {
-          "name": "compile_args",
-          "type": "COMPILEARGS",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "vae",
-          "type": "VAE",
-          "links": [
-            174
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-hunyuanvideowrapper",
-        "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
-        "Node name for S&R": "HyVideoVAELoader"
-      },
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
       "widgets_values": [
-        "hunyuan_video_vae_bf16.safetensors",
-        "bf16"
-      ]
+        "# VRAM Usage Control Factors\n\nBefore diving into specific nodes, let's identify the main factors controlling VRAM usage in this workflow:\n\n1. **Model Precision**: Using BF16 or FP8 precision (vs FP32) reduces VRAM needs\n2. **Block Swapping**: Controls how many model blocks are offloaded to CPU when not in use\n3. **TeaCache**: Controls memory allocation for attention caching\n4. **Attention Implementation**: Different attention mechanisms (sage, flash, sdpa) use varying amounts of VRAM\n5. **Resolution**: Higher resolutions require more VRAM\n6. **Video Length**: More frames require more VRAM\n7. **Torch Compile**: Can reduce VRAM with proper Triton support\n\nNow let's look at each node:\n\n## HyVideoVAELoader\n- **Purpose**: Loads the Hunyuan Video VAE model for encoding/decoding images to/from latents\n- **Settings**:\n  - Model path: Uses `hunyuan_video_vae_bf16.safetensors`\n  - Precision: Set to BF16 (lower precision requires less VRAM than FP32)\n\n## HyVideoModelLoader\n- **Purpose**: Loads the primary Hunyuan video generation model\n- **Settings**:\n  - Model path: Uses `hunyuan_video_I2V_720_fixed_bf16.safetensors`\n  - Model precision: BF16 \n  - Weight precision: FP8_e4m3fn (extreme memory savings)\n  - Device offload: Move unused parts to CPU/RAM when not needed\n  - Attention type: Using SageAttention for variable length sequences\n  - Compile: Whether to enable torch compilation (false here)\n  - Cache compile: Whether to cache compiled model\n\n## HyVideoBlockSwap\n- **Purpose**: Controls CPU offloading of model blocks to save VRAM\n- **Settings**:\n  - Input blocks: 20 (number of input blocks to swap to CPU when not in use)\n  - Output blocks: 20 (number of output blocks to swap to CPU when not in use)\n  - Dynamic offload: Off (static offloading approach)\n  - Special handling: Off (no special block handling)\n\n## HyVideoTeaCache\n- **Purpose**: Controls attention caching to trade VRAM for speed\n- **Settings**:\n  - Cache size: 0.15 (percentage of total VRAM to use for caching)\n  - Offload device: Move to CPU when not needed\n\n## HyVideoTorchCompileSettings\n- **Purpose**: Controls torch compilation for performance optimization\n- **Settings**: \n  - Backend: Inductor\n  - CUDA graph: Off\n  - Mode: Default\n  - Dynamic shapes: Off\n  - Max autotune: 64\n  - Trim graphs: On\n  - Cache compilation: On\n  - Fullgraph: Off\n  - Dynamic: Off\n  - Disable cudagraphs: Off\n\n## DownloadAndLoadHyVideoTextEncoder\n- **Purpose**: Loads text encoders for conditioning\n- **Settings**:\n  - LLAVA model: Uses Llama-3-8b\n  - CLIP model: OpenAI large patch14\n  - Precision: FP16\n  - Use baked: Off\n  - Batch size: 2\n  - Compile disabled\n  - Device offload: Move to CPU when not needed\n\n## HyVideoI2VEncode\n- **Purpose**: Encodes text and image into conditioning for Image-to-Video generation\n- **Settings**:\n  - Prompt: \"a woman dancing in the street\"\n  - Use CLIP: On (uses CLIP for additional conditioning)\n  - Conditioning type: \"I2V_video\"\n  - Negative prompt weight: 4\n\n## HyVideoEncode\n- **Purpose**: Encodes input images into latent space\n- **Settings**:\n  - Use text: Off\n  - Start frame: 64\n  - End frame: 256\n  - Process all frames: On\n  - Process strength: 0.02 (how strongly to condition on input)\n  - Batch size: 1\n\n## HyVideoSampler\n- **Purpose**: The main sampling component that generates video latents\n- **Settings**:\n  - Width/Height: 512x512 (size affects VRAM significantly)\n  - Frames: 65 (more frames = more VRAM)\n  - FPS: 30\n  - Steps: 6 (fewer steps = less VRAM)\n  - CFG: 7 (classifier-free guidance scale)\n  - Batch size: 128 (larger batches use more VRAM at once)\n  - Interpolation: Fixed\n  - Use CFG: On\n  - Seed: 1\n  - Scheduler: FlowMatchDiscreteScheduler\n  - Offset: 0\n  - Implementation: Stability\n\n## HyVideoEnhanceAVideo\n- **Purpose**: Post-processing enhancement for video quality\n- **Settings**:\n  - Enhancement strength: 2 (higher = more enhancement but more VRAM)\n  - Long video: On\n  - Process all frames: On\n  - Start index: 0\n  - End index: 1\n\n## HyVideoDecode\n- **Purpose**: Decodes latent video back to pixel space\n- **Settings**:\n  - Preview during generation: On\n  - Start frame: 64\n  - End frame: 192\n  - Process all frames: Off\n\n## Additional Nodes\n\n- **LoadImage**: Loads the input image\n- **HyVideoGetClosestBucketSize**: Automatically sizes input to match model's optimal dimensions\n- **ImageScale**: Resizes the input image to the target resolution\n- **GetImageSizeAndCount**: Gets dimensions and frame count of images\n- **ImageConcatMulti**: Concatenates input and output images for comparison\n- **VHS_VideoCombine**: Combines frames into an MP4 video file\n\n## Main VRAM Control Settings\n\nTo reduce VRAM usage:\n\n1. **In HyVideoModelLoader**:\n   - Use FP8 or BF16 precision\n   - Enable device offloading\n\n2. **In HyVideoBlockSwap**:\n   - Increase the number of input/output blocks to swap\n\n3. **In HyVideoSampler**:\n   - Reduce resolution (width/height)\n   - Reduce number of frames\n   - Reduce steps\n   - Reduce batch size\n\n4. **In HyVideoTeaCache**:\n   - Reduce cache size\n   - Enable offloading\n\n5. **General Tips**:\n   - Use SageAttention if your GPU supports it\n   - Enable torch compilation if you have Triton support\n\nAccording to the notes in the workflow, the torch compilation can reduce VRAM usage by about 30% if you have a working Triton installation."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 59,
@@ -1044,7 +1211,7 @@
           "name": "block_swap_args",
           "type": "BLOCKSWAPARGS",
           "links": [
-            182
+            185
           ],
           "slot_index": 0
         }
@@ -1055,176 +1222,34 @@
         "Node name for S&R": "HyVideoBlockSwap"
       },
       "widgets_values": [
-        20,
-        20,
+        10,
+        10,
         false,
         false
       ]
     },
     {
-      "id": 87,
-      "type": "GetImageSizeAndCount",
+      "id": 69,
+      "type": "Note",
       "pos": [
-        -696.3228759765625,
-        480.2991943359375
+        -1338.4915771484375,
+        -570.17236328125
       ],
       "size": [
-        277.20001220703125,
-        86
-      ],
-      "flags": {},
-      "order": 19,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 161
-        }
-      ],
-      "outputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            144,
-            145
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "width",
-          "label": "800 width",
-          "type": "INT",
-          "links": [
-            169
-          ],
-          "slot_index": 1
-        },
-        {
-          "name": "height",
-          "label": "1152 height",
-          "type": "INT",
-          "links": [
-            170
-          ],
-          "slot_index": 2
-        },
-        {
-          "name": "count",
-          "label": "1 count",
-          "type": "INT",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-kjnodes",
-        "ver": "68db110554d5f1d9bef8d027a111a49fd7f85e1b",
-        "Node name for S&R": "GetImageSizeAndCount"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 72,
-      "type": "LoadImage",
-      "pos": [
-        -1689.248779296875,
-        162.35377502441406
-      ],
-      "size": [
-        456.52972412109375,
-        499.45269775390625
+        322.248046875,
+        100.02107238769531
       ],
       "flags": {},
       "order": 14,
       "mode": 0,
       "inputs": [],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            128,
-            160
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.24",
-        "Node name for S&R": "LoadImage"
-      },
+      "outputs": [],
+      "properties": {},
       "widgets_values": [
-        "FluxTxt2Img.png",
-        "image"
-      ]
-    },
-    {
-      "id": 77,
-      "type": "HyVideoI2VEncode",
-      "pos": [
-        -238.791748046875,
-        160.3931884765625
+        "block swap is a manual way to do cpu offloading, use this to trade speed with memory use\n\n20 20 24GB\n10 10 for 48GB"
       ],
-      "size": [
-        434.1623840332031,
-        253.68370056152344
-      ],
-      "flags": {},
-      "order": 22,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text_encoders",
-          "type": "HYVIDTEXTENCODER",
-          "link": 114
-        },
-        {
-          "name": "clip_l",
-          "type": "CLIP",
-          "shape": 7,
-          "link": null
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "shape": 7,
-          "link": 145
-        },
-        {
-          "name": "hyvid_cfg",
-          "type": "HYVID_CFG",
-          "shape": 7,
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "hyvid_embeds",
-          "type": "HYVIDEMBEDS",
-          "links": [
-            163
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-hunyuanvideowrapper",
-        "ver": "a20d9940306cd6ca87144d6ed28d00aa705ee900",
-        "Node name for S&R": "HyVideoI2VEncode"
-      },
-      "widgets_values": [
-        "a woman dancing in the street",
-        true,
-        "I2V_video",
-        4
-      ]
+      "color": "#432",
+      "bgcolor": "#653"
     }
   ],
   "links": [
@@ -1413,7 +1438,15 @@
       "TEACACHEARGS"
     ],
     [
-      182,
+      183,
+      57,
+      0,
+      7,
+      0,
+      "COMPILEARGS"
+    ],
+    [
+      185,
       59,
       0,
       1,
@@ -1425,10 +1458,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.5644739300537773,
+      "scale": 1.3310000000000004,
       "offset": [
-        1667.0882715993982,
-        1088.0042917718135
+        1696.1814036400972,
+        742.5651239112377
       ]
     },
     "node_versions": {
