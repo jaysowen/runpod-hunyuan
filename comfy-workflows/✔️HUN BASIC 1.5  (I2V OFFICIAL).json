@@ -1,13 +1,13 @@
 {
   "last_node_id": 405,
-  "last_link_id": 868,
+  "last_link_id": 872,
   "nodes": [
     {
       "id": 288,
       "type": "Label (rgthree)",
       "pos": [
-        -3220,
-        340
+        -1840.311767578125,
+        343.0354309082031
       ],
       "size": [
         130.068359375,
@@ -38,8 +38,8 @@
       "id": 289,
       "type": "Label (rgthree)",
       "pos": [
-        -3220,
-        510
+        -1840.311767578125,
+        513.0354614257812
       ],
       "size": [
         245.5859375,
@@ -70,8 +70,8 @@
       "id": 180,
       "type": "Anything Everywhere3",
       "pos": [
-        -2780,
-        1300
+        -1400.3118896484375,
+        1303.03515625
       ],
       "size": [
         180,
@@ -152,8 +152,8 @@
       "id": 10,
       "type": "VAELoader",
       "pos": [
-        -3220,
-        1360
+        -1840.311767578125,
+        1363.03515625
       ],
       "size": [
         410,
@@ -190,8 +190,8 @@
       "id": 297,
       "type": "Reroute",
       "pos": [
-        -2700,
-        490
+        -1320.31201171875,
+        493.0354919433594
       ],
       "size": [
         75,
@@ -227,8 +227,8 @@
       "id": 272,
       "type": "Label (rgthree)",
       "pos": [
-        -3070,
-        230
+        -1690.311767578125,
+        233.03550720214844
       ],
       "size": [
         317.3828125,
@@ -430,8 +430,8 @@
       "id": 11,
       "type": "DualCLIPLoader",
       "pos": [
-        -3220,
-        1190
+        -1840.311767578125,
+        1193.03515625
       ],
       "size": [
         410,
@@ -471,8 +471,8 @@
       "id": 290,
       "type": "Label (rgthree)",
       "pos": [
-        -3220,
-        800
+        -1840.311767578125,
+        803.0354614257812
       ],
       "size": [
         110.029296875,
@@ -673,8 +673,8 @@
       "id": 381,
       "type": "UnetLoaderGGUFDisTorchMultiGPU",
       "pos": [
-        -3220,
-        570
+        -1840.311767578125,
+        573.0354614257812
       ],
       "size": [
         520,
@@ -781,10 +781,6 @@
         {
           "name": "guidance",
           "type": "FLOAT",
-          "pos": [
-            10,
-            36
-          ],
           "widget": {
             "name": "guidance"
           },
@@ -849,10 +845,6 @@
         {
           "name": "width",
           "type": "INT",
-          "pos": [
-            10,
-            76
-          ],
           "widget": {
             "name": "width"
           },
@@ -861,10 +853,6 @@
         {
           "name": "height",
           "type": "INT",
-          "pos": [
-            10,
-            100
-          ],
           "widget": {
             "name": "height"
           },
@@ -873,10 +861,6 @@
         {
           "name": "length",
           "type": "INT",
-          "pos": [
-            10,
-            124
-          ],
           "widget": {
             "name": "length"
           },
@@ -937,10 +921,6 @@
         {
           "name": "shift",
           "type": "FLOAT",
-          "pos": [
-            10,
-            36
-          ],
           "widget": {
             "name": "shift"
           },
@@ -970,8 +950,8 @@
       "id": 400,
       "type": "CLIPVisionLoader",
       "pos": [
-        -3220,
-        1470
+        -1840.311767578125,
+        1473.03515625
       ],
       "size": [
         315,
@@ -1219,7 +1199,7 @@
       ],
       "size": [
         540,
-        1180
+        334
       ],
       "flags": {
         "pinned": false
@@ -1343,8 +1323,8 @@
       "id": 12,
       "type": "UNETLoader",
       "pos": [
-        -3220,
-        400
+        -1840.311767578125,
+        403.0354309082031
       ],
       "size": [
         490,
@@ -1384,8 +1364,8 @@
       "id": 296,
       "type": "ApplyFBCacheOnModel",
       "pos": [
-        -3020,
-        790
+        -1640.311767578125,
+        793.0354614257812
       ],
       "size": [
         315,
@@ -1432,8 +1412,8 @@
       "id": 403,
       "type": "PathchSageAttentionKJ",
       "pos": [
-        -3220,
-        1050
+        -1840.311767578125,
+        1053.03515625
       ],
       "size": [
         315,
@@ -1685,7 +1665,7 @@
         "Node name for S&R": "RandomNoise"
       },
       "widgets_values": [
-        10,
+        11,
         "increment"
       ],
       "color": "#136762",
@@ -1695,8 +1675,8 @@
       "id": 344,
       "type": "Note",
       "pos": [
-        -3500,
-        320
+        -2120.3115234375,
+        323.0354309082031
       ],
       "size": [
         250,
@@ -1778,10 +1758,6 @@
         {
           "name": "steps",
           "type": "INT",
-          "pos": [
-            10,
-            60
-          ],
           "widget": {
             "name": "steps"
           },
@@ -1790,10 +1766,6 @@
         {
           "name": "denoise",
           "type": "FLOAT",
-          "pos": [
-            10,
-            84
-          ],
           "widget": {
             "name": "denoise"
           },
@@ -1827,8 +1799,8 @@
       "id": 253,
       "type": "HunyuanVideoLoraLoader",
       "pos": [
-        -3220,
-        850
+        -1840.311767578125,
+        853.0354614257812
       ],
       "size": [
         490,
@@ -1848,10 +1820,6 @@
         {
           "name": "strength",
           "type": "FLOAT",
-          "pos": [
-            10,
-            60
-          ],
           "widget": {
             "name": "strength"
           },
@@ -1924,7 +1892,8 @@
         "Node name for S&R": "TextEncodeHunyuanVideo_ImageToVideo"
       },
       "widgets_values": [
-        "a woman talking"
+        "a woman talking",
+        2
       ],
       "color": "#212121",
       "bgcolor": "#396123"
@@ -1985,7 +1954,7 @@
       ],
       "title": "🕹️ Console 🕹️",
       "properties": {
-        "cnr_id": "The-AI-Doctors-Clinical-Tools",
+        "aux_id": "BlueprintCoding/ComfyUI_AIDocsClinicalTools",
         "ver": "b524ae60c100d812b8d339f80209a7fa0e5b551b",
         "activeCount": 7,
         "floatSteps": [
@@ -2063,6 +2032,8 @@
         "minWidth": 250,
         "maxWidth": 1000,
         "showStaticLabelAndLine": false,
+        "Node name for S&R": "MultiFloatNodeAID",
+        "cnr_id": "The-AI-Doctors-Clinical-Tools",
         "bgColor": "#212121",
         "rowBgColor": "#1a1a1a",
         "rowSpacing": 2,
@@ -3696,6 +3667,38 @@
       402,
       0,
       "CLIP"
+    ],
+    [
+      869,
+      10,
+      0,
+      395,
+      1,
+      "VAE"
+    ],
+    [
+      870,
+      10,
+      0,
+      73,
+      1,
+      "VAE"
+    ],
+    [
+      871,
+      10,
+      0,
+      82,
+      3,
+      "VAE"
+    ],
+    [
+      872,
+      11,
+      0,
+      402,
+      0,
+      "CLIP"
     ]
   ],
   "groups": [
@@ -3703,8 +3706,8 @@
       "id": 4,
       "title": "Setup",
       "bounding": [
-        -3230,
-        290,
+        -1850.311767578125,
+        293.0354309082031,
         620,
         1560
       ],
@@ -3742,10 +3745,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.7247295000000007,
+      "scale": 1.1,
       "offset": [
-        2725.8018239338644,
-        144.23639095690106
+        2270.7379090909094,
+        -12.55609090909087
       ]
     },
     "groupNodes": {},
@@ -4095,7 +4098,7 @@
         "type": "CLIP"
       }
     ],
-    "VHS_latentpreview": true,
+    "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "node_versions": {
       "comfy-core": "0.3.13",
