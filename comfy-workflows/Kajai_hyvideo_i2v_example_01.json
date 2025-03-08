@@ -266,7 +266,7 @@
           "slot_index": 0
         },
         {
-          "name": "832 width",
+          "name": "width",
           "type": "INT",
           "links": [
             169
@@ -274,7 +274,7 @@
           "slot_index": 1
         },
         {
-          "name": "576 height",
+          "name": "height",
           "type": "INT",
           "links": [
             170
@@ -282,7 +282,7 @@
           "slot_index": 2
         },
         {
-          "name": "1 count",
+          "name": "count",
           "type": "INT",
           "links": null
         }
@@ -317,10 +317,6 @@
         {
           "name": "width",
           "type": "INT",
-          "pos": [
-            10,
-            60
-          ],
           "widget": {
             "name": "width"
           },
@@ -329,10 +325,6 @@
         {
           "name": "height",
           "type": "INT",
-          "pos": [
-            10,
-            84
-          ],
           "widget": {
             "name": "height"
           },
@@ -549,7 +541,7 @@
       ],
       "size": [
         315,
-        198
+        222
       ],
       "flags": {},
       "order": 22,
@@ -587,7 +579,8 @@
         256,
         true,
         0.020000000000000004,
-        1
+        1,
+        "sample"
       ]
     },
     {
@@ -599,7 +592,7 @@
       ],
       "size": [
         315,
-        58
+        82
       ],
       "flags": {},
       "order": 9,
@@ -621,7 +614,8 @@
         "Node name for S&R": "HyVideoTeaCache"
       },
       "widgets_values": [
-        0.15000000000000002
+        0.15000000000000002,
+        "offload_device"
       ]
     },
     {
@@ -946,10 +940,6 @@
         {
           "name": "width",
           "type": "INT",
-          "pos": [
-            10,
-            176
-          ],
           "widget": {
             "name": "width"
           },
@@ -958,10 +948,6 @@
         {
           "name": "height",
           "type": "INT",
-          "pos": [
-            10,
-            200
-          ],
           "widget": {
             "name": "height"
           },
@@ -999,77 +985,6 @@
       ]
     },
     {
-      "id": 97,
-      "type": "TitlePlus",
-      "pos": [
-        -146.43408203125,
-        -943.3402709960938
-      ],
-      "size": [
-        594.4599609375,
-        133.0399932861328
-      ],
-      "flags": {
-        "allow_interaction": true,
-        "resizable": true,
-        "draggable": true
-      },
-      "order": 15,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "title": "Download",
-      "properties": {
-        "title": "To use this workflow",
-        "subtitle": "go to the ./workspace\nand run ./download-files.sh\n",
-        "fontFamily": "Open Sans",
-        "titleFontSize": 28,
-        "subtitleFontSize": 25,
-        "titleFontWeight": "600",
-        "subtitleFontWeight": "400",
-        "titleColor": "#ffffff",
-        "subtitleColor": "#cccccc",
-        "textColor": "#ffffff",
-        "backgroundColor": "#242424",
-        "accentColor": "#3498db",
-        "borderRadius": 12,
-        "padding": 20,
-        "titleSubtitleGap": 8,
-        "animation": false,
-        "animationType": "none",
-        "animationDuration": 500,
-        "animationEasing": "linear",
-        "shadow": true,
-        "shadowColor": "rgba(0,0,0,0.25)",
-        "shadowBlur": 15,
-        "shadowOffsetX": 0,
-        "shadowOffsetY": 4,
-        "textAlign": "left",
-        "gradientBackground": true,
-        "gradientStartColor": "#432d39",
-        "gradientEndColor": "#2e2131",
-        "customBackground": false,
-        "backgroundUrl": "",
-        "backgroundOpacity": 0.7,
-        "backgroundBlur": 0,
-        "backgroundScale": 1,
-        "backgroundPosition": "center",
-        "backgroundFit": "cover",
-        "backgroundOverlay": true,
-        "backgroundOverlayColor": "rgba(0,0,0,0.4)",
-        "gradientType": "linear",
-        "gradientAngle": 145,
-        "dividerEnabled": true,
-        "dividerColor": "#3498db",
-        "dividerWidth": 2,
-        "dividerLength": 120,
-        "dividerOpacity": 0.8
-      },
-      "widgets_values": [],
-      "color": "#fff0",
-      "bgcolor": "#fff0"
-    },
-    {
       "id": 72,
       "type": "LoadImage",
       "pos": [
@@ -1081,7 +996,7 @@
         499.45269775390625
       ],
       "flags": {},
-      "order": 16,
+      "order": 15,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1167,7 +1082,8 @@
       "widgets_values": [
         "disco party, 2 men and a woman dacing at a night club in the 80's",
         true,
-        "I2V_video"
+        "I2V_video",
+        2
       ]
     },
     {
@@ -1179,7 +1095,7 @@
       ],
       "size": [
         662.8809204101562,
-        570.5357055664062
+        334
       ],
       "flags": {},
       "order": 29,
@@ -1257,7 +1173,7 @@
       ],
       "size": [
         662.8809204101562,
-        669.4404296875
+        334
       ],
       "flags": {},
       "order": 28,
@@ -1358,17 +1274,17 @@
           "slot_index": 0
         },
         {
-          "name": "832 width",
+          "name": "width",
           "type": "INT",
           "links": null
         },
         {
-          "name": "576 height",
+          "name": "height",
           "type": "INT",
           "links": null
         },
         {
-          "name": "129 count",
+          "name": "count",
           "type": "INT",
           "links": null
         }
@@ -1379,6 +1295,77 @@
         "Node name for S&R": "GetImageSizeAndCount"
       },
       "widgets_values": []
+    },
+    {
+      "id": 97,
+      "type": "TitlePlus",
+      "pos": [
+        -146.43408203125,
+        -943.3402709960938
+      ],
+      "size": [
+        869.857177734375,
+        133.0399932861328
+      ],
+      "flags": {
+        "allow_interaction": true,
+        "resizable": true,
+        "draggable": true
+      },
+      "order": 16,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Download",
+      "properties": {
+        "title": "To use this workflow",
+        "subtitle": "Onn Juypter Labs 8888> go to the ./workspaceand run ./download-files.sh",
+        "fontFamily": "Open Sans",
+        "titleFontSize": 28,
+        "subtitleFontSize": 25,
+        "titleFontWeight": "600",
+        "subtitleFontWeight": "400",
+        "titleColor": "#ffffff",
+        "subtitleColor": "#cccccc",
+        "textColor": "#ffffff",
+        "backgroundColor": "#242424",
+        "accentColor": "#3498db",
+        "borderRadius": 12,
+        "padding": 20,
+        "titleSubtitleGap": 8,
+        "animation": false,
+        "animationType": "none",
+        "animationDuration": 500,
+        "animationEasing": "linear",
+        "shadow": true,
+        "shadowColor": "rgba(0,0,0,0.25)",
+        "shadowBlur": 15,
+        "shadowOffsetX": 0,
+        "shadowOffsetY": 4,
+        "textAlign": "left",
+        "gradientBackground": true,
+        "gradientStartColor": "#432d39",
+        "gradientEndColor": "#2e2131",
+        "customBackground": false,
+        "backgroundUrl": "",
+        "backgroundOpacity": 0.7,
+        "backgroundBlur": 0,
+        "backgroundScale": 1,
+        "backgroundPosition": "center",
+        "backgroundFit": "cover",
+        "backgroundOverlay": true,
+        "backgroundOverlayColor": "rgba(0,0,0,0.4)",
+        "gradientType": "linear",
+        "gradientAngle": 145,
+        "dividerEnabled": true,
+        "dividerColor": "#3498db",
+        "dividerWidth": 2,
+        "dividerLength": 120,
+        "dividerOpacity": 0.8
+      },
+      "widgets_values": [],
+      "color": "#fff0",
+      "bgcolor": "#fff0"
     }
   ],
   "links": [
@@ -1579,10 +1566,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.5131581182307067,
+      "scale": 0.6209213230591553,
       "offset": [
-        2892.0656726795023,
-        1278.5781137043903
+        2371.589303079502,
+        1172.3900020043902
       ]
     },
     "node_versions": {
@@ -1591,7 +1578,7 @@
       "comfy-core": "0.3.19",
       "ComfyUI-VideoHelperSuite": "2c25b8b53835aaeb63f831b3137c705cf9f85dce"
     },
-    "VHS_latentpreview": true,
+    "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,
     "VHS_KeepIntermediate": true,
