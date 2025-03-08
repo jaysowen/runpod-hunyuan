@@ -8,6 +8,8 @@ UPDATE
   - `SKIP_DOWNLOADS=true`: Skip downloading models
   - `SKIP_NODES=true`: Skip installing custom nodes
   - Perfect for network drives & persistent storage
+- May have fixed the Easy Use Node Error and can use Latent Dreams original workflow
+- Added Latent Dream's AllinOne 1.5 workflows including Official Hunyuan Image to Video workflow ( files.txt already has links to repo)
 
 21/02/25
 - Added download-files.sh - Add your models to files.txt and './download-files.sh' on terminal to download all your files from hugginface
@@ -32,7 +34,7 @@ UPDATE
 
 1. Head over to [RunPod.io]([https://runpod.io](https://runpod.io?ref=0eayrc3z))
 2. Click on `Deploy` and select `Template`
-3. Search for `Hunyuan Video - ComfyUI Manager - AllInOne3.0`
+3. Search for `Hunyuan Video ComfyUI Manager- AllInOne3.0-CUDA2.5`
 4. Choose your preferred GPU
 5. Hit that `Deploy` button! 🎉
 
@@ -56,7 +58,7 @@ These are especially useful when:
 
 Once your pod is up and running, you'll see several URLs in your pod's overview:
 
-- Will take around 25 mins to download all the models (less with `SKIP_DOWNLOADS=true`). Give it a few miniutes after "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
+- Will take around 10 mins to download all the models (less with `SKIP_DOWNLOADS=true`). Give it a few miniutes after "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
 
 - 🎨 **ComfyUI**: `https://your-pod-id-8188.proxy.runpod.net`
 - 📓 **JupyterLab**: `https://your-pod-id-8888.proxy.runpod.net`
@@ -140,7 +142,7 @@ cd /workspace
 ----------
 
 
-## 🎯 Pre-installed Models
+## 🎯 Pre-installed Models ( Can be skipped using ENV)
 
 ### 🎬 Video Generation Models
 - **HunyuanVideo Models**
