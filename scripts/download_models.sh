@@ -1,6 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
+# Exit immediately if SKIP_DOWNLOADS is set to true
+if [ "${SKIP_DOWNLOADS:-false}" == "true" ]; then
+    echo "SKIP_DOWNLOADS is set to true, skipping model downloads"
+    exit 0
+fi
+
 MODEL_DIR="/ComfyUI/models"
 mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
 

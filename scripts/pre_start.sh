@@ -9,10 +9,19 @@ mkdir -p /workspace
 chmod 755 /workspace
 
 echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
-/install_nodes.sh install_only
+if [ "${SKIP_NODES}" == "true" ]; then
+    echo "**** SKIPPING NODE INSTALLATION (SKIP_NODES=true) ****"
+else
+    /install_nodes.sh install_only
+fi
 
-echo "**** DOWNLOAD - INSTALLING MODELS ****"
-/download_models.sh
+# Check if downloads should be skipped
+if [ "${SKIP_DOWNLOADS}" == "true" ]; then
+    echo "**** SKIPPING MODEL DOWNLOADS (SKIP_DOWNLOADS=true) ****"
+else
+    echo "**** DOWNLOADING - INSTALLING MODELS ****"
+    /download_models.sh
+fi
 
 echo "MOVING COMFYUI TO WORKSPACE"
 # Ensure clean workspace/ComfyUI directory setup
@@ -42,7 +51,7 @@ fi
 chmod -R 755 /workspace/ComfyUI
 
 
-echo "MOVING SD GALLERY to worksapce"
+echo "MOVING SD GALLERY to workspace"
 # Ensure clean workspace/ComfyUI directory setup
 if [ -e "/workspace/sd-webui-infinite-image-browsing" ]; then
     if [ ! -d "/workspace/sd-webui-infinite-image-browsing" ]; then
@@ -65,6 +74,5 @@ if [ -d "/sd-webui-infinite-image-browsing" ] && [ ! -L "/sd-webui-infinite-imag
     # Create symlink
     ln -sf /workspace/sd-webui-infinite-image-browsing /sd-webui-infinite-image-browsing
 fi
-
 
 echo "✨ Pre-start completed successfully ✨"

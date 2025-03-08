@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# Exit immediately if SKIP_NODES is set to true and we're not forcing installation
+if [ "${SKIP_NODES}" == "true" ] && [ "$1" != "force" ]; then
+    echo "SKIP_NODES is set to true, skipping node installations"
+    exit 0
+fi
+
 CUSTOM_NODES_DIR="/ComfyUI/custom_nodes"
 mkdir -p "$CUSTOM_NODES_DIR"
 cd "$CUSTOM_NODES_DIR"
@@ -71,7 +77,7 @@ clone_if_not_exists "https://github.com/welltop-cn/ComfyUI-TeaCache.git"
 clone_if_not_exists "https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git"
 clone_if_not_exists  "https://github.com/chengzeyi/Comfy-WaveSpeed.git"
 clone_if_not_exists "https://github.com/ltdrdata/ComfyUI-Manager.git"
-# clone_if_not_exists "https://github.com/yolain/ComfyUI-Easy-Use.git"
+clone_if_not_exists "https://github.com/yolain/ComfyUI-Easy-Use.git"
 clone_if_not_exists "https://github.com/crystian/ComfyUI-Crystools.git"
 clone_if_not_exists "https://github.com/kijai/ComfyUI-KJNodes.git"
 clone_if_not_exists "https://github.com/ltdrdata/ComfyUI-Impact-Pack.git"

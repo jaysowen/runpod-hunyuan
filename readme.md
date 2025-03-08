@@ -3,12 +3,18 @@
 Welcome to the most awesome ComfyUI setup you'll ever encounter! This template comes packed with everything you need to start creating amazing AI-generated videos and images. 🚀
 
 UPDATE
+08/03/25
+- Added environment variables to control setup behavior:
+  - `SKIP_DOWNLOADS=true`: Skip downloading models
+  - `SKIP_NODES=true`: Skip installing custom nodes
+  - Perfect for network drives & persistent storage
+
 21/02/25
 - Added download-files.sh - Add your models to files.txt and './download-files.sh' on terminal to download all your files from hugginface
 - Updated Python to comfy recommened 3.12 - Uses Miniconda
   
 20/02/25
-- Everything working  well now udpated to the latest Pytorch and Cuda (Better performance)
+- Everything working well now udpated to the latest Pytorch and Cuda (Better performance)
 - One anoying issue is the Easy Setnode refuse to work so I've created an alternative AllinoneUltra1.3 without that node 
 
 ## ✨ Features
@@ -30,23 +36,39 @@ UPDATE
 4. Choose your preferred GPU
 5. Hit that `Deploy` button! 🎉
 
-### 2. Accessing Your Instance
+### 2. Environment Variables
+
+When deploying, you can set these environment variables to control the startup behavior:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SKIP_DOWNLOADS` | Set to `true` to skip model downloads | `false` |
+| `SKIP_NODES` | Set to `true` to skip node installations | `false` |
+| `JUPYTERLAB_PASSWORD` | Set a password for JupyterLab | Empty (no password) |
+| `PUBLIC_KEY` | Your SSH public key for secure access | Empty (SSH disabled) |
+
+These are especially useful when:
+- Using network drives or persistent storage
+- Redeploying pods frequently
+- You've already downloaded models and want faster startup
+
+### 3. Accessing Your Instance
 
 Once your pod is up and running, you'll see several URLs in your pod's overview:
 
-- Will take around 25 mins to to download all the models (Will try to make this faster). Give it a few miniutes after "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
+- Will take around 25 mins to download all the models (less with `SKIP_DOWNLOADS=true`). Give it a few miniutes after "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
 
 - 🎨 **ComfyUI**: `https://your-pod-id-8188.proxy.runpod.net`
 - 📓 **JupyterLab**: `https://your-pod-id-8888.proxy.runpod.net`
 
-### 3. Working with JupyterLab
+### 4. Working with JupyterLab
 
-- To set a password. on ENV template set JUPYTERLAB_PASSWORD = "password"
+- To set a password, on ENV template set JUPYTERLAB_PASSWORD = "password"
 - Access JupyterLab using the URL from your pod's overview
 - Default password is empty (just press Enter)
 - All your work will be saved in the `/workspace` directory
 
-### 4. SSH Access (Optional)
+### 5. SSH Access (Optional)
 
 To enable SSH access:
 1. Set your `PUBLIC_KEY` in the template settings
@@ -64,18 +86,16 @@ cd /workspace/ComfyUI/models/checkpoints
 2. Download using wget (replace URL with your model link):
 ```bash
 # For direct downloads
-wget -O https://huggingface.co/CompVis/stable-diffusion-v1-4/resolve/main/sd-v1-4.ckpt
+wget -O model-name.safetensors https://huggingface.co/CompVis/stable-diffusion-v1-4/resolve/main/sd-v1-4.ckpt
 
 # For files requiring authentication
-wget -O ArcaneJinx.safetensors "https://civitai.com/api/download/models/782002?type=Model&format=SafeTensor&token=xxxxxxxxxxxxxxxxxxxxxxxxxxx""
+wget -O ArcaneJinx.safetensors "https://civitai.com/api/download/models/782002?type=Model&format=SafeTensor&token=xxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
 3. For large files, you can show progress:
 ```bash
 wget -q --show-progress https://huggingface.co/model/resolve/main/model.safetensors
 ```
-
-
 
 ### Pro Tips 💡
 
@@ -105,6 +125,16 @@ done < download_list.txt
 3. **Resume Interrupted Downloads**:
 ```bash
 wget -c -q --show-progress "DOWNLOAD_URL"
+```
+
+4. **Using files.txt for Automated Downloads**:
+```bash
+# Edit the files.txt in your workspace directory
+nano /workspace/files.txt
+
+# Then run the download script
+cd /workspace
+./download-files.sh
 ```
 
 ----------
@@ -262,3 +292,4 @@ wget -c -q --show-progress "DOWNLOAD_URL"
 - Custom node settings are preserved in `/workspace/ComfyUI/custom_nodes`
 - Node updates are handled automatically on container restart
 - Additional nodes can be installed via ComfyUI Manager
+- Use `SKIP_NODES=true` to keep your existing nodes when redeploying
