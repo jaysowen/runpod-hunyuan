@@ -38,8 +38,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Clone ComfyUI (source only; no final environment here)
 WORKDIR /
-RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
-RUN git clone --depth 1 https://github.com/zanllp/sd-webui-infinite-image-browsing.git
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git
+RUN git clone https://github.com/zanllp/sd-webui-infinite-image-browsing.git
 
 
 # =============================================================================
@@ -138,52 +138,52 @@ RUN pip install --no-cache-dir \
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
-RUN git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
-    git clone --depth 1 https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
-    git clone --depth 1 https://github.com/sipherxyz/comfyui-art-venture.git && \
-    git clone --depth 1 https://github.com/theUpsider/ComfyUI-Logic.git && \
-    git clone --depth 1 https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
-    git clone --depth 1 https://github.com/alt-key-project/comfyui-dream-project.git && \
-    git clone --depth 1 https://github.com/Jonseed/ComfyUI-Detail-Daemon.git && \
-    git clone --depth 1 https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git && \
-    git clone --depth 1 https://github.com/BlenderNeko/ComfyUI_Noise.git && \
-    git clone --depth 1 https://github.com/chrisgoringe/cg-noisetools.git && \
-    git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials.git && \
-    git clone --depth 1 https://github.com/chrisgoringe/cg-use-everywhere.git && \
-    git clone --depth 1 https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git && \
-    git clone --depth 1 https://github.com/pharmapsychotic/comfy-cliption.git && \
-    git clone --depth 1 https://github.com/darkpixel/darkprompts.git && \
-    git clone --depth 1 https://github.com/Koushakur/ComfyUI-DenoiseChooser.git && \
-    git clone --depth 1 https://github.com/city96/ComfyUI-GGUF.git && \
-    git clone --depth 1 https://github.com/giriss/comfy-image-saver.git && \
-    git clone --depth 1 https://github.com/11dogzi/Comfyui-ergouzi-Nodes.git && \
-    git clone --depth 1 https://github.com/jamesWalker55/comfyui-various.git && \
-    git clone --depth 1 https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
-    git clone --depth 1 https://github.com/M1kep/ComfyLiterals.git && \
-    git clone --depth 1 https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
-    git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone --depth 1 https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git && \
-    git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
-    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
-    git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
-    git clone --depth 1 https://github.com/kijai/ComfyUI-HunyuanVideoWrapper.git && \
-    git clone --depth 1 https://github.com/TinyTerra/ComfyUI_tinyterraNodes.git && \
-    git clone --depth 1 https://github.com/SKBv0/ComfyUI_SKBundle.git && \
-    git clone --depth 1 https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
-    git clone --depth 1 https://github.com/evanspearman/ComfyMath.git && \
-    git clone --depth 1 https://github.com/BlueprintCoding/ComfyUI_AIDocsClinicalTools.git && \
-    git clone --depth 1 https://github.com/logtd/ComfyUI-HunyuanLoom.git && \
-    git clone --depth 1 https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
-    git clone --depth 1 https://github.com/Amorano/Jovimetrix.git && \
-    git clone --depth 1 https://github.com/Stability-AI/stability-ComfyUI-nodes.git && \
-    git clone --depth 1 https://github.com/DoctorDiffusion/ComfyUI-MediaMixer.git && \
-    git clone --depth 1 https://github.com/kijai/ComfyUI-VideoNoiseWarp.git && \
-    git clone --depth 1 https://github.com/spacepxl/ComfyUI-Image-Filters.git
+RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    git clone https://github.com/facok/ComfyUI-HunyuanVideoMultiLora.git && \
+    git clone https://github.com/sipherxyz/comfyui-art-venture.git && \
+    git clone https://github.com/theUpsider/ComfyUI-Logic.git && \
+    git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
+    git clone https://github.com/alt-key-project/comfyui-dream-project.git && \
+    git clone https://github.com/Jonseed/ComfyUI-Detail-Daemon.git && \
+    git clone https://github.com/ShmuelRonen/ComfyUI-ImageMotionGuider.git && \
+    git clone https://github.com/BlenderNeko/ComfyUI_Noise.git && \
+    git clone https://github.com/chrisgoringe/cg-noisetools.git && \
+    git clone https://github.com/cubiq/ComfyUI_essentials.git && \
+    git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
+    git clone https://github.com/TTPlanetPig/Comfyui_TTP_Toolset.git && \
+    git clone https://github.com/pharmapsychotic/comfy-cliption.git && \
+    git clone https://github.com/darkpixel/darkprompts.git && \
+    git clone https://github.com/Koushakur/ComfyUI-DenoiseChooser.git && \
+    git clone https://github.com/city96/ComfyUI-GGUF.git && \
+    git clone https://github.com/giriss/comfy-image-saver.git && \
+    git clone https://github.com/11dogzi/Comfyui-ergouzi-Nodes.git && \
+    git clone https://github.com/jamesWalker55/comfyui-various.git && \
+    git clone https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git && \
+    git clone https://github.com/M1kep/ComfyLiterals.git && \
+    git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/chengzeyi/Comfy-WaveSpeed.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/rgthree/rgthree-comfy.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone https://github.com/kijai/ComfyUI-HunyuanVideoWrapper.git && \
+    git clone https://github.com/TinyTerra/ComfyUI_tinyterraNodes.git && \
+    git clone https://github.com/SKBv0/ComfyUI_SKBundle.git && \
+    git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
+    git clone https://github.com/evanspearman/ComfyMath.git && \
+    git clone https://github.com/BlueprintCoding/ComfyUI_AIDocsClinicalTools.git && \
+    git clone https://github.com/logtd/ComfyUI-HunyuanLoom.git && \
+    git clone https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
+    git clone https://github.com/Amorano/Jovimetrix.git && \
+    git clone https://github.com/Stability-AI/stability-ComfyUI-nodes.git && \
+    git clone https://github.com/DoctorDiffusion/ComfyUI-MediaMixer.git && \
+    git clone https://github.com/kijai/ComfyUI-VideoNoiseWarp.git && \
+    git clone https://github.com/spacepxl/ComfyUI-Image-Filters.git
 
 
 # Install requirements for custom nodes (if any)
