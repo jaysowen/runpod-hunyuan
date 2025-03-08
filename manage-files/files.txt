@@ -21,14 +21,7 @@
 
 
 # Kijai's Image to Video Models
-normal|clip_vision|llava_llama3_vision.safetensors|https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/clip_vision/llava_llama3_vision.safetensors
 normal|diffusion_models|hunyuan_video_I2V_fp8_e4m3fn.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hunyuan_video_I2V_fp8_e4m3fn.safetensors
 #normal|diffusion_models|hunyuan_video_I2V_fp8_e5m2.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/blob/main/hunyuan_video_I2V_fp8_e5m2.safetensors
 #normal|loras|hyvid_I2V_lora_embrace.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hyvid_I2V_lora_embrace.safetensors
 #normal|loras|hyvid_I2V_lora_hair_growth.safetensors|https://huggingface.co/Kijai/HunyuanVideo_comfy/resolve/main/hyvid_I2V_lora_hair_growth.safetensors
-
-# Comfy Org
-normal|diffusion_models|hunyuan_video_image_to_video_720p_bf16.safetensors|https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/diffusion_models/hunyuan_video_image_to_video_720p_bf16.safetensors
-normal|text_encoders|llava_llama3_fp8_scaled.safetensors|https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/llava_llama3_fp8_scaled.safetensors
-normal|text_encoders|clip_l.safetensors|https://huggingface.co/Comfy-Org/HunyuanVideo_repackaged/resolve/main/split_files/text_encoders/clip_l.safetensors
-
