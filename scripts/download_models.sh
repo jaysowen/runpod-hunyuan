@@ -1,8 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+# Exit immediately if SKIP_DOWNLOADS is set to true
+if [ "${SKIP_DOWNLOADS:-false}" == "true" ]; then
+    echo "SKIP_DOWNLOADS is set to true, skipping model downloads"
+    exit 0
+fi
+
 MODEL_DIR="/ComfyUI/models"
-mkdir -p ${MODEL_DIR}/{diffusion_models,text_encoders,clip_vision,vae,loras}
+mkdir -p ${MODEL_DIR}/{unet,text_encoders,clip_vision,vae,loras}
 
 # Function to format file size
 format_size() {
@@ -69,7 +75,7 @@ download_file() {
     echo "✨ Completed: $filename"
 }
 
-echo "🚀 Starting WAN model downloads..."
+echo "🚀 Starting model downloads..."
 
 # Define download tasks with their respective directories
 declare -A downloads=(

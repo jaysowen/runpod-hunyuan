@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# Exit immediately if SKIP_NODES is set to true and we're not forcing installation
+if [ "${SKIP_NODES}" == "true" ] && [ "$1" != "force" ]; then
+    echo "SKIP_NODES is set to true, skipping node installations"
+    exit 0
+fi
+
 CUSTOM_NODES_DIR="/ComfyUI/custom_nodes"
 mkdir -p "$CUSTOM_NODES_DIR"
 cd "$CUSTOM_NODES_DIR"

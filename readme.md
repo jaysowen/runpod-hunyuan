@@ -2,6 +2,14 @@
 
 Welcome to the most awesome ComfyUI setup you'll ever encounter! This template comes packed with everything you need to start creating amazing AI-generated videos and images using Wan Video models. 🚀
 
+## UPDATE
+17/03/25
+- Added environment variables to control setup behavior:
+  - `SKIP_DOWNLOADS=true`: Skip downloading models
+  - `SKIP_NODES=true`: Skip installing custom nodes
+  - Perfect for network drives & persistent storage
+
+
 ## ✨ Features
 
 - 🎥 Pre-installed Wan 2.1 models for high-quality video generation
@@ -21,6 +29,23 @@ Welcome to the most awesome ComfyUI setup you'll ever encounter! This template c
 3. Search for `WanVideo - ComfyUI Manager - AllInOne1.0`
 4. Choose your preferred GPU
 5. Hit that `Deploy` button! 🎉
+
+### 2. Environment Variables
+
+When deploying, you can set these environment variables to control the startup behavior:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SKIP_DOWNLOADS` | Set to `true` to skip model downloads | `false` |
+| `SKIP_NODES` | Set to `true` to skip node installations | `false` |
+| `JUPYTERLAB_PASSWORD` | Set a password for JupyterLab | Empty (no password) |
+| `PUBLIC_KEY` | Your SSH public key for secure access | Empty (SSH disabled) |
+
+These are especially useful when:
+- Using network drives or persistent storage
+- Redeploying pods frequently
+- You've already downloaded models and want faster startup
+
 
 ### 2. Accessing Your Instance
 

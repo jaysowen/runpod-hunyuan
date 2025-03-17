@@ -9,10 +9,20 @@ mkdir -p /workspace
 chmod 755 /workspace
 
 echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
-/install_nodes.sh install_only
+if [ "${SKIP_NODES}" == "true" ]; then
+    echo "**** SKIPPING NODE INSTALLATION (SKIP_NODES=true) ****"
+else
+    /install_nodes.sh install_only
+fi
 
-echo "**** DOWNLOAD - INSTALLING MODELS ****"
-/download_models.sh
+# Check if downloads should be skipped
+if [ "${SKIP_DOWNLOADS}" == "true" ]; then
+    echo "**** SKIPPING MODEL DOWNLOADS (SKIP_DOWNLOADS=true) ****"
+else
+    echo "**** DOWNLOADING - INSTALLING MODELS ****"
+    /download_models.sh
+fi
+
 
 echo "MOVING COMFYUI TO WORKSPACE"
 # Ensure clean workspace/ComfyUI directory setup
