@@ -38,8 +38,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Clone ComfyUI (source only; no final environment here)
 WORKDIR /
-RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git
-RUN git clone --depth 1 https://github.com/zanllp/sd-webui-infinite-image-browsing.git
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git
+RUN git clone https://github.com/zanllp/sd-webui-infinite-image-browsing.git
 
 
 # =============================================================================
@@ -138,20 +138,20 @@ RUN pip install --no-cache-dir \
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
-RUN git clone --depth 1 https://github.com/chrisgoringe/cg-use-everywhere.git && \
-    git clone --depth 1 https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git && \
-    git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git && \
-    git clone --depth 1 https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git && \
-    git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui.git && \
-    git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone --depth 1 https://github.com/yolain/ComfyUI-Easy-Use.git && \
-    git clone --depth 1 https://github.com/cubiq/ComfyUI_essentials && \
-    git clone --depth 1 https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite && \
-    git clone --depth 1 https://github.com/kijai/ComfyUI-HunyuanVideoWrapper.git && \
-    git clone --depth 1 https://github.com/logtd/ComfyUI-HunyuanLoom.git && \
-    git clone --depth 1 https://github.com/kijai/ComfyUI-WanVideoWrapper.git
+RUN git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Manager.git && \
+    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/rgthree/rgthree-comfy.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone https://github.com/cubiq/ComfyUI_essentials && \
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite && \
+    git clone https://github.com/kijai/ComfyUI-HunyuanVideoWrapper.git && \
+    git clone https://github.com/logtd/ComfyUI-HunyuanLoom.git && \
+    git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git
 
 # Install requirements for custom nodes (if any)
 RUN for dir in */; do \
