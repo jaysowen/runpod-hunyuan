@@ -1,7 +1,7 @@
 # =============================================================================
 # 1) BUILDER STAGE
 # =============================================================================
-FROM nvidia/cuda:12.5.0-runtime-ubuntu22.04 as builder
+FROM nvidia/cuda:12.4.0-devel-ubuntu22.04 as builder
 
 # Install build dependencies
 RUN apt-get update && \
@@ -45,7 +45,7 @@ RUN git clone https://github.com/zanllp/sd-webui-infinite-image-browsing.git
 # =============================================================================
 # 2) FINAL STAGE
 # =============================================================================
-FROM nvidia/cuda:12.5.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.0-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && \
