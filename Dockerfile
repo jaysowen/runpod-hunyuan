@@ -69,7 +69,7 @@ RUN apt-get update && \
         libegl-mesa0 \
         libgles2-mesa-dev \
         libglvnd0 \
-        libglx0 \
+        libglx0 && \
     rm -rf /var/lib/apt/lists/*
 
 # Set OpenGL environment variables
