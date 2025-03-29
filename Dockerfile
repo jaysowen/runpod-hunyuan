@@ -120,6 +120,8 @@ RUN pip install --no-cache-dir \
 # Install runpod
 RUN pip install runpod requests
 
+RUN pip install b2sdk
+
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
 RUN git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
