@@ -146,7 +146,6 @@ RUN git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials && \
     git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
     git clone https://github.com/kijai/ComfyUI-Florence2.git && \
     git clone https://github.com/kijai/ComfyUI-segment-anything-2.git && \
