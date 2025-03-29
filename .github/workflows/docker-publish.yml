@@ -7,8 +7,7 @@ on:
     branches: [ "wanvideo1.0" ]
 
 env:
-  REGISTRY: docker.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: jaysowen/runpod-worker-comfy
   DOCKER_BUILDKIT: 1
 
 jobs:
@@ -40,14 +39,14 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ vars.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PAT }}
 
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=${{ github.ref_name }}
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
@@ -61,7 +60,7 @@ jobs:
           build-args: |
             PYTHON_VERSION=3.12.1
             TORCH_VERSION=2.2.1
-            CUDA_VERSION=12.4.0
+            CUDA_VERSION=12.5.0
             COMFYUI_VERSION=latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
