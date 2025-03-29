@@ -41,7 +41,7 @@ WORKDIR /
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 
 # =============================================================================
-# 2) FINAL STAGE
+# 2) FINAL STAGE - Only Jupyter pip packages removed
 # =============================================================================
 FROM nvidia/cuda:12.5.0-devel-ubuntu22.04
 
@@ -82,7 +82,7 @@ RUN apt-get update && \
         fontconfig && \
     rm -rf /var/lib/apt/lists/*
 
-# Set OpenGL environment variables -  libEGL.so not loaded
+# Set OpenGL environment variables
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
 ENV DISPLAY=:99
 
@@ -103,7 +103,7 @@ RUN conda install -y python=3.12 pip && \
 ENV CC=gcc \
     CXX=g++
 
-# Upgrade pip
+# Upgrade pip - UNCHANGED
 RUN pip install --no-cache-dir --upgrade pip
 
 # --- Install PyTorch for CUDA ---
@@ -116,14 +116,14 @@ COPY --from=builder /ComfyUI /ComfyUI
 WORKDIR /ComfyUI
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install other Python packages
+# Install other Python packages - *** MODIFIED: Jupyter packages removed ***
 RUN pip install --no-cache-dir \
-    jupyterlab \
-    notebook \
-    ipykernel \
-    ipywidgets \
-    jupyter_server \
-    jupyterlab_widgets \
+    # jupyterlab \           <- REMOVED
+    # notebook \             <- REMOVED
+    # ipykernel \            <- REMOVED
+    # ipywidgets \           <- REMOVED
+    # jupyter_server \       <- REMOVED
+    # jupyterlab_widgets \   <- REMOVED
     triton \
     sageattention \
     safetensors \
@@ -151,7 +151,7 @@ RUN git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/kijai/ComfyUI-Florence2.git && \
     git clone https://github.com/kijai/ComfyUI-segment-anything-2.git && \
     git clone https://github.com/storyicon/comfyui_segment_anything.git && \
-    git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git \
+    git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && \
     git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git
 
 # Install requirements for custom nodes (if any)
@@ -162,11 +162,11 @@ RUN for dir in */; do \
     fi \
     done
 
-
 # Copy workflow files
 COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
 
-# Copy all scripts
+# Copy all scripts 
+COPY scripts/rp_handler.py /
 COPY scripts/*.sh /
 
 # Copy files to container root directory
@@ -180,9 +180,11 @@ RUN mkdir -p /workspace
 COPY manage-files/download-files.sh /workspace/
 COPY manage-files/files.txt /workspace/
 
+# Permissions and line ending fixes
 RUN dos2unix /*.sh && \
     dos2unix /workspace/*.sh && \
     chmod +x /*.sh && \
     chmod +x /workspace/*.sh
 
+# Default command
 CMD ["/start.sh"]
