@@ -88,7 +88,17 @@ downloads["${MODEL_DIR}/vae/wan_2.1_vae.safetensors"]="https://huggingface.co/Co
 
 # Then, read and add models from files.txt
 if [ -f "/workspace/files.txt" ]; then
+    FILES_PATH="/workspace/files.txt"
     echo "📄 Reading additional models from /workspace/files.txt"
+elif [ -f "/files.txt" ]; then
+    FILES_PATH="/files.txt"
+    echo "📄 Reading additional models from /files.txt"
+else
+    echo "⚠️ Warning: files.txt not found in either /workspace or root directory"
+    FILES_PATH=""
+fi
+
+if [ -n "$FILES_PATH" ]; then
     while IFS='|' read -r model_type filename url || [ -n "$model_type" ]; do
         # Skip empty lines and comments
         if [[ -z "$model_type" || "$model_type" =~ ^# ]]; then
@@ -104,9 +114,7 @@ if [ -f "/workspace/files.txt" ]; then
             downloads["$dest"]="$url"
             echo "➕ Added from files.txt: ${model_type}/${filename}"
         fi
-    done < "/workspace/files.txt"
-else
-    echo "⚠️ Warning: /workspace/files.txt not found"
+    done < "$FILES_PATH"
 fi
 
 download_success=true
