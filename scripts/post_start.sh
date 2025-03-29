@@ -26,13 +26,26 @@ if [ ! -f "/workspace/files.txt" ]; then
     fi
 fi
 
-
 echo "⭐⭐⭐⭐⭐   ALL DONE - STARTING COMFYUI ⭐⭐⭐⭐⭐"
 
-# Change to ComfyUI directory and start the server
-cd /workspace/ComfyUI
-python main.py --listen --port 8188 --enable-cors-header $COMFYUI_EXTRA_ARGS &
+# Use libtcmalloc for better memory management
+TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
+export LD_PRELOAD="${TCMALLOC}"
 
-echo "🖼️ Starting Infinite Image Browser..."
-cd /workspace/sd-webui-infinite-image-browsing
-python app.py --port=8181 --extra_paths /workspace/ComfyUI/output --host=0.0.0.0
+# Change to ComfyUI directory
+cd /workspace/ComfyUI
+
+# Serve the API and don't shutdown the container
+if [ "$SERVE_API_LOCALLY" == "true" ]; then
+    echo "runpod-worker-comfy: Starting ComfyUI"
+    python3 main.py --disable-auto-launch --disable-metadata --listen &
+
+    echo "runpod-worker-comfy: Starting RunPod Handler"
+    python3 -u /rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
+else
+    echo "runpod-worker-comfy: Starting ComfyUI"
+    python3 main.py --disable-auto-launch --disable-metadata &
+
+    echo "runpod-worker-comfy: Starting RunPod Handler"
+    python3 -u /rp_handler.py
+fi
