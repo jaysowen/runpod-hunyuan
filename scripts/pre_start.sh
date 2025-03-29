@@ -20,7 +20,7 @@ if [ "${SKIP_DOWNLOADS}" == "true" ]; then
     echo "**** SKIPPING MODEL DOWNLOADS (SKIP_DOWNLOADS=true) ****"
 else
     echo "**** DOWNLOADING - INSTALLING MODELS ****"
-    /download_models.sh
+    /download-files.sh
 fi
 
 echo "MOVING COMFYUI TO WORKSPACE"
