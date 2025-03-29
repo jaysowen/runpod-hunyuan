@@ -81,10 +81,10 @@ echo "🚀 Starting model downloads..."
 declare -A downloads=(
     ["${MODEL_DIR}/diffusion_models/wan2.1_i2v_480p_14B_fp16.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_480p_14B_fp16.safetensors"
     ["${MODEL_DIR}/loras/Titty_Drop_Wan_2.1_LoRA.safetensors"]="https://civitai.com/api/download/models/1514116"
-    ["${MODEL_DIR}/loras/Wan_Female_Masturbation.safetensors"]="https://civitai.com/api/download/models/1514404"
     ["${MODEL_DIR}/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
     ["${MODEL_DIR}/clip_vision/clip_vision_h.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors"
     ["${MODEL_DIR}/vae/wan_2.1_vae.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors"
+    ["${MODEL_DIR}/loras/wan_female_masturbation.safetensors"]="https://civitai.com/api/download/models/1514404"
 )
 
 download_success=true
