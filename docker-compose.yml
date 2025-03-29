@@ -1,10 +1,8 @@
 services:
   comfyui-worker:
-    image: jaysowen/runpod-worker-comfy:wan0.3.27
+    image: jaysowen/runpod-worker-comfy:wan1.0
     environment:
       - SERVE_API_LOCALLY=true
-      - DOCKER_USERNAME=${DOCKER_USERNAME}
-      - DOCKER_PASSWORD=${DOCKER_PASSWORD}
     deploy:
       resources:
         reservations:

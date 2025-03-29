@@ -1,7 +1,7 @@
 # =============================================================================
 # 1) BUILDER STAGE
 # =============================================================================
-FROM nvidia/cuda:12.5.0-runtime-ubuntu22.04 as builder
+FROM nvidia/cuda:12.5.0-runtime-ubuntu22.04 AS builder
 
 # Install build dependencies
 RUN apt-get update && \
@@ -24,7 +24,7 @@ RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Minic
     rm ~/miniconda.sh
 
 # Add conda to path
-ENV PATH /opt/conda/bin:$PATH
+ENV PATH=/opt/conda/bin:$PATH
 
 # Create Python 3.12 environment
 RUN conda install -y python=3.12 pip && \
@@ -93,7 +93,7 @@ RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Minic
     rm ~/miniconda.sh
 
 # Add conda to path
-ENV PATH /opt/conda/bin:$PATH
+ENV PATH=/opt/conda/bin:$PATH
 
 # Create Python 3.12 environment
 RUN conda install -y python=3.12 pip && \
@@ -116,14 +116,8 @@ COPY --from=builder /ComfyUI /ComfyUI
 WORKDIR /ComfyUI
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install other Python packages - *** MODIFIED: Jupyter packages removed ***
+# Install other Python packages
 RUN pip install --no-cache-dir \
-    # jupyterlab \           <- REMOVED
-    # notebook \             <- REMOVED
-    # ipykernel \            <- REMOVED
-    # ipywidgets \           <- REMOVED
-    # jupyter_server \       <- REMOVED
-    # jupyterlab_widgets \   <- REMOVED
     triton \
     sageattention \
     safetensors \
@@ -133,6 +127,9 @@ RUN pip install --no-cache-dir \
     torchsde \
     opencv-python \
     gdown
+
+# Install runpod
+RUN pip install runpod requests
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
