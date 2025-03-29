@@ -77,45 +77,15 @@ download_file() {
 
 echo "🚀 Starting model downloads..."
 
-# Initialize downloads array
-declare -A downloads
-
-# First, add the default models
-downloads["${MODEL_DIR}/diffusion_models/wan2.1_i2v_480p_14B_fp16.safetensors"]="https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1-I2V-14B-720P_fp8_e4m3fn.safetensors"
-downloads["${MODEL_DIR}/clip_vision/clip_vision_h.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors"
-downloads["${MODEL_DIR}/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
-downloads["${MODEL_DIR}/vae/wan_2.1_vae.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors"
-
-# Then, read and add models from files.txt
-if [ -f "/workspace/files.txt" ]; then
-    FILES_PATH="/workspace/files.txt"
-    echo "📄 Reading additional models from /workspace/files.txt"
-elif [ -f "/files.txt" ]; then
-    FILES_PATH="/files.txt"
-    echo "📄 Reading additional models from /files.txt"
-else
-    echo "⚠️ Warning: files.txt not found in either /workspace or root directory"
-    FILES_PATH=""
-fi
-
-if [ -n "$FILES_PATH" ]; then
-    while IFS='|' read -r model_type filename url || [ -n "$model_type" ]; do
-        # Skip empty lines and comments
-        if [[ -z "$model_type" || "$model_type" =~ ^# ]]; then
-            continue
-        fi
-        # Remove any whitespace
-        model_type=$(echo "$model_type" | tr -d '[:space:]')
-        filename=$(echo "$filename" | tr -d '[:space:]')
-        url=$(echo "$url" | tr -d '[:space:]')
-        
-        if [ -n "$model_type" ] && [ -n "$filename" ] && [ -n "$url" ]; then
-            dest="${MODEL_DIR}/${model_type}/${filename}"
-            downloads["$dest"]="$url"
-            echo "➕ Added from files.txt: ${model_type}/${filename}"
-        fi
-    done < "$FILES_PATH"
-fi
+# Define download tasks with their respective directories
+declare -A downloads=(
+    ["${MODEL_DIR}/diffusion_models/wan2.1_i2v_480p_14B_fp16.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_480p_14B_fp16.safetensors"
+    ["${MODEL_DIR}/loras/Titty_Drop_Wan_2.1_LoRA.safetensors"]="https://civitai.com/api/download/models/1514116"
+    ["${MODEL_DIR}/loras/Wan_Female_Masturbation.safetensors"]="https://civitai.com/api/download/models/1514404"
+    ["${MODEL_DIR}/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
+    ["${MODEL_DIR}/clip_version/clip_vision_h.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors"
+    ["${MODEL_DIR}/vae/wan_2.1_vae.safetensors"]="https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors"
+)
 
 download_success=true
 total_files=${#downloads[@]}

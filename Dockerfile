@@ -48,7 +48,6 @@ FROM nvidia/cuda:12.5.0-devel-ubuntu22.04
 # Install runtime dependencies
 RUN apt-get update && \
     # Pre-accept the Microsoft font EULA
-    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
     apt-get install -y --no-install-recommends \
         wget \
         git \
@@ -60,9 +59,6 @@ RUN apt-get update && \
         libxrender-dev \
         libgl1-mesa-glx \
         curl \
-        openssh-server \
-        nodejs \
-        npm \
         build-essential \
         nvidia-cuda-dev \
         gcc \
@@ -74,17 +70,10 @@ RUN apt-get update && \
         libgles2-mesa-dev \
         libglvnd0 \
         libglx0 \
-        libopengl0 \
-        x11-xserver-utils \
-        ttf-mscorefonts-installer \
-        fonts-liberation \
-        fonts-dejavu \
-        fontconfig && \
     rm -rf /var/lib/apt/lists/*
 
 # Set OpenGL environment variables
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
-ENV DISPLAY=:99
 
 # Install Miniconda and Python 3.12
 RUN curl -fsSL -v -o ~/miniconda.sh -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
