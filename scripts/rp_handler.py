@@ -480,53 +480,44 @@ def get_progress(prompt_id):
             executing_node = status_info.get("executing")
 
             if executing_node:
+                node_id = executing_node.get("node", "unknown")
+                progress = executing_node.get("progress", 0)
                 return {
                     "status": "processing",
-                    "progress": int(executing_node.get("progress", 0) * 100),
+                    "progress": int(progress * 100),
+                    "node_id": node_id,
+                    "detail": f"Processing node {node_id}",
+                    "type": "progress"
                 }
             elif status_info.get("completed") is True:
-                # 获取历史记录以获取输出文件信息
                 history = get_history(prompt_id)
                 if prompt_id in history and "outputs" in history[prompt_id]:
                     outputs = history[prompt_id]["outputs"]
-                    # 处理输出文件
-                    for node_id, node_output in outputs.items():
-                        if "videos" in node_output:
-                            video_info = node_output["videos"][0]  # 获取第一个视频
-                            local_video_path = video_info.get("fullpath")
-                            filename = video_info.get("filename")
-                            
-                            # 生成缩略图
-                            thumbnail_path = generate_video_thumbnail(local_video_path)
-                            video_url = None
-                            thumbnail_url = None
-                            
-                            try:
-                                # 上传视频
-                                video_url = upload_to_b2(local_video_path, f"videos/{filename}")
-                                
-                                # 上传缩略图
-                                if thumbnail_path:
-                                    thumb_filename = f"{os.path.splitext(filename)[0]}_thumb.jpg"
-                                    thumbnail_url = upload_to_b2(thumbnail_path, f"thumbnails/{thumb_filename}")
-                            finally:
-                                # 清理文件
-                                if os.path.exists(local_video_path):
-                                    os.remove(local_video_path)
-                            
-                            return {
-                                "status": "success",
-                                "message": video_url,
-                                "thumbnail": thumbnail_url
-                            }
+                    # 检查输出类型
+                    is_video = any(key in node_output for node_output in outputs.values() 
+                                 for key in ["videos", "gifs"])
+                    is_image = any("images" in node_output for node_output in outputs.values())
+                    
+                    output_type = "video" if is_video else "image" if is_image else "unknown"
+                    return {
+                        "status": "completed",
+                        "progress": 100,
+                        "output_type": output_type,
+                        "detail": "Task completed",
+                        "type": "progress"
+                    }
                 return {
                     "status": "completed",
                     "progress": 100,
+                    "detail": "Task completed",
+                    "type": "progress"
                 }
             else:
                 return {
                     "status": "pending",
                     "progress": 0,
+                    "detail": "Waiting in queue",
+                    "type": "progress"
                 }
         elif response.status_code == 404:
             history = get_history(prompt_id)
@@ -534,21 +525,29 @@ def get_progress(prompt_id):
                 return {
                     "status": "completed",
                     "progress": 100,
+                    "detail": "Task completed (found in history)",
+                    "type": "progress"
                 }
             return {
                 "status": "pending",
                 "progress": 0,
+                "detail": "Task not found",
+                "type": "progress"
             }
         else:
             return {
                 "status": "error",
                 "progress": 0,
+                "detail": f"HTTP error {response.status_code}",
+                "type": "progress"
             }
 
     except Exception as e:
         return {
             "status": "error",
             "progress": 0,
+            "detail": str(e),
+            "type": "progress"
         }
 
 # --- 主处理函数 ---
@@ -640,7 +639,7 @@ def handler(job):
 
             # 发送进度更新
             if progress_info and progress_info.get('status') != 'error' and current_progress_state != last_progress_sent:
-                print(f"runpod-worker-comfy - Job {job_id} Progress: {progress_info['progress']}% - {progress_info['status']} - {progress_info['detail']}")
+                print(f"runpod-worker-comfy - Job {job_id} Progress: {progress_info['progress']}% - {progress_info['status']} - {progress_info.get('detail', 'No detail')}")
                 try:
                     runpod.serverless.progress_update(job, progress_info)
                     last_progress_sent = current_progress_state
