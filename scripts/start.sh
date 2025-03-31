@@ -1,39 +1,28 @@
 #!/bin/bash
 set -e  # Exit the script if any statement returns a non-true return value
 
-# ---------------------------------------------------------------------------- #
-#                          Function Definitions                                #
-# ---------------------------------------------------------------------------- #
-
-# Execute script if exists
-execute_script() {
-    local script_path=$1
-    local script_msg=$2
-    if [[ -f ${script_path} ]]; then
-        echo "${script_msg}"
-        bash ${script_path}
-    fi
-}
-
-# Export env vars
-export_env_vars() {
-    echo "Exporting environment variables..."
-    printenv | grep -E '^RUNPOD_|^PATH=|^_=' | awk -F = '{ print "export " $1 "=\"" $2 "\"" }' >> /etc/rp_environment
-    echo 'source /etc/rp_environment' >> ~/.bashrc
-}
+echo "Pod Started"
 
 # ---------------------------------------------------------------------------- #
 #                               Main Program                                   #
 # ---------------------------------------------------------------------------- #
 
-echo "Pod Started"
+echo "Running pre-start script (if exists)..."
+if [[ -f "/pre_start.sh" ]]; then
+    bash "/pre_start.sh"
+else
+    echo "No pre_start.sh found."
+fi
 
-export_env_vars
+echo "Running post-start script (if exists)..."
+if [[ -f "/post_start.sh" ]]; then
+    bash "/post_start.sh"
+else
+    echo "No post_start.sh found."
+fi
 
-execute_script "/pre_start.sh" "Running pre-start script..."
+echo "Start script(s) finished, serverless is ready to use."
 
-execute_script "/post_start.sh" "Running post-start script..."
-
-echo "Start script(s) finished, pod is ready to use."
-
+# Keep the container running indefinitely, the actual work is done by processes
+# started in post_start.sh (usually the RunPod handler)
 sleep infinity
