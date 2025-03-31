@@ -114,12 +114,11 @@ def upload_to_b2(local_file_path, file_name):
             print(f"runpod-worker-comfy - {error_msg}")
             return None
 
-        # 使用较大的分块上传模式，更适合大文件
+        # 使用标准上传模式
         print("runpod-worker-comfy - 开始上传到 B2...")
         uploaded_file = b2_bucket_instance.upload_local_file(
             local_file=local_file_path,
-            file_name=file_name,
-            upload_mode=UploadMode.RAW
+            file_name=file_name
         )
 
         download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
