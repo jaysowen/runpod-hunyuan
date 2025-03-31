@@ -38,7 +38,7 @@ cd /workspace/ComfyUI
 # Serve the API and don't shutdown the container
 if [ "$SERVE_API_LOCALLY" == "true" ]; then
     echo "runpod-worker-comfy: Starting ComfyUI"
-    python3 main.py --disable-auto-launch --disable-metadata --listen 0.0.0.0 8188
+    python3 main.py --disable-auto-launch --disable-metadata --listen
 else
     echo "runpod-worker-comfy: Starting ComfyUI"
     python3 main.py --disable-auto-launch --disable-metadata &
