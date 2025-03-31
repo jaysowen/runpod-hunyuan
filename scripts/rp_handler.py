@@ -320,115 +320,49 @@ def base64_encode(file_path):
 
 def process_output_images(outputs, job_id):
     """处理所有图片输出"""
-    processed_images = []
     use_b2 = bool(os.environ.get("BUCKET_ACCESS_KEY_ID", False))
+    if not use_b2:
+        return {"status": "error", "message": "B2 storage is not configured", "type": "image"}
 
-    print(f"runpod-worker-comfy - Processing image outputs for job {job_id}...")
-
-    found_images = False
     for node_id, node_output in outputs.items():
         if "images" in node_output:
-            found_images = True
             for image_info in node_output["images"]:
-                # ComfyUI 可能返回不带子文件夹的路径，进行兼容处理
-                subfolder = image_info.get("subfolder", "")
                 filename = image_info.get("filename")
                 if not filename:
-                    print(f"runpod-worker-comfy - Warning: Found image output in node {node_id} without filename.")
                     continue
 
+                subfolder = image_info.get("subfolder", "")
                 relative_path = os.path.join(subfolder, filename)
                 local_image_path = os.path.join(IMAGE_OUTPUT_PATH, relative_path.lstrip('/'))
-                print(f"runpod-worker-comfy - Found image output: {local_image_path}")
 
                 if os.path.exists(local_image_path):
-                    image_result = {"filename": filename} # 包含原始文件名
-                    original_filename = os.path.basename(local_image_path)
-                    blur_image_url = None
-
-                    if use_b2:
-                        # 处理模糊版本
-                        local_blur_image_path = None
-                        try:
-                            filename_base, ext = os.path.splitext(original_filename)
-                            # 使用 job_id 和原始文件名哈希生成唯一模糊文件名
-                            blur_filename_base = hashlib.md5(f"{job_id}-{original_filename}".encode()).hexdigest()
-                            blur_filename = f"{blur_filename_base}{ext}"
-                            # 将模糊图创建在临时目录，避免权限问题
-                            temp_dir = tempfile.gettempdir()
-                            local_blur_image_path = os.path.join(temp_dir, blur_filename)
-
-                            print(f"runpod-worker-comfy - Generating blurred version for {original_filename} at {local_blur_image_path}")
-                            with Image.open(local_image_path) as img:
-                                blurred = img.filter(ImageFilter.GaussianBlur(radius=IMAGE_FILTER_BLUR_RADIUS))
-                                blurred.save(local_blur_image_path)
-
-                            # 上传模糊版本到 B2
-                            b2_blur_path = f"{job_id}/blurred/{blur_filename}"
-                            blur_image_url = upload_to_b2(local_blur_image_path, b2_blur_path)
-                            if blur_image_url:
-                                image_result["blur_url"] = blur_image_url
-                                print(f"runpod-worker-comfy - Blurred image uploaded to B2: {blur_image_url}")
-                            else:
-                                image_result["blur_error"] = "Failed to upload blurred image"
-
-                        except Exception as e:
-                            print(f"runpod-worker-comfy - Error processing blurred image for {original_filename}: {str(e)}")
-                            image_result["blur_error"] = str(e)
-                        finally:
-                            # 清理本地模糊临时文件
-                            if local_blur_image_path and os.path.exists(local_blur_image_path):
-                                try:
-                                    os.remove(local_blur_image_path)
-                                    print(f"runpod-worker-comfy - Cleaned up temporary blurred image: {local_blur_image_path}")
-                                except OSError as e:
-                                     print(f"runpod-worker-comfy - Error cleaning up temp blur image {local_blur_image_path}: {e}")
-
-
-                        # 上传原始图片到 B2 (模糊处理后上传原图)
-                        b2_file_path = f"{job_id}/images/{original_filename}"
-                        image_url = upload_to_b2(local_image_path, b2_file_path)
-                        if image_url:
-                            image_result["url"] = image_url
-                            print(f"runpod-worker-comfy - Original image uploaded to B2: {image_url}")
-                        else:
-                            image_result["error"] = "Failed to upload original image to B2"
-
-                    else:
-                        # base64 image
-                        encoded_image = base64_encode(local_image_path)
-                        if encoded_image:
-                             image_result["base64"] = encoded_image
-                             print(f"runpod-worker-comfy - Image {original_filename} generated and converted to base64")
-                        else:
-                             image_result["error"] = "Failed to encode image to base64"
-
-                    processed_images.append(image_result)
-
-                    # 清理 ComfyUI 输出的原图 (无论成功与否都尝试清理)
                     try:
+                        # 上传原始图片到 B2
+                        b2_file_path = f"{job_id}/images/{filename}"
+                        image_url = upload_to_b2(local_image_path, b2_file_path)
+                        
+                        # 清理原始文件
                         if os.path.exists(local_image_path):
                             os.remove(local_image_path)
-                            print(f"runpod-worker-comfy - Cleaned up original image from ComfyUI output: {local_image_path}")
+
+                        if image_url:
+                            return {
+                                "status": "success",
+                                "message": image_url,
+                                "type": "image"
+                            }
+
                     except Exception as e:
-                        print(f"runpod-worker-comfy - Error cleaning up image {local_image_path}: {str(e)}")
+                        if os.path.exists(local_image_path):
+                            os.remove(local_image_path)
+                        continue
 
-                else:
-                    print(f"runpod-worker-comfy - Image file does not exist: {local_image_path}")
-                    processed_images.append({"filename": filename, "error": f"Output image file not found"})
-
-    if not found_images:
-         print("runpod-worker-comfy - No 'images' key found in any node output.")
-         # 根据需求决定是否返回错误
-         # return {"status": "warning", "message": "No image outputs found in the workflow result."}
-
-    # 清理可能的空目录
     cleanup_empty_dirs(IMAGE_OUTPUT_PATH)
-
-    if not processed_images:
-         return {"status": "error", "message": "No image outputs were found or successfully processed."}
-
-    return {"status": "success", "images": processed_images}
+    return {
+        "status": "error",
+        "message": "Failed to process image output",
+        "type": "image"
+    }
 
 def generate_video_thumbnail(video_path, time_offset="00:00:01.000"):
     """从视频生成缩略图"""
@@ -472,18 +406,14 @@ def generate_video_thumbnail(video_path, time_offset="00:00:01.000"):
 
 def process_video_output(outputs, job_id):
     """处理所有视频输出"""
-    processed_videos = []
     use_b2 = bool(os.environ.get("BUCKET_ACCESS_KEY_ID", False))
     if not use_b2:
-        return {"status": "error", "message": "B2 storage is not configured for video output."}
+        return {"status": "error", "message": "B2 storage is not configured", "type": "video"}
 
     for node_id, node_output in outputs.items():
-        # 检查输出类型
         if "videos" in node_output:
-            output_type = "videos"
             items = node_output["videos"]
         elif "gifs" in node_output:
-            output_type = "gifs"
             items = node_output["gifs"]
         else:
             continue
@@ -492,74 +422,50 @@ def process_video_output(outputs, job_id):
             try:
                 local_video_path = video_info.get("fullpath")
                 if not local_video_path or not os.path.exists(local_video_path):
-                    processed_videos.append({
-                        "filename": video_info.get("filename"),
-                        "error": "File not found"
-                    })
                     continue
 
                 filename = video_info.get("filename")
-                # 根据文件扩展名决定目录
                 file_ext = os.path.splitext(filename)[1].lower()
                 output_dir = 'gifs' if file_ext == '.gif' else 'videos'
-
-                # 上传到对应目录
+                
+                # 上传视频文件
                 b2_file_path = f"{job_id}/{output_dir}/{filename}"
                 video_url = upload_to_b2(local_video_path, b2_file_path)
                 
-                if video_url:
-                    video_result = {
-                        "filename": filename,
-                        "url": video_url,
-                        "frame_rate": video_info.get("frame_rate"),
-                        "format": video_info.get("format"),
-                        "type": output_dir
-                    }
-                    
-                    # 只为视频文件生成缩略图
-                    if output_dir == 'videos':
-                        thumbnail_path = generate_video_thumbnail(local_video_path)
-                        if thumbnail_path:
-                            try:
-                                thumb_filename = f"{os.path.splitext(filename)[0]}_thumb.jpg"
-                                b2_thumbnail_path = f"{job_id}/thumbnails/{thumb_filename}"
-                                thumbnail_url = upload_to_b2(thumbnail_path, b2_thumbnail_path)
-                                if thumbnail_url:
-                                    video_result["thumbnail_url"] = thumbnail_url
-                            finally:
-                                if os.path.exists(thumbnail_path):
-                                    os.remove(thumbnail_path)
-                    
-                    processed_videos.append(video_result)
-                else:
-                    processed_videos.append({
-                        "filename": filename,
-                        "error": "Failed to upload to B2"
-                    })
+                # 生成并上传缩略图
+                thumbnail_url = None
+                if output_dir == 'videos':
+                    thumbnail_path = generate_video_thumbnail(local_video_path)
+                    if thumbnail_path:
+                        try:
+                            thumb_filename = f"{os.path.splitext(filename)[0]}_thumb.jpg"
+                            b2_thumbnail_path = f"{job_id}/thumbnails/{thumb_filename}"
+                            thumbnail_url = upload_to_b2(thumbnail_path, b2_thumbnail_path)
+                        finally:
+                            if os.path.exists(thumbnail_path):
+                                os.remove(thumbnail_path)
 
-            except Exception as e:
-                processed_videos.append({
-                    "filename": video_info.get("filename"),
-                    "error": f"Processing error: {str(e)}"
-                })
-            finally:
                 # 清理原始文件
                 if os.path.exists(local_video_path):
                     os.remove(local_video_path)
 
-    # 清理空目录
+                if video_url:
+                    return {
+                        "status": "success",
+                        "message": video_url,
+                        "thumbnail": thumbnail_url,
+                        "type": "video"
+                    }
+
+            except Exception as e:
+                if os.path.exists(local_video_path):
+                    os.remove(local_video_path)
+                continue
+
     cleanup_empty_dirs(VIDEO_OUTPUT_PATH)
-
-    if not processed_videos:
-        return {
-            "status": "error",
-            "message": "No outputs were successfully processed.",
-            "type": "video"
-        }
-
     return {
-        "status": "success",
-        "videos": processed_videos,
+        "status": "error",
+        "message": "Failed to process video output",
         "type": "video"
     }
 
