@@ -70,17 +70,8 @@ def initialize_b2():
 def upload_to_b2(local_file_path, file_name):
     """将文件上传到 B2 存储"""
     if not b2_bucket_instance:
-        error_msg = "B2 Bucket 未初始化，请检查以下配置："
-        env_vars = {
-            'BUCKET_ACCESS_KEY_ID': os.environ.get('BUCKET_ACCESS_KEY_ID', '未设置'),
-            'BUCKET_SECRET_ACCESS_KEY': '已设置' if os.environ.get('BUCKET_SECRET_ACCESS_KEY') else '未设置',
-            'BUCKET_NAME': os.environ.get('BUCKET_NAME', '未设置'),
-            'BUCKET_ENDPOINT_URL': os.environ.get('BUCKET_ENDPOINT_URL', '未设置')
-        }
+        error_msg = "B2 Bucket 未初始化，请检查配置"
         print(f"runpod-worker-comfy - {error_msg}")
-        print("环境变量状态：")
-        for key, value in env_vars.items():
-            print(f"- {key}: {value}")
         return None
 
     try:
@@ -88,57 +79,32 @@ def upload_to_b2(local_file_path, file_name):
         bucket_name = os.environ.get('BUCKET_NAME')
         
         if not endpoint_url or not bucket_name:
-            error_msg = f"缺少必要的 B2 配置：\nBUCKET_ENDPOINT_URL: {endpoint_url}\nBUCKET_NAME: {bucket_name}"
+            error_msg = "缺少必要的 B2 配置"
             print(f"runpod-worker-comfy - {error_msg}")
             return None
 
-        print(f"runpod-worker-comfy - 正在上传文件：")
-        print(f"- 本地路径: {local_file_path}")
-        print(f"- B2路径: {file_name}")
-        print(f"- 文件大小: {os.path.getsize(local_file_path) / (1024*1024):.2f} MB")
-        
         # 检查文件是否存在且可读
         if not os.path.exists(local_file_path):
-            error_msg = f"本地文件不存在：{local_file_path}"
-            print(f"runpod-worker-comfy - {error_msg}")
             return None
             
         if not os.access(local_file_path, os.R_OK):
-            error_msg = f"文件无读取权限：{local_file_path}"
-            print(f"runpod-worker-comfy - {error_msg}")
             return None
 
         # 检查文件是否为空
         if os.path.getsize(local_file_path) == 0:
-            error_msg = f"文件大小为0：{local_file_path}"
-            print(f"runpod-worker-comfy - {error_msg}")
             return None
 
         # 使用标准上传模式
-        print("runpod-worker-comfy - 开始上传到 B2...")
         uploaded_file = b2_bucket_instance.upload_local_file(
             local_file=local_file_path,
             file_name=file_name
         )
 
         download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
-        print(f"runpod-worker-comfy - 上传成功：{download_url}")
         return download_url
 
     except Exception as e:
-        error_msg = f"上传 {file_name} 到 B2 时出错: {str(e)}"
-        print(f"runpod-worker-comfy - {error_msg}")
-        # 打印更详细的错误信息
-        import traceback
-        print(f"runpod-worker-comfy - 详细错误信息：\n{traceback.format_exc()}")
-        
-        # 检查网络连接
-        try:
-            response = requests.get(endpoint_url, timeout=5)
-            print(f"runpod-worker-comfy - B2 端点连接测试：HTTP {response.status_code}")
-        except Exception as conn_err:
-            print(f"runpod-worker-comfy - B2 端点连接失败：{str(conn_err)}")
-        
+        print(f"runpod-worker-comfy - 上传失败: {str(e)}")
         return None
 
 def cleanup_empty_dirs(path_to_clean):
@@ -509,10 +475,7 @@ def process_video_output(outputs, job_id):
     processed_videos = []
     use_b2 = bool(os.environ.get("BUCKET_ACCESS_KEY_ID", False))
     if not use_b2:
-        print("runpod-worker-comfy - B2 is not configured. Cannot process video output.")
         return {"status": "error", "message": "B2 storage is not configured for video output."}
-
-    print(f"runpod-worker-comfy - Processing video outputs for job {job_id}...")
 
     for node_id, node_output in outputs.items():
         # 检查输出类型
@@ -529,7 +492,6 @@ def process_video_output(outputs, job_id):
             try:
                 local_video_path = video_info.get("fullpath")
                 if not local_video_path or not os.path.exists(local_video_path):
-                    print(f"runpod-worker-comfy - Video file not found: {local_video_path}")
                     processed_videos.append({
                         "filename": video_info.get("filename"),
                         "error": "File not found"
@@ -539,12 +501,7 @@ def process_video_output(outputs, job_id):
                 filename = video_info.get("filename")
                 # 根据文件扩展名决定目录
                 file_ext = os.path.splitext(filename)[1].lower()
-                if file_ext == '.gif':
-                    output_dir = 'gifs'
-                else:
-                    output_dir = 'videos'
-
-                print(f"runpod-worker-comfy - Processing {output_dir} file: {filename}")
+                output_dir = 'gifs' if file_ext == '.gif' else 'videos'
 
                 # 上传到对应目录
                 b2_file_path = f"{job_id}/{output_dir}/{filename}"
@@ -556,10 +513,10 @@ def process_video_output(outputs, job_id):
                         "url": video_url,
                         "frame_rate": video_info.get("frame_rate"),
                         "format": video_info.get("format"),
-                        "type": output_dir  # 添加类型信息
+                        "type": output_dir
                     }
                     
-                    # 只为视频文件生成缩略图，GIF 不需要
+                    # 只为视频文件生成缩略图
                     if output_dir == 'videos':
                         thumbnail_path = generate_video_thumbnail(local_video_path)
                         if thumbnail_path:
@@ -574,27 +531,21 @@ def process_video_output(outputs, job_id):
                                     os.remove(thumbnail_path)
                     
                     processed_videos.append(video_result)
-                    print(f"runpod-worker-comfy - Successfully processed {output_dir} file: {filename}")
                 else:
                     processed_videos.append({
                         "filename": filename,
-                        "error": f"Failed to upload to B2"
+                        "error": "Failed to upload to B2"
                     })
 
             except Exception as e:
-                print(f"runpod-worker-comfy - Error processing file: {str(e)}")
                 processed_videos.append({
                     "filename": video_info.get("filename"),
                     "error": f"Processing error: {str(e)}"
                 })
             finally:
                 # 清理原始文件
-                try:
-                    if os.path.exists(local_video_path):
-                        os.remove(local_video_path)
-                        print(f"runpod-worker-comfy - Cleaned up file: {local_video_path}")
-                except Exception as e:
-                    print(f"runpod-worker-comfy - Error cleaning up file: {e}")
+                if os.path.exists(local_video_path):
+                    os.remove(local_video_path)
 
     # 清理空目录
     cleanup_empty_dirs(VIDEO_OUTPUT_PATH)
@@ -615,70 +566,83 @@ def process_video_output(outputs, job_id):
 def get_progress(prompt_id):
     """获取工作流处理的实时进度"""
     try:
-        # 使用 requests 库，因为它处理 JSON 更方便，并能设置超时
         response = requests.get(f"http://{COMFY_HOST}/prompt/status/{prompt_id}", timeout=2)
         
-        # 处理不同的状态码
         if response.status_code == 200:
             data = response.json()
             status_info = data.get("status", {})
             executing_node = status_info.get("executing")
 
             if executing_node:
-                node_id = executing_node.get("node")
-                progress = executing_node.get("progress", 0)
                 return {
                     "status": "processing",
-                    "progress": int(progress * 100) if progress is not None else 0,
-                    "detail": f"Executing node {node_id}"
+                    "progress": int(executing_node.get("progress", 0) * 100),
                 }
             elif status_info.get("completed") is True:
+                # 获取历史记录以获取输出文件信息
+                history = get_history(prompt_id)
+                if prompt_id in history and "outputs" in history[prompt_id]:
+                    outputs = history[prompt_id]["outputs"]
+                    # 处理输出文件
+                    for node_id, node_output in outputs.items():
+                        if "videos" in node_output:
+                            video_info = node_output["videos"][0]  # 获取第一个视频
+                            local_video_path = video_info.get("fullpath")
+                            filename = video_info.get("filename")
+                            
+                            # 生成缩略图
+                            thumbnail_path = generate_video_thumbnail(local_video_path)
+                            video_url = None
+                            thumbnail_url = None
+                            
+                            try:
+                                # 上传视频
+                                video_url = upload_to_b2(local_video_path, f"videos/{filename}")
+                                
+                                # 上传缩略图
+                                if thumbnail_path:
+                                    thumb_filename = f"{os.path.splitext(filename)[0]}_thumb.jpg"
+                                    thumbnail_url = upload_to_b2(thumbnail_path, f"thumbnails/{thumb_filename}")
+                            finally:
+                                # 清理文件
+                                if os.path.exists(local_video_path):
+                                    os.remove(local_video_path)
+                            
+                            return {
+                                "status": "success",
+                                "message": video_url,
+                                "thumbnail": thumbnail_url
+                            }
                 return {
                     "status": "completed",
                     "progress": 100,
-                    "detail": "Workflow completed"
                 }
             else:
                 return {
                     "status": "pending",
                     "progress": 0,
-                    "detail": "Waiting in queue or starting"
                 }
         elif response.status_code == 404:
-            # 如果是 404，检查历史记录
             history = get_history(prompt_id)
             if prompt_id in history:
                 return {
                     "status": "completed",
                     "progress": 100,
-                    "detail": "Workflow completed (found in history)"
                 }
             return {
                 "status": "pending",
                 "progress": 0,
-                "detail": "Prompt not found in active queue"
             }
         else:
-            print(f"runpod-worker-comfy - Warning: Failed to get progress for {prompt_id}, status: {response.status_code}")
             return {
-                "status": "unknown",
+                "status": "error",
                 "progress": 0,
-                "detail": f"Failed to get status (HTTP {response.status_code})"
             }
 
-    except requests.exceptions.RequestException as e:
-        print(f"runpod-worker-comfy - Error getting progress for {prompt_id}: {e}")
-        return {
-            "status": "error",
-            "progress": 0,
-            "detail": f"Network error: {str(e)}"
-        }
     except Exception as e:
-        print(f"runpod-worker-comfy - Unexpected error getting progress for {prompt_id}: {e}")
         return {
             "status": "error",
             "progress": 0,
-            "detail": f"Unexpected error: {str(e)}"
         }
 
 # --- 主处理函数 ---
