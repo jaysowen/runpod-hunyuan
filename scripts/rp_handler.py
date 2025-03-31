@@ -30,7 +30,7 @@ REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
 # 图片模糊处理的半径
 IMAGE_FILTER_BLUR_RADIUS = int(os.environ.get("IMAGE_FILTER_BLUR_RADIUS", 8))
 # 视频相关配置
-VIDEO_OUTPUT_PATH = os.environ.get("VIDEO_OUTPUT_PATH", "/comfyui/output")
+VIDEO_OUTPUT_PATH = "/workspace/ComfyUI/output"  # 修改默认路径
 IMAGE_OUTPUT_PATH = os.environ.get("IMAGE_OUTPUT_PATH", "/comfyui/output") # 明确图片输出路径
 SUPPORTED_VIDEO_FORMATS = ['.mp4', '.webm', '.avi', '.gif'] # 添加 gif 支持
 
@@ -475,6 +475,8 @@ def process_video_output(outputs, job_id):
         return {"status": "error", "message": "B2 storage is not configured for video output."}
 
     print(f"runpod-worker-comfy - Processing video outputs for job {job_id}...")
+    print(f"runpod-worker-comfy - Video output path: {VIDEO_OUTPUT_PATH}")
+    print(f"runpod-worker-comfy - Outputs data: {json.dumps(outputs, indent=2)}")  # 打印完整的输出数据
 
     for node_id, node_output in outputs.items():
         video_key_found = None
@@ -487,25 +489,49 @@ def process_video_output(outputs, job_id):
             for video_info in node_output[video_key_found]:
                 subfolder = video_info.get("subfolder", "")
                 filename = video_info.get("filename")
+                
+                # 打印详细的路径信息
+                print(f"runpod-worker-comfy - Video info: {json.dumps(video_info, indent=2)}")
+                print(f"runpod-worker-comfy - Subfolder: {subfolder}")
+                print(f"runpod-worker-comfy - Filename: {filename}")
+
                 if not filename:
                     print(f"runpod-worker-comfy - Warning: Found video/gif output in node {node_id} without filename.")
                     continue
 
-                # 使用 workflow 提供的路径
+                # 构建完整路径并检查文件
                 local_video_path = os.path.join(VIDEO_OUTPUT_PATH, subfolder, filename)
-                print(f"runpod-worker-comfy - Processing video: {local_video_path}")
-
-                if not os.path.exists(local_video_path):
-                    print(f"runpod-worker-comfy - Video file not found: {local_video_path}")
-                    processed_videos.append({
-                        "filename": filename,
-                        "error": "File not found"
-                    })
-                    continue
+                print(f"runpod-worker-comfy - Constructed path: {local_video_path}")
+                
+                # 检查文件是否存在
+                if os.path.exists(local_video_path):
+                    print(f"runpod-worker-comfy - Found video at: {local_video_path}")
+                else:
+                    # 尝试列出目录内容
+                    parent_dir = os.path.dirname(local_video_path)
+                    print(f"runpod-worker-comfy - Checking directory: {parent_dir}")
+                    if os.path.exists(parent_dir):
+                        print(f"runpod-worker-comfy - Directory contents: {os.listdir(parent_dir)}")
+                    else:
+                        print(f"runpod-worker-comfy - Directory does not exist: {parent_dir}")
+                    
+                    # 尝试其他可能的路径
+                    alt_path = os.path.join("/workspace/ComfyUI/output", "Wan", filename)
+                    if os.path.exists(alt_path):
+                        print(f"runpod-worker-comfy - Found video at alternate path: {alt_path}")
+                        local_video_path = alt_path
+                    else:
+                        print(f"runpod-worker-comfy - Video file not found at alternate path: {alt_path}")
+                        processed_videos.append({
+                            "filename": filename,
+                            "error": "File not found"
+                        })
+                        continue
 
                 try:
                     # 上传视频到B2
                     b2_file_path = f"{job_id}/{video_key_found}/{filename}"
+                    print(f"runpod-worker-comfy - Uploading to B2: {b2_file_path}")
                     video_url = upload_to_b2(local_video_path, b2_file_path)
                     
                     if video_url:
