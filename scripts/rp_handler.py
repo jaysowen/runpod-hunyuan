@@ -472,6 +472,7 @@ def process_video_output(outputs, job_id):
 def get_progress(prompt_id):
     """获取工作流处理的实时进度"""
     try:
+        print(f"runpod-worker-comfy - Checking progress for prompt_id: {prompt_id}")
         response = requests.get(f"http://{COMFY_HOST}/prompt/status/{prompt_id}", timeout=2)
         
         if response.status_code == 200:
@@ -520,21 +521,33 @@ def get_progress(prompt_id):
                     "type": "progress"
                 }
         elif response.status_code == 404:
+            print(f"runpod-worker-comfy - Prompt {prompt_id} not found in active queue, checking history...")
             history = get_history(prompt_id)
             if prompt_id in history:
-                return {
-                    "status": "completed",
-                    "progress": 100,
-                    "detail": "Task completed (found in history)",
-                    "type": "progress"
-                }
+                print(f"runpod-worker-comfy - Found prompt {prompt_id} in history")
+                if "outputs" in history[prompt_id]:
+                    return {
+                        "status": "completed",
+                        "progress": 100,
+                        "detail": "Task completed (found in history)",
+                        "type": "progress"
+                    }
+                else:
+                    return {
+                        "status": "processing",
+                        "progress": 50,
+                        "detail": "Task found in history but outputs not ready",
+                        "type": "progress"
+                    }
+            print(f"runpod-worker-comfy - Prompt {prompt_id} not found in history either")
             return {
                 "status": "pending",
                 "progress": 0,
-                "detail": "Task not found",
+                "detail": "Task not found in queue or history",
                 "type": "progress"
             }
         else:
+            print(f"runpod-worker-comfy - Unexpected HTTP status code: {response.status_code}")
             return {
                 "status": "error",
                 "progress": 0,
@@ -543,6 +556,7 @@ def get_progress(prompt_id):
             }
 
     except Exception as e:
+        print(f"runpod-worker-comfy - Error in get_progress: {str(e)}")
         return {
             "status": "error",
             "progress": 0,
