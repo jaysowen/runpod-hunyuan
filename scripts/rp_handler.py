@@ -91,7 +91,7 @@ def upload_to_b2(local_file_path, file_name):
         uploaded_file = b2_bucket_instance.upload_local_file(
             local_file=local_file_path,
             file_name=file_name,
-            upload_mode=UploadMode.LARGE_FILE # 显式指定大文件模式
+            upload_mode=UploadMode.RAW  # 或其他有效的模式
         )
 
         download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
