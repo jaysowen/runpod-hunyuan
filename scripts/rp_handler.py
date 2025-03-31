@@ -303,50 +303,6 @@ def get_history(prompt_id):
         print(f"runpod-worker-comfy - Error getting history for {prompt_id}: {e}")
         return {}
 
-def get_progress(prompt_id):
-    """获取工作流处理的实时进度"""
-    try:
-        # 使用 requests 库，因为它处理 JSON 更方便，并能设置超时
-        response = requests.get(f"http://{COMFY_HOST}/prompt/status/{prompt_id}", timeout=2)
-        if response.status_code == 200:
-            data = response.json()
-            # 假设 ComfyUI 的 /prompt/status 接口返回类似 {"prompt_id": "...", "status": {"executing": ...}} 结构
-            status_info = data.get("status", {})
-            executing_node = status_info.get("executing")
-
-            if executing_node:
-                node_id = executing_node.get("node")
-                progress = executing_node.get("progress", 0)
-                # 需要另一个请求获取节点信息，如果API不支持直接返回节点类型
-                # 这里简化处理，只返回进度
-                return {
-                    "status": "processing",
-                    "progress": int(progress * 100) if progress is not None else 0, # 转换为百分比
-                    "detail": f"Executing node {node_id}" # ComfyUI API 可能不直接提供 class_type
-                }
-            elif status_info.get("completed") is True: # 检查完成状态
-                return {
-                    "status": "completed",
-                    "progress": 100,
-                    "detail": "Workflow completed"
-                }
-            else: # 否则认为是等待中或队列中
-                 return {
-                    "status": "pending",
-                    "progress": 0,
-                    "detail": "Waiting in queue or starting"
-                }
-        else:
-             print(f"runpod-worker-comfy - Warning: Failed to get progress for {prompt_id}, status: {response.status_code}")
-             return {"status": "unknown", "progress": 0, "detail": "Failed to get status"}
-
-    except requests.exceptions.RequestException as e:
-        print(f"runpod-worker-comfy - Error getting progress for {prompt_id}: {e}")
-        return {"status": "error", "progress": 0, "detail": f"Network error: {e}"}
-    except Exception as e: # 捕获其他潜在错误，如JSON解析错误
-        print(f"runpod-worker-comfy - Unexpected error getting progress for {prompt_id}: {e}")
-        return {"status": "error", "progress": 0, "detail": f"Unexpected error: {e}"}
-
 # --- 输出处理 ---
 def base64_encode(file_path):
     """将文件转换为 base64 字符串"""
@@ -519,17 +475,15 @@ def process_video_output(outputs, job_id):
         return {"status": "error", "message": "B2 storage is not configured for video output."}
 
     print(f"runpod-worker-comfy - Processing video outputs for job {job_id}...")
-    found_videos = False
+
     for node_id, node_output in outputs.items():
-        # 支持 'videos' 和 'gifs' 作为输出键
         video_key_found = None
         if "videos" in node_output:
             video_key_found = "videos"
-        elif "gifs" in node_output: # 处理如 AnimateDiff 可能输出的 GIF
-             video_key_found = "gifs"
+        elif "gifs" in node_output:
+            video_key_found = "gifs"
 
         if video_key_found:
-            found_videos = True
             for video_info in node_output[video_key_found]:
                 subfolder = video_info.get("subfolder", "")
                 filename = video_info.get("filename")
@@ -537,85 +491,81 @@ def process_video_output(outputs, job_id):
                     print(f"runpod-worker-comfy - Warning: Found video/gif output in node {node_id} without filename.")
                     continue
 
-                relative_path = os.path.join(subfolder, filename)
-                local_video_path = os.path.join(VIDEO_OUTPUT_PATH, relative_path.lstrip('/'))
-                print(f"runpod-worker-comfy - Found video/gif output: {local_video_path}")
+                # 使用 workflow 提供的路径
+                local_video_path = os.path.join(VIDEO_OUTPUT_PATH, subfolder, filename)
+                print(f"runpod-worker-comfy - Processing video: {local_video_path}")
 
                 if not os.path.exists(local_video_path):
-                    print(f"runpod-worker-comfy - Video/gif file not found: {local_video_path}")
-                    processed_videos.append({"filename": filename, "error": f"Output video/gif file not found"})
+                    print(f"runpod-worker-comfy - Video file not found: {local_video_path}")
+                    processed_videos.append({
+                        "filename": filename,
+                        "error": "File not found"
+                    })
                     continue
 
-                video_result = {"filename": filename}
-                original_filename = os.path.basename(local_video_path)
-                video_url = None
-                thumbnail_url = None
-
                 try:
-                    # 上传视频/GIF到B2
-                    b2_file_path = f"{job_id}/{video_key_found}/{original_filename}" # 目录区分 videos/gifs
+                    # 上传视频到B2
+                    b2_file_path = f"{job_id}/{video_key_found}/{filename}"
                     video_url = upload_to_b2(local_video_path, b2_file_path)
-
-                    if not video_url:
-                        video_result["error"] = "Failed to upload video/gif to B2"
-                    else:
-                        video_result["url"] = video_url # 统一使用 url 字段
-                        print(f"runpod-worker-comfy - Video/gif uploaded to B2: {video_url}")
-
-                        # 仅为非 GIF 文件生成缩略图
-                        file_ext = os.path.splitext(original_filename)[1].lower()
-                        if file_ext != '.gif':
+                    
+                    if video_url:
+                        video_result = {
+                            "filename": filename,
+                            "url": video_url
+                        }
+                        
+                        # 为非GIF文件生成缩略图
+                        if not filename.lower().endswith('.gif'):
                             thumbnail_path = generate_video_thumbnail(local_video_path)
                             if thumbnail_path:
                                 try:
-                                    thumb_filename_base = hashlib.md5(f"{job_id}-{original_filename}".encode()).hexdigest()
-                                    thumb_filename = f"{thumb_filename_base}.jpg"
+                                    thumb_filename = f"{os.path.splitext(filename)[0]}_thumb.jpg"
                                     b2_thumbnail_path = f"{job_id}/thumbnails/{thumb_filename}"
                                     thumbnail_url = upload_to_b2(thumbnail_path, b2_thumbnail_path)
                                     if thumbnail_url:
-                                         video_result["thumbnail_url"] = thumbnail_url
-                                         print(f"runpod-worker-comfy - Thumbnail uploaded to B2: {thumbnail_url}")
-                                    else:
-                                         video_result["thumbnail_error"] = "Failed to upload thumbnail"
+                                        video_result["thumbnail_url"] = thumbnail_url
                                 finally:
-                                    # 清理临时缩略图
-                                    try:
+                                    if os.path.exists(thumbnail_path):
                                         os.remove(thumbnail_path)
-                                        print(f"runpod-worker-comfy - Cleaned up temporary thumbnail: {thumbnail_path}")
-                                    except OSError as e:
-                                        print(f"runpod-worker-comfy - Error cleaning up temp thumbnail {thumbnail_path}: {e}")
-                            else:
-                                video_result["thumbnail_error"] = "Thumbnail generation failed"
-                        else:
-                            print(f"runpod-worker-comfy - Skipping thumbnail generation for GIF: {original_filename}")
-                            video_result["thumbnail_url"] = None # GIF 不需要缩略图
-
+                        
+                        processed_videos.append(video_result)
+                        print(f"runpod-worker-comfy - Successfully processed video: {filename}")
+                    else:
+                        processed_videos.append({
+                            "filename": filename,
+                            "error": "Failed to upload to B2"
+                        })
+                        
                 except Exception as e:
-                     print(f"runpod-worker-comfy - Error processing video/gif {original_filename}: {str(e)}")
-                     video_result["error"] = f"Error processing video/gif: {str(e)}"
+                    print(f"runpod-worker-comfy - Error processing video {filename}: {str(e)}")
+                    processed_videos.append({
+                        "filename": filename,
+                        "error": f"Processing error: {str(e)}"
+                    })
                 finally:
-                    # 清理原始视频/GIF文件 (无论成功失败都清理)
-                    if os.path.exists(local_video_path):
-                        try:
+                    # 清理原始视频文件
+                    try:
+                        if os.path.exists(local_video_path):
                             os.remove(local_video_path)
-                            print(f"runpod-worker-comfy - Cleaned up original video/gif from ComfyUI output: {local_video_path}")
-                        except Exception as clean_e:
-                            print(f"runpod-worker-comfy - Error cleaning up video/gif file {local_video_path}: {str(clean_e)}")
+                            print(f"runpod-worker-comfy - Cleaned up video file: {local_video_path}")
+                    except Exception as e:
+                        print(f"runpod-worker-comfy - Error cleaning up video: {e}")
 
-                processed_videos.append(video_result)
-
-    if not found_videos:
-        print("runpod-worker-comfy - No 'videos' or 'gifs' key found in any node output.")
-        # return {"status": "warning", "message": "No video/gif outputs found in the workflow result."}
-
-    # 清理可能的空目录
+    # 清理空目录
     cleanup_empty_dirs(VIDEO_OUTPUT_PATH)
 
     if not processed_videos:
-         return {"status": "error", "message": "No video/gif outputs were found or successfully processed."}
+        return {
+            "status": "error",
+            "message": "No video outputs were successfully processed.",
+            "type": "video"
+        }
 
-    # 返回统一的 videos 列表，包含 URL 和可能的缩略图 URL
-    return {"status": "success", "videos": processed_videos, "type": "video"} # type 保持 video
+    return {
+        "status": "success",
+        "videos": processed_videos,
+        "type": "video"
+    }
 
 # --- 主处理函数 ---
 def handler(job):
@@ -626,7 +576,7 @@ def handler(job):
     3. 检查 ComfyUI 服务可用性
     4. 上传输入图片（如果有）
     5. 提交工作流到 ComfyUI
-    6. 等待处理完成并监控进度 (发送进度更新)
+    6. 等待处理完成
     7. 处理输出（图片或视频/GIF）
     8. 返回结果
     """
@@ -656,13 +606,9 @@ def handler(job):
         # 4. 上传输入图片（如果有）
         if images_to_upload:
             upload_result = upload_images(images_to_upload)
-            # 如果上传失败，可以选择中止或继续（取决于工作流是否能处理无输入图）
             if upload_result["status"] == "error":
                 print(f"runpod-worker-comfy - Input image upload failed: {upload_result.get('message')}")
-                # 决定是否中止
-                # return {"error": f"Input image upload failed: {upload_result.get('message')}", "details": upload_result.get("details")}
-                print("runpod-worker-comfy - Warning: Proceeding without uploaded images due to upload errors.")
-
+                return {"error": f"Input image upload failed: {upload_result.get('message')}", "details": upload_result.get("details")}
 
         # 5. 提交工作流
         print("runpod-worker-comfy - Queuing workflow...")
@@ -670,67 +616,36 @@ def handler(job):
             queued_workflow = queue_workflow(workflow)
             prompt_id = queued_workflow.get("prompt_id")
             if not prompt_id:
-                 raise ValueError(f"ComfyUI did not return a prompt_id. Response: {queued_workflow}")
+                raise ValueError(f"ComfyUI did not return a prompt_id. Response: {queued_workflow}")
             print(f"runpod-worker-comfy - Workflow queued successfully with Prompt ID: {prompt_id}")
         except Exception as e:
             print(f"runpod-worker-comfy - Error queuing workflow: {str(e)}")
             return {"error": f"Error queuing workflow: {str(e)}"}
 
-        # 6. 等待处理完成并监控进度
-        print(f"runpod-worker-comfy - Waiting for workflow completion (Prompt ID: {prompt_id})...")
-        retries = 0
-        last_progress_sent = None # 记录上次发送的进度，避免重复发送相同进度
+        # 6. 等待处理完成
+        print(f"runpod-worker-comfy - Waiting for workflow completion...")
         start_time = time.time()
-
-        while retries < COMFY_POLLING_MAX_RETRIES:
-            current_time = time.time()
-            elapsed_time = current_time - start_time
-            # 检查总超时（例如10分钟）
-            if elapsed_time > 600: # 10 分钟超时
-                print(f"runpod-worker-comfy - Job {job_id} timed out after {elapsed_time:.2f} seconds.")
+        while True:
+            # 检查总超时（10分钟）
+            if time.time() - start_time > 600:
                 return {"error": "Job processing timed out after 10 minutes."}
 
-            # 获取进度
-            progress_info = get_progress(prompt_id)
-            current_progress_state = (progress_info['status'], progress_info['progress'])
+            # 检查历史记录
+            history = get_history(prompt_id)
+            if prompt_id in history and "outputs" in history[prompt_id]:
+                print(f"runpod-worker-comfy - Workflow completed for Prompt ID: {prompt_id}")
+                outputs = history[prompt_id]["outputs"]
+                break
 
-            # 只在进度状态或百分比发生变化时发送更新
-            if progress_info and progress_info.get('status') != 'error' and current_progress_state != last_progress_sent:
-                print(f"runpod-worker-comfy - Job {job_id} Progress: {progress_info['progress']}% - {progress_info['status']} - {progress_info['detail']}")
-                try:
-                    runpod.serverless.progress_update(job, progress_info)
-                    last_progress_sent = current_progress_state
-                except Exception as progress_err:
-                    # 捕获发送进度更新时的错误，但不中止主流程
-                    print(f"runpod-worker-comfy - Warning: Failed to send progress update: {progress_err}")
-
-            # 检查是否完成 (使用 get_history 确认最终输出)
-            # 稍微增加检查历史的频率，减少完成后的延迟
-            if retries % 4 == 0 or (progress_info and progress_info['status'] == 'completed'): # 每秒或完成后检查历史
-                history = get_history(prompt_id)
-                # 检查历史记录中是否有对应 prompt_id 且包含 'outputs'
-                if prompt_id in history and "outputs" in history[prompt_id]:
-                    print(f"runpod-worker-comfy - Workflow completed for Prompt ID: {prompt_id}. Processing outputs...")
-                    outputs = history[prompt_id]["outputs"]
-                    break # 跳出等待循环
-
-            # 等待下一次检查
-            time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-            retries += 1
-        else: # 如果循环正常结束（达到最大重试次数）
-            print(f"runpod-worker-comfy - Timeout waiting for results after {retries} retries for Prompt ID: {prompt_id}")
-            # 超时也尝试发送最后一次进度
-            if last_progress_sent:
-                 try: runpod.serverless.progress_update(job, {"status": last_progress_sent[0], "progress": last_progress_sent[1], "detail": "Timeout reached"})
-                 except: pass
-            return {"error": "Timeout waiting for workflow results from ComfyUI."}
+            # 短暂等待后再次检查
+            time.sleep(1)
 
         # 7. 处理输出
         print(f"runpod-worker-comfy - Processing outputs for job {job_id}...")
         result = {}
-        # 检查输出中是否包含视频/GIF指示符
+        
+        # 检查输出类型
         is_video_output = any(key in node_output for node_output in outputs.values() for key in ["videos", "gifs"])
-        # 检查输出中是否包含图片指示符
         is_image_output = any("images" in node_output for node_output in outputs.values())
 
         if is_video_output:
@@ -741,22 +656,21 @@ def handler(job):
             result = process_output_images(outputs, job_id)
         else:
             print("runpod-worker-comfy - No recognizable image or video/gif outputs found.")
-            result = {"status": "warning", "message": "Workflow completed, but no standard image or video/gif outputs were found."}
+            result = {"status": "warning", "message": "Workflow completed, but no standard outputs were found."}
 
         # 确保总是有 status 字段
         if "status" not in result:
-            result["status"] = "error" # 如果处理函数没有返回status，则标记为错误
+            result["status"] = "error"
 
         result["refresh_worker"] = REFRESH_WORKER
         print(f"runpod-worker-comfy - Job {job_id} finished with status: {result.get('status')}")
         return result
 
     except Exception as e:
-        # 捕获任何未预料的顶层错误
         error_type = type(e).__name__
         print(f"runpod-worker-comfy - Unexpected error during handler execution for job {job_id}: {error_type} - {str(e)}")
         import traceback
-        traceback.print_exc() # 打印详细的回溯信息到日志
+        traceback.print_exc()
         return {"error": f"An unexpected error occurred: {error_type} - {str(e)}"}
 
 
