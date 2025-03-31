@@ -195,10 +195,13 @@ def download_image(url):
         return None
 
 def upload_images(images):
-    """将图片上传到 ComfyUI 服务器"""
     if not images:
         return {"status": "success", "message": "No images to upload.", "details": []}
 
+    # 确保输入目录存在
+    input_dir = "/workspace/ComfyUI/input"
+    os.makedirs(input_dir, exist_ok=True)
+    
     uploaded_files_info = []
     errors = []
     print(f"runpod-worker-comfy - Uploading {len(images)} image(s) to ComfyUI...")
@@ -208,40 +211,42 @@ def upload_images(images):
         image_data_str = image_input["image"]
         blob = None
 
+        # 确保文件名是安全的
+        safe_filename = os.path.basename(name)
+        local_path = os.path.join(input_dir, safe_filename)
+
         if image_data_str.startswith(('http://', 'https://')):
             print(f"runpod-worker-comfy - Downloading image {name} from URL...")
             blob = download_image(image_data_str)
-            if blob is None:
-                errors.append(f"Failed to download image '{name}' from URL.")
-                continue # 处理下一张图片
         else:
             try:
-                # 假设是 base64
                 blob = base64.b64decode(image_data_str)
-            except (base64.binascii.Error, ValueError) as e:
-                 errors.append(f"Failed to decode base64 for image '{name}': {e}")
-                 continue # 处理下一张图片
+            except Exception as e:
+                errors.append(f"Failed to decode base64 for image '{name}': {e}")
+                continue
 
         if blob:
             try:
-                # 使用 BytesIO 包装二进制数据
-                image_bytesio = BytesIO(blob)
+                # 直接保存到输入目录
+                with open(local_path, 'wb') as f:
+                    f.write(blob)
+                print(f"runpod-worker-comfy - Saved image to {local_path}")
+                
+                # 上传到 ComfyUI
                 files = {
-                    "image": (name, image_bytesio, "image/png"), # 假设是 PNG，ComfyUI 通常能处理
+                    "image": (name, open(local_path, 'rb'), "image/png"),
                     "overwrite": (None, "true"),
                 }
                 upload_url = f"http://{COMFY_HOST}/upload/image"
-                response = requests.post(upload_url, files=files, timeout=30) # 增加上传超时
-
+                response = requests.post(upload_url, files=files)
+                
                 if response.status_code == 200:
-                    uploaded_files_info.append(response.json()) # 保存 ComfyUI 返回的文件信息
+                    uploaded_files_info.append(response.json())
                     print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
                 else:
-                    errors.append(f"Error uploading '{name}' to ComfyUI (status {response.status_code}): {response.text}")
-            except requests.exceptions.RequestException as e:
-                errors.append(f"Network error uploading '{name}': {e}")
+                    errors.append(f"Error uploading '{name}' to ComfyUI: {response.text}")
             except Exception as e:
-                errors.append(f"Unexpected error uploading '{name}': {e}")
+                errors.append(f"Error processing '{name}': {e}")
 
     if errors:
         print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
@@ -262,6 +267,15 @@ def upload_images(images):
 def queue_workflow(workflow):
     """向 ComfyUI 提交工作流"""
     try:
+        # 在提交工作流之前确保所有引用的图片文件存在
+        input_dir = "/workspace/ComfyUI/input"
+        for node_id, node_data in workflow.items():
+            if isinstance(node_data, dict) and node_data.get("class_type") == "LoadImage":
+                image_path = os.path.join(input_dir, node_data.get("inputs", {}).get("image", ""))
+                if not os.path.exists(image_path):
+                    print(f"Warning: Image file not found: {image_path}")
+        
+        # 继续原有的提交逻辑
         prompt_data = {"prompt": workflow}
         data = json.dumps(prompt_data).encode('utf-8')
         req = urllib.request.Request(f"http://{COMFY_HOST}/prompt", data=data, headers={'Content-Type': 'application/json'})

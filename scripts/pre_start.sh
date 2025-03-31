@@ -8,6 +8,7 @@ export PATH="/workspace/bin:$PATH"
 mkdir -p /workspace
 chmod 755 /workspace
 
+# Check and install additional nodes if needed
 echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
 if [ "${SKIP_NODES}" == "true" ]; then
     echo "**** SKIPPING NODE INSTALLATION (SKIP_NODES=true) ****"
@@ -15,7 +16,7 @@ else
     /install_nodes.sh install_only
 fi
 
-# Check if downloads should be skipped
+# Download models if not skipped
 if [ "${SKIP_DOWNLOADS}" == "true" ]; then
     echo "**** SKIPPING MODEL DOWNLOADS (SKIP_DOWNLOADS=true) ****"
 else
@@ -23,31 +24,15 @@ else
     /download_models.sh
 fi
 
-echo "MOVING COMFYUI TO WORKSPACE"
-# Ensure clean workspace/ComfyUI directory setup
-if [ -e "/workspace/ComfyUI" ]; then
-    if [ ! -d "/workspace/ComfyUI" ]; then
-        echo "Removing invalid /workspace/ComfyUI"
-        rm -f /workspace/ComfyUI
-    fi
-fi
-
-# Create fresh ComfyUI directory
-mkdir -p /workspace/ComfyUI
-chmod 755 /workspace/ComfyUI
-
-# Check if /ComfyUI exists and is not already a symlink
-if [ -d "/ComfyUI" ] && [ ! -L "/ComfyUI" ]; then
-    echo "**** SETTING UP COMFYUI IN WORKSPACE ****"
-    # Copy files instead of moving to avoid potential issues
-    cp -rf /ComfyUI/* /workspace/ComfyUI/
-    cp -rf /ComfyUI/.??* /workspace/ComfyUI/ 2>/dev/null || true
-    rm -rf /ComfyUI
-    # Create symlink
-    ln -sf /workspace/ComfyUI /ComfyUI
-fi
-
-# Ensure proper permissions
+# Ensure proper permissions for ComfyUI
 chmod -R 755 /workspace/ComfyUI
+
+# 创建必要的目录
+mkdir -p /workspace/ComfyUI/input
+mkdir -p /workspace/ComfyUI/output
+mkdir -p /workspace/ComfyUI/temp
+chmod -R 755 /workspace/ComfyUI/input
+chmod -R 755 /workspace/ComfyUI/output
+chmod -R 755 /workspace/ComfyUI/temp
 
 echo "✨ Pre-start completed successfully ✨"
