@@ -130,6 +130,7 @@ RUN git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone https://github.com/melMass/comfy_mtb.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials && \
