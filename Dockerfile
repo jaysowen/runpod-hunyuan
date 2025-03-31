@@ -124,17 +124,17 @@ RUN pip install b2sdk
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
-RUN git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-    git clone https://github.com/crystian/ComfyUI-Crystools.git && \
-    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+RUN git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
-    git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
-    git clone https://github.com/melMass/comfy_mtb.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    git clone https://github.com/melMass/comfy_mtb.git && \
+    git clone https://github.com/Derfuu/Derfuu_ComfyUI_ModdedNodes.git && \
+    git clone https://github.com/jamesWalker55/comfyui-various.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials && \
-    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite && \
     git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
     git clone https://github.com/kijai/ComfyUI-Florence2.git && \
     git clone https://github.com/kijai/ComfyUI-segment-anything-2.git && \
