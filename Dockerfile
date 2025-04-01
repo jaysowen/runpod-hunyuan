@@ -56,18 +56,11 @@ RUN apt-get update && \
         libglib2.0-0 \
         libsm6 \
         libxext6 \
-        libxrender-dev \
         libgl1-mesa-glx \
         curl \
-        build-essential \
-        nvidia-cuda-dev \
-        gcc \
-        g++ \
         ca-certificates \
         dos2unix \
         libegl1 \
-        libegl-mesa0 \
-        libgles2-mesa-dev \
         libglvnd0 \
         libglx0 && \
     rm -rf /var/lib/apt/lists/*
@@ -118,9 +111,7 @@ RUN pip install --no-cache-dir \
     gdown
 
 # Install runpod
-RUN pip install runpod requests
-
-RUN pip install b2sdk
+RUN pip install runpod requests b2sdk
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
