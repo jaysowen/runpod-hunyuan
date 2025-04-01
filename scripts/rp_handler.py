@@ -470,24 +470,29 @@ def process_video_output(outputs, job_id):
     }
 
 def get_progress(prompt_id):
-    """获取工作流处理的实时进度"""
+    """获取工作流处理的实时进度，更稳健地处理初始状态"""
     try:
-        response = requests.get(f"http://{COMFY_HOST}/prompt/status/{prompt_id}", timeout=2)
-        
-        # 检查系统状态，看是否在加载模型
+        # 1. 检查系统状态 (是否在加载模型?)
         try:
-            system_stats = requests.get(f"http://{COMFY_HOST}/system_stats", timeout=2)
+            system_stats_url = f"http://{COMFY_HOST}/system_stats"
+            system_stats = requests.get(system_stats_url, timeout=2)
             if system_stats.status_code == 200:
                 stats = system_stats.json()
                 if stats.get("system", {}).get("loading", False):
                     return {
                         "status": "processing",
                         "progress": 10,
-                        "detail": "Loading models...",
+                        "detail": "Loading required models...",
                         "type": "progress"
                     }
-        except Exception:
-            pass
+        except requests.exceptions.RequestException as e:
+            print(f"runpod-worker-comfy - Warning: Failed to get system stats: {e}")
+        except Exception as e:
+            print(f"runpod-worker-comfy - Warning: Error parsing system stats: {e}")
+
+        # 2. 检查 Prompt 状态
+        prompt_status_url = f"http://{COMFY_HOST}/prompt/status/{prompt_id}"
+        response = requests.get(prompt_status_url, timeout=2)
 
         if response.status_code == 200:
             data = response.json()
@@ -495,16 +500,21 @@ def get_progress(prompt_id):
             executing_node = status_info.get("executing")
 
             if executing_node:
+                # 任务正在执行某个节点
                 node_id = executing_node.get("node", "unknown")
-                progress = executing_node.get("progress", 0)
+                # 假设节点进度是从 0 到 1
+                node_progress = executing_node.get("progress", 0)
+                # 将节点进度映射到整体进度的一个范围 (例如 20% 到 95%)
+                overall_progress = 20 + int(node_progress * 75)
                 return {
                     "status": "processing",
-                    "progress": int(progress * 100),
+                    "progress": max(20, min(95, overall_progress)), # 保证在 20-95 之间
                     "node_id": node_id,
                     "detail": f"Processing node {node_id}",
                     "type": "progress"
                 }
             elif status_info.get("completed") is True:
+                # 任务已完成
                 return {
                     "status": "completed",
                     "progress": 100,
@@ -512,26 +522,69 @@ def get_progress(prompt_id):
                     "type": "progress"
                 }
             else:
+                # 状态码 200 但未执行也未完成，说明在队列中等待开始
                 return {
-                    "status": "processing",
-                    "progress": 20,
-                    "detail": "Task queued",
+                    "status": "processing", # 保持 processing 状态
+                    "progress": 18, # 比模型加载高，比节点执行低
+                    "detail": "Task queued, waiting to start execution",
                     "type": "progress"
                 }
-        else:
-            # 任务可能还在初始化或队列中
+        elif response.status_code == 404:
+            # 找不到 Prompt 状态，可能是刚提交，检查队列
+            try:
+                queue_url = f"http://{COMFY_HOST}/queue"
+                queue_response = requests.get(queue_url, timeout=2)
+                if queue_response.status_code == 200:
+                    queue_data = queue_response.json()
+                    # 检查正在运行和等待的队列
+                    queue_running_ids = [item[1] for item in queue_data.get("queue_running", [])]
+                    queue_pending_ids = [item[1] for item in queue_data.get("queue_pending", [])]
+
+                    if prompt_id in queue_running_ids or prompt_id in queue_pending_ids:
+                        # 任务确实在队列里，只是状态接口还没反应过来
+                        return {
+                            "status": "processing",
+                            "progress": 15, # 比模型加载高一点
+                            "detail": "Task submitted and waiting in queue",
+                            "type": "progress"
+                        }
+            except requests.exceptions.RequestException as e:
+                 print(f"runpod-worker-comfy - Warning: Failed to get queue status: {e}")
+            except Exception as e:
+                 print(f"runpod-worker-comfy - Warning: Error parsing queue status: {e}")
+
+            # 如果状态 404，也不在队列里，那确实可能还在非常早期的初始化
             return {
                 "status": "processing",
                 "progress": 5,
-                "detail": "Task initializing",
+                "detail": "Task initializing or status check delayed",
+                "type": "progress"
+            }
+        else:
+            # 其他 HTTP 错误
+            return {
+                "status": "processing", # 仍然认为在处理，避免卡住
+                "progress": 5,
+                "detail": f"Status check failed (HTTP {response.status_code})",
                 "type": "progress"
             }
 
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
+        # 网络连接错误
+        print(f"runpod-worker-comfy - Warning: Network error checking progress: {e}")
         return {
-            "status": "processing",
+            "status": "processing", # 网络问题也暂时认为是 processing
             "progress": 5,
-            "detail": "System initializing",
+            "detail": "Network error checking status",
+            "type": "progress"
+        }
+    except Exception as e:
+        # 其他未知错误
+        print(f"runpod-worker-comfy - Error checking progress: {e}")
+        return {
+            "status": "processing", # 未知错误也暂时认为是 processing
+            "progress": 5,
+            "detail": "Error checking status",
             "type": "progress"
         }
 
