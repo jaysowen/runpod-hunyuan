@@ -1,7 +1,5 @@
 import runpod
 import json
-import urllib.request
-import urllib.parse
 import time
 import os
 import requests
@@ -279,33 +277,21 @@ def queue_workflow(workflow):
                 if not os.path.exists(image_path):
                     print(f"Warning: Image file not found: {image_path}")
         
-        # 继续原有的提交逻辑
+        # 使用 requests 提交工作流
         prompt_data = {"prompt": workflow}
-        data = json.dumps(prompt_data).encode('utf-8')
-        req = urllib.request.Request(f"http://{COMFY_HOST}/prompt", data=data, headers={'Content-Type': 'application/json'})
-        with urllib.request.urlopen(req, timeout=10) as response:
-            if response.getcode() == 200:
-                return json.loads(response.read())
-            else:
-                raise Exception(f"Failed to queue prompt, status code: {response.getcode()}, message: {response.read().decode()}")
+        response = requests.post(
+            f"http://{COMFY_HOST}/prompt",
+            json=prompt_data,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f"Failed to queue prompt, status code: {response.status_code}, message: {response.text}")
     except Exception as e:
         print(f"runpod-worker-comfy - Error queuing workflow: {e}")
         raise # 将异常重新抛出，以便上层处理
-
-def get_history(prompt_id):
-    """获取指定 prompt_id 的处理历史"""
-    try:
-        with urllib.request.urlopen(f"http://{COMFY_HOST}/history/{prompt_id}", timeout=5) as response:
-             if response.getcode() == 200:
-                 return json.loads(response.read())
-             else:
-                 # 可能历史还没准备好，返回空字典而不是抛异常
-                 print(f"runpod-worker-comfy - Warning: Failed to get history for {prompt_id}, status: {response.getcode()}")
-                 return {}
-    except Exception as e:
-        # 网络错误等也返回空字典
-        print(f"runpod-worker-comfy - Error getting history for {prompt_id}: {e}")
-        return {}
 
 # --- 输出处理 ---
 def base64_encode(file_path):
@@ -318,11 +304,24 @@ def base64_encode(file_path):
         print(f"runpod-worker-comfy - Error encoding file {file_path} to base64: {e}")
         return None
 
+def handle_output_error(file_path, error_msg, output_type):
+    """通用的输出处理错误处理函数"""
+    if file_path and os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(f"runpod-worker-comfy - Error removing file {file_path}: {e}")
+    return {
+        "status": "error",
+        "message": error_msg,
+        "type": output_type
+    }
+
 def process_output_images(outputs, job_id):
     """处理所有图片输出"""
     use_b2 = bool(os.environ.get("BUCKET_ACCESS_KEY_ID", False))
     if not use_b2:
-        return {"status": "error", "message": "B2 storage is not configured", "type": "image"}
+        return handle_output_error(None, "B2 storage is not configured", "image")
 
     for node_id, node_output in outputs.items():
         if "images" in node_output:
@@ -353,16 +352,10 @@ def process_output_images(outputs, job_id):
                             }
 
                     except Exception as e:
-                        if os.path.exists(local_image_path):
-                            os.remove(local_image_path)
-                        continue
+                        return handle_output_error(local_image_path, f"Error processing image: {str(e)}", "image")
 
     cleanup_empty_dirs(IMAGE_OUTPUT_PATH)
-    return {
-        "status": "error",
-        "message": "Failed to process image output",
-        "type": "image"
-    }
+    return handle_output_error(None, "Failed to process image output", "image")
 
 def generate_video_thumbnail(video_path, time_offset="00:00:01.000"):
     """从视频生成缩略图"""
@@ -408,7 +401,7 @@ def process_video_output(outputs, job_id):
     """处理所有视频输出"""
     use_b2 = bool(os.environ.get("BUCKET_ACCESS_KEY_ID", False))
     if not use_b2:
-        return {"status": "error", "message": "B2 storage is not configured", "type": "video"}
+        return handle_output_error(None, "B2 storage is not configured", "video")
 
     for node_id, node_output in outputs.items():
         if "videos" in node_output:
@@ -458,127 +451,10 @@ def process_video_output(outputs, job_id):
                     }
 
             except Exception as e:
-                if os.path.exists(local_video_path):
-                    os.remove(local_video_path)
-                continue
+                return handle_output_error(local_video_path, f"Error processing video: {str(e)}", "video")
 
     cleanup_empty_dirs(VIDEO_OUTPUT_PATH)
-    return {
-        "status": "error",
-        "message": "Failed to process video output",
-        "type": "video"
-    }
-
-def get_progress(prompt_id):
-    """获取工作流处理的实时进度"""
-    try:
-        # 1. 首先检查队列状态
-        try:
-            queue_url = f"http://{COMFY_HOST}/queue"
-            queue_response = requests.get(queue_url, timeout=5)
-            if queue_response.status_code == 200:
-                queue_data = queue_response.json()
-                
-                # 检查队列状态
-                queue_running = queue_data.get("queue_running", [])
-                queue_pending = queue_data.get("queue_pending", [])
-                
-                # 如果任务在运行队列中
-                if any(prompt_id in item for item in queue_running):
-                    # 2. 获取执行状态
-                    status_url = f"http://{COMFY_HOST}/prompt/status/{prompt_id}"
-                    status_response = requests.get(status_url, timeout=5)
-                    
-                    if status_response.status_code == 200:
-                        status_data = status_response.json()
-                        executing = status_data.get("status", {}).get("executing", {})
-                        if executing:
-                            node_id = executing.get("node", "unknown")
-                            node_progress = executing.get("progress", 0)
-                            overall_progress = 20 + int(node_progress * 75)
-                            return {
-                                "status": "processing",
-                                "progress": overall_progress,
-                                "node_id": node_id,
-                                "detail": f"Processing node {node_id} ({overall_progress}%)",
-                                "type": "progress"
-                            }
-                    
-                # 如果任务在等待队列中
-                elif any(prompt_id in item for item in queue_pending):
-                    position = next(i for i, item in enumerate(queue_pending) if prompt_id in item)
-                    return {
-                        "status": "processing",
-                        "progress": 15,
-                        "detail": f"Waiting in queue (position: {position + 1})",
-                        "type": "progress"
-                    }
-                
-                # 检查是否已完成
-                history_url = f"http://{COMFY_HOST}/history/{prompt_id}"
-                history_response = requests.get(history_url, timeout=5)
-                if history_response.status_code == 200:
-                    history_data = history_response.json()
-                    if prompt_id in history_data:
-                        return {
-                            "status": "completed",
-                            "progress": 100,
-                            "detail": "Task completed",
-                            "type": "progress"
-                        }
-                
-        except requests.exceptions.RequestException as e:
-            print(f"runpod-worker-comfy - Network error checking queue: {e}")
-        
-        # 3. 检查系统状态
-        try:
-            system_stats_url = f"http://{COMFY_HOST}/system_stats"
-            system_stats = requests.get(system_stats_url, timeout=5)
-            if system_stats.status_code == 200:
-                stats = system_stats.json()
-                
-                if stats.get("system", {}).get("loading", False):
-                    return {
-                        "status": "processing",
-                        "progress": 10,
-                        "detail": "Loading required models...",
-                        "type": "progress"
-                    }
-        except Exception as e:
-            print(f"runpod-worker-comfy - Error checking system stats: {e}")
-
-        # 4. 检查工作流状态
-        try:
-            workflow_url = f"http://{COMFY_HOST}/prompt/{prompt_id}"
-            workflow_response = requests.get(workflow_url, timeout=5)
-            if workflow_response.status_code == 200:
-                workflow_data = workflow_response.json()
-                if workflow_data.get("status", {}).get("executing"):
-                    return {
-                        "status": "processing",
-                        "progress": 15,
-                        "detail": "Workflow is executing",
-                        "type": "progress"
-                    }
-        except Exception as e:
-            print(f"runpod-worker-comfy - Error checking workflow status: {e}")
-
-        # 如果以上都没有返回，返回初始化状态
-        return {
-            "status": "processing",
-            "progress": 5,
-            "detail": "Task initializing",
-            "type": "progress"
-        }
-
-    except Exception as e:
-        print(f"runpod-worker-comfy - Unexpected error in get_progress: {str(e)}")
-        return {
-            "status": "processing",
-            "progress": 5,
-            "detail": f"Error checking status: {str(e)}",
-            "type": "progress"
-        }
+    return handle_output_error(None, "Failed to process video output", "video")
 
 # --- 主处理函数 ---
 def handler(job):
@@ -589,7 +465,7 @@ def handler(job):
     3. 检查 ComfyUI 服务可用性
     4. 上传输入图片（如果有）
     5. 提交工作流到 ComfyUI
-    6. 等待处理完成并监控进度
+    6. 等待处理完成
     7. 处理输出（图片或视频/GIF）
     8. 返回结果
     """
@@ -635,108 +511,39 @@ def handler(job):
             print(f"runpod-worker-comfy - Error queuing workflow: {str(e)}")
             return {"error": f"Error queuing workflow: {str(e)}"}
 
-        # 初始化 outputs 变量
-        outputs = {}
-        workflow_completed = False
-        last_progress = 0
-        last_progress_time = time.time()
-        progress_stuck_count = 0
-        max_stuck_count = 10  # 最大卡住次数
-        error_count = 0
-        max_error_count = 5  # 最大错误次数
-
-        # 等待处理完成并监控进度
-        print(f"runpod-worker-comfy - 开始处理任务 (Prompt ID: {prompt_id})...")
+        # 6. 等待处理完成
+        print(f"runpod-worker-comfy - Waiting for workflow completion...")
         retries = 0
         start_time = time.time()
+        outputs = {}
 
         while retries < COMFY_POLLING_MAX_RETRIES:
             try:
-                current_time = time.time()
-                elapsed_time = current_time - start_time
+                # 检查是否超时
+                if time.time() - start_time > 600:  # 10 分钟超时
+                    print(f"runpod-worker-comfy - Job {job_id} timed out after 10 minutes")
+                    return {"error": "Job processing timed out after 10 minutes"}
 
-                if elapsed_time > 600:  # 10 分钟超时
-                    print(f"runpod-worker-comfy - 任务 {job_id} 超时 (已运行 {elapsed_time:.2f} 秒)")
-                    return {"error": "任务处理超时 (10分钟)"}
-
-                # 获取进度
-                progress_info = get_progress(prompt_id)
-                
-                if not progress_info:
-                    error_count += 1
-                    if error_count >= max_error_count:
-                        print(f"runpod-worker-comfy - 任务 {job_id} 获取进度失败次数过多")
-                        return {"error": "无法获取任务进度，请检查 ComfyUI 服务状态"}
-                    time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-                    retries += 1
-                    continue
-
-                error_count = 0  # 重置错误计数
-                current_progress = progress_info.get('progress', 0)
-                current_status = progress_info.get('status', '')
-                current_detail = progress_info.get('detail', '')
-                
-                # 检查是否有错误状态
-                if current_status == 'error':
-                    print(f"runpod-worker-comfy - 任务 {job_id} 发生错误: {current_detail}")
-                    return {"error": f"任务执行错误: {current_detail}"}
-                
-                # 检查进度是否卡住
-                if current_progress == last_progress:
-                    if current_time - last_progress_time > 30:  # 30秒没有变化
-                        progress_stuck_count += 1
-                        if progress_stuck_count >= max_stuck_count:
-                            print(f"runpod-worker-comfy - 任务 {job_id} 进度卡住 ({current_progress}%)")
-                            return {"error": "任务进度卡住，请检查工作流配置"}
-                    else:
-                        progress_stuck_count = 0
-                else:
-                    last_progress = current_progress
-                    last_progress_time = current_time
-                    progress_stuck_count = 0
-
-                # 只在进度变化时更新
-                if current_progress != last_progress:
-                    print(f"runpod-worker-comfy - 任务 {job_id} 进度: {current_progress}% - {current_status} - {current_detail}")
-                    try:
-                        runpod.serverless.progress_update(job, progress_info)
-                    except Exception as progress_err:
-                        print(f"runpod-worker-comfy - 警告: 进度更新失败: {progress_err}")
-
-                # 检查是否完成
-                if current_status == 'completed':
-                    try:
-                        response = requests.get(f"http://{COMFY_HOST}/history/{prompt_id}", timeout=5)
-                        if response.status_code == 200:
-                            history_data = response.json()
-                            if prompt_id in history_data:
-                                outputs = history_data[prompt_id].get("outputs", {})
-                                if outputs:
-                                    print(f"runpod-worker-comfy - 任务 {job_id} 处理完成")
-                                    workflow_completed = True
-                                    break
-                                else:
-                                    print(f"runpod-worker-comfy - 任务 {job_id} 完成但没有输出")
-                                    return {"error": "任务完成但没有生成输出"}
-                    except Exception as e:
-                        print(f"runpod-worker-comfy - 获取输出失败: {e}")
-                        error_count += 1
-                        if error_count >= max_error_count:
-                            return {"error": "无法获取任务输出，请检查 ComfyUI 服务状态"}
+                # 检查工作流是否完成
+                response = requests.get(f"http://{COMFY_HOST}/history/{prompt_id}", timeout=5)
+                if response.status_code == 200:
+                    history_data = response.json()
+                    if prompt_id in history_data:
+                        outputs = history_data[prompt_id].get("outputs", {})
+                        if outputs:
+                            print(f"runpod-worker-comfy - Workflow completed successfully")
+                            break
 
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                 retries += 1
 
             except Exception as e:
-                print(f"runpod-worker-comfy - 进度监控错误: {str(e)}")
-                error_count += 1
-                if error_count >= max_error_count:
-                    return {"error": "进度监控发生错误，请检查 ComfyUI 服务状态"}
+                print(f"runpod-worker-comfy - Error checking workflow status: {str(e)}")
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                 retries += 1
 
         # 检查工作流是否成功完成
-        if not workflow_completed:
+        if not outputs:
             print(f"runpod-worker-comfy - Workflow did not complete successfully for job {job_id}")
             return {
                 "error": "Workflow did not complete successfully",
@@ -744,7 +551,7 @@ def handler(job):
                 "detail": "No outputs were generated after maximum retries"
             }
 
-        # 处理输出
+        # 7. 处理输出
         print(f"runpod-worker-comfy - Processing outputs for job {job_id}...")
         result = {}
         
