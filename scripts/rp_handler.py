@@ -475,10 +475,9 @@ def get_progress(prompt_id):
         # 1. 首先检查队列状态
         try:
             queue_url = f"http://{COMFY_HOST}/queue"
-            queue_response = requests.get(queue_url, timeout=5)  # 增加超时时间
+            queue_response = requests.get(queue_url, timeout=5)
             if queue_response.status_code == 200:
                 queue_data = queue_response.json()
-                print(f"runpod-worker-comfy - Queue status: {queue_data}")  # 添加日志
                 
                 # 检查队列状态
                 queue_running = queue_data.get("queue_running", [])
@@ -486,16 +485,12 @@ def get_progress(prompt_id):
                 
                 # 如果任务在运行队列中
                 if any(prompt_id in item for item in queue_running):
-                    print(f"runpod-worker-comfy - Prompt {prompt_id} is running")
-                    
                     # 2. 获取执行状态
                     status_url = f"http://{COMFY_HOST}/prompt/status/{prompt_id}"
                     status_response = requests.get(status_url, timeout=5)
                     
                     if status_response.status_code == 200:
                         status_data = status_response.json()
-                        print(f"runpod-worker-comfy - Status data: {status_data}")  # 添加日志
-                        
                         executing = status_data.get("status", {}).get("executing", {})
                         if executing:
                             node_id = executing.get("node", "unknown")
@@ -541,7 +536,6 @@ def get_progress(prompt_id):
             system_stats = requests.get(system_stats_url, timeout=5)
             if system_stats.status_code == 200:
                 stats = system_stats.json()
-                print(f"runpod-worker-comfy - System stats: {stats}")  # 添加日志
                 
                 if stats.get("system", {}).get("loading", False):
                     return {
@@ -552,6 +546,22 @@ def get_progress(prompt_id):
                     }
         except Exception as e:
             print(f"runpod-worker-comfy - Error checking system stats: {e}")
+
+        # 4. 检查工作流状态
+        try:
+            workflow_url = f"http://{COMFY_HOST}/prompt/{prompt_id}"
+            workflow_response = requests.get(workflow_url, timeout=5)
+            if workflow_response.status_code == 200:
+                workflow_data = workflow_response.json()
+                if workflow_data.get("status", {}).get("executing"):
+                    return {
+                        "status": "processing",
+                        "progress": 15,
+                        "detail": "Workflow is executing",
+                        "type": "progress"
+                    }
+        except Exception as e:
+            print(f"runpod-worker-comfy - Error checking workflow status: {e}")
 
         # 如果以上都没有返回，返回初始化状态
         return {
@@ -628,13 +638,15 @@ def handler(job):
         # 初始化 outputs 变量
         outputs = {}
         workflow_completed = False
+        last_progress = 0
+        last_progress_time = time.time()
+        progress_stuck_count = 0
+        max_stuck_count = 10  # 最大卡住次数
 
         # 等待处理完成并监控进度
-        print(f"runpod-worker-comfy - Waiting for workflow completion (Prompt ID: {prompt_id})...")
+        print(f"runpod-worker-comfy - 开始处理任务 (Prompt ID: {prompt_id})...")
         retries = 0
-        last_progress_sent = None
         start_time = time.time()
-        consecutive_errors = 0
 
         while retries < COMFY_POLLING_MAX_RETRIES:
             try:
@@ -642,34 +654,44 @@ def handler(job):
                 elapsed_time = current_time - start_time
 
                 if elapsed_time > 600:  # 10 分钟超时
-                    print(f"runpod-worker-comfy - Job {job_id} timed out after {elapsed_time:.2f} seconds.")
-                    return {"error": "Job processing timed out after 10 minutes."}
+                    print(f"runpod-worker-comfy - 任务 {job_id} 超时 (已运行 {elapsed_time:.2f} 秒)")
+                    return {"error": "任务处理超时 (10分钟)"}
 
                 # 获取进度
                 progress_info = get_progress(prompt_id)
                 
-                # 重置连续错误计数
-                if progress_info.get("detail") != "Error checking status":
-                    consecutive_errors = 0
+                if not progress_info:
+                    time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
+                    retries += 1
+                    continue
+
+                current_progress = progress_info.get('progress', 0)
+                current_status = progress_info.get('status', '')
+                
+                # 检查进度是否卡住
+                if current_progress == last_progress:
+                    if current_time - last_progress_time > 30:  # 30秒没有变化
+                        progress_stuck_count += 1
+                        if progress_stuck_count >= max_stuck_count:
+                            print(f"runpod-worker-comfy - 任务 {job_id} 进度卡住 ({current_progress}%)")
+                            return {"error": "任务进度卡住，请检查工作流配置"}
+                    else:
+                        progress_stuck_count = 0
                 else:
-                    consecutive_errors += 1
-                    if consecutive_errors >= 5:
-                        print(f"runpod-worker-comfy - Too many consecutive errors checking progress")
-                        return {"error": "Failed to check progress after multiple attempts"}
+                    last_progress = current_progress
+                    last_progress_time = current_time
+                    progress_stuck_count = 0
 
-                current_progress_state = (progress_info['status'], progress_info['progress'])
-
-                # 发送进度更新
-                if progress_info and current_progress_state != last_progress_sent:
-                    print(f"runpod-worker-comfy - Job {job_id} Progress: {progress_info['progress']}% - {progress_info['status']} - {progress_info.get('detail', 'No detail')}")
+                # 只在进度变化时更新
+                if current_progress != last_progress:
+                    print(f"runpod-worker-comfy - 任务 {job_id} 进度: {current_progress}% - {current_status}")
                     try:
                         runpod.serverless.progress_update(job, progress_info)
-                        last_progress_sent = current_progress_state
                     except Exception as progress_err:
-                        print(f"runpod-worker-comfy - Warning: Failed to send progress update: {progress_err}")
+                        print(f"runpod-worker-comfy - 警告: 进度更新失败: {progress_err}")
 
                 # 检查是否完成
-                if progress_info['status'] == 'completed':
+                if current_status == 'completed':
                     try:
                         response = requests.get(f"http://{COMFY_HOST}/history/{prompt_id}", timeout=5)
                         if response.status_code == 200:
@@ -677,26 +699,19 @@ def handler(job):
                             if prompt_id in history_data:
                                 outputs = history_data[prompt_id].get("outputs", {})
                                 if outputs:
-                                    print(f"runpod-worker-comfy - Workflow completed successfully for Prompt ID: {prompt_id}")
+                                    print(f"runpod-worker-comfy - 任务 {job_id} 处理完成")
                                     workflow_completed = True
                                     break
-                                else:
-                                    print(f"runpod-worker-comfy - Warning: No outputs found in history data")
                     except Exception as e:
-                        print(f"runpod-worker-comfy - Error getting outputs: {e}")
-                        if consecutive_errors >= 5:
-                            return {"error": f"Failed to get outputs after multiple attempts: {str(e)}"}
-                        consecutive_errors += 1
+                        print(f"runpod-worker-comfy - 获取输出失败: {e}")
 
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                 retries += 1
 
             except Exception as e:
-                print(f"runpod-worker-comfy - Error in progress monitoring loop: {str(e)}")
-                consecutive_errors += 1
-                if consecutive_errors >= 5:
-                    return {"error": f"Too many errors in progress monitoring: {str(e)}"}
+                print(f"runpod-worker-comfy - 进度监控错误: {str(e)}")
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
+                retries += 1
 
         # 检查工作流是否成功完成
         if not workflow_completed:
