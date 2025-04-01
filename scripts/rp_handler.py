@@ -516,6 +516,7 @@ def handler(job):
         retries = 0
         start_time = time.time()
         outputs = {}
+        last_error = None
 
         while retries < COMFY_POLLING_MAX_RETRIES:
             try:
@@ -529,10 +530,36 @@ def handler(job):
                 if response.status_code == 200:
                     history_data = response.json()
                     if prompt_id in history_data:
-                        outputs = history_data[prompt_id].get("outputs", {})
+                        workflow_data = history_data[prompt_id]
+                        outputs = workflow_data.get("outputs", {})
+                        
+                        # 检查是否有错误信息
+                        if "error" in workflow_data:
+                            last_error = workflow_data["error"]
+                            print(f"runpod-worker-comfy - Workflow error: {last_error}")
+                        
+                        # 检查节点状态
+                        for node_id, node_data in workflow_data.get("status", {}).items():
+                            if "error" in node_data:
+                                print(f"runpod-worker-comfy - Node {node_id} error: {node_data['error']}")
+                                last_error = node_data['error']
+                        
                         if outputs:
                             print(f"runpod-worker-comfy - Workflow completed successfully")
                             break
+                        elif last_error:
+                            print(f"runpod-worker-comfy - Workflow failed with error: {last_error}")
+                            return {
+                                "error": f"Workflow failed: {last_error}",
+                                "status": "error",
+                                "detail": "Workflow execution failed"
+                            }
+
+                elif response.status_code == 404:
+                    print(f"runpod-worker-comfy - Prompt ID {prompt_id} not found in history")
+                else:
+                    print(f"runpod-worker-comfy - Unexpected response status: {response.status_code}")
+                    print(f"Response content: {response.text}")
 
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                 retries += 1
@@ -544,9 +571,13 @@ def handler(job):
 
         # 检查工作流是否成功完成
         if not outputs:
-            print(f"runpod-worker-comfy - Workflow did not complete successfully for job {job_id}")
+            error_message = "Workflow did not complete successfully"
+            if last_error:
+                error_message = f"Workflow failed: {last_error}"
+            
+            print(f"runpod-worker-comfy - {error_message} for job {job_id}")
             return {
-                "error": "Workflow did not complete successfully",
+                "error": error_message,
                 "status": "error",
                 "detail": "No outputs were generated after maximum retries"
             }
