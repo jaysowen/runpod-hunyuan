@@ -472,9 +472,23 @@ def process_video_output(outputs, job_id):
 def get_progress(prompt_id):
     """获取工作流处理的实时进度"""
     try:
-        print(f"runpod-worker-comfy - Checking progress for prompt_id: {prompt_id}")
         response = requests.get(f"http://{COMFY_HOST}/prompt/status/{prompt_id}", timeout=2)
         
+        # 检查系统状态，看是否在加载模型
+        try:
+            system_stats = requests.get(f"http://{COMFY_HOST}/system_stats", timeout=2)
+            if system_stats.status_code == 200:
+                stats = system_stats.json()
+                if stats.get("system", {}).get("loading", False):
+                    return {
+                        "status": "processing",
+                        "progress": 10,
+                        "detail": "Loading models...",
+                        "type": "progress"
+                    }
+        except Exception:
+            pass
+
         if response.status_code == 200:
             data = response.json()
             status_info = data.get("status", {})
@@ -491,22 +505,6 @@ def get_progress(prompt_id):
                     "type": "progress"
                 }
             elif status_info.get("completed") is True:
-                history = get_history(prompt_id)
-                if prompt_id in history and "outputs" in history[prompt_id]:
-                    outputs = history[prompt_id]["outputs"]
-                    # 检查输出类型
-                    is_video = any(key in node_output for node_output in outputs.values() 
-                                 for key in ["videos", "gifs"])
-                    is_image = any("images" in node_output for node_output in outputs.values())
-                    
-                    output_type = "video" if is_video else "image" if is_image else "unknown"
-                    return {
-                        "status": "completed",
-                        "progress": 100,
-                        "output_type": output_type,
-                        "detail": "Task completed",
-                        "type": "progress"
-                    }
                 return {
                     "status": "completed",
                     "progress": 100,
@@ -515,52 +513,25 @@ def get_progress(prompt_id):
                 }
             else:
                 return {
-                    "status": "pending",
-                    "progress": 0,
-                    "detail": "Waiting in queue",
+                    "status": "processing",
+                    "progress": 20,
+                    "detail": "Task queued",
                     "type": "progress"
                 }
-        elif response.status_code == 404:
-            print(f"runpod-worker-comfy - Prompt {prompt_id} not found in active queue, checking history...")
-            history = get_history(prompt_id)
-            if prompt_id in history:
-                print(f"runpod-worker-comfy - Found prompt {prompt_id} in history")
-                if "outputs" in history[prompt_id]:
-                    return {
-                        "status": "completed",
-                        "progress": 100,
-                        "detail": "Task completed (found in history)",
-                        "type": "progress"
-                    }
-                else:
-                    return {
-                        "status": "processing",
-                        "progress": 50,
-                        "detail": "Task found in history but outputs not ready",
-                        "type": "progress"
-                    }
-            print(f"runpod-worker-comfy - Prompt {prompt_id} not found in history either")
-            return {
-                "status": "pending",
-                "progress": 0,
-                "detail": "Task not found in queue or history",
-                "type": "progress"
-            }
         else:
-            print(f"runpod-worker-comfy - Unexpected HTTP status code: {response.status_code}")
+            # 任务可能还在初始化或队列中
             return {
-                "status": "error",
-                "progress": 0,
-                "detail": f"HTTP error {response.status_code}",
+                "status": "processing",
+                "progress": 5,
+                "detail": "Task initializing",
                 "type": "progress"
             }
 
     except Exception as e:
-        print(f"runpod-worker-comfy - Error in get_progress: {str(e)}")
         return {
-            "status": "error",
-            "progress": 0,
-            "detail": str(e),
+            "status": "processing",
+            "progress": 5,
+            "detail": "System initializing",
             "type": "progress"
         }
 
@@ -624,7 +595,6 @@ def handler(job):
         retries = 0
         last_progress_sent = None
         start_time = time.time()
-        consecutive_404_count = 0  # 添加连续404计数器
 
         while retries < COMFY_POLLING_MAX_RETRIES:
             current_time = time.time()
@@ -638,21 +608,8 @@ def handler(job):
             progress_info = get_progress(prompt_id)
             current_progress_state = (progress_info['status'], progress_info['progress'])
 
-            # 处理连续404的情况
-            if progress_info['status'] == 'pending' and progress_info['detail'] == 'Prompt not found in active queue':
-                consecutive_404_count += 1
-                if consecutive_404_count >= 5:  # 如果连续5次404
-                    # 检查历史记录
-                    history = get_history(prompt_id)
-                    if prompt_id in history and "outputs" in history[prompt_id]:
-                        print(f"runpod-worker-comfy - Workflow completed (found in history after 404s)")
-                        outputs = history[prompt_id]["outputs"]
-                        break
-            else:
-                consecutive_404_count = 0  # 重置计数器
-
             # 发送进度更新
-            if progress_info and progress_info.get('status') != 'error' and current_progress_state != last_progress_sent:
+            if progress_info and current_progress_state != last_progress_sent:
                 print(f"runpod-worker-comfy - Job {job_id} Progress: {progress_info['progress']}% - {progress_info['status']} - {progress_info.get('detail', 'No detail')}")
                 try:
                     runpod.serverless.progress_update(job, progress_info)
@@ -662,10 +619,18 @@ def handler(job):
 
             # 检查是否完成
             if progress_info['status'] == 'completed':
-                history = get_history(prompt_id)
-                if prompt_id in history and "outputs" in history[prompt_id]:
+                outputs = {}
+                try:
+                    response = requests.get(f"http://{COMFY_HOST}/history/{prompt_id}", timeout=2)
+                    if response.status_code == 200:
+                        history_data = response.json()
+                        if prompt_id in history_data:
+                            outputs = history_data[prompt_id].get("outputs", {})
+                except Exception as e:
+                    print(f"runpod-worker-comfy - Error getting outputs: {e}")
+                
+                if outputs:
                     print(f"runpod-worker-comfy - Workflow completed for Prompt ID: {prompt_id}")
-                    outputs = history[prompt_id]["outputs"]
                     break
 
             # 等待下一次检查
