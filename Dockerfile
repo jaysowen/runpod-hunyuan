@@ -150,9 +150,6 @@ RUN for dir in */; do \
     fi \
     done
 
-# Copy workflow files
-COPY comfy-workflows/*.json /ComfyUI/user/default/workflows/
-
 # Copy all scripts 
 COPY /test_input.json /
 COPY scripts/rp_handler.py /
