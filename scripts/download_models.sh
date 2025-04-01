@@ -50,16 +50,10 @@ download_file() {
     local filename=$(basename "$dest")
     local model_type=$(basename $(dirname "$dest"))
     
-    # 检查文件是否存在且大小不为0
-    if [ -f "$dest" ] && [ -s "$dest" ]; then
-        local file_size=$(stat -f%z "$dest" 2>/dev/null || stat -c%s "$dest")
-        if [ "$file_size" -gt 0 ]; then
-            echo "✅ $filename already exists in $model_type (size: $(format_size $file_size))"
-            return 0
-        else
-            echo "⚠️ $filename exists but is empty, will redownload"
-            rm -f "$dest"
-        fi
+    # 如果文件存在，直接跳过下载
+    if [ -f "$dest" ]; then
+        echo "✅ $filename already exists in $model_type, skipping download"
+        return 0
     fi
 
     echo "📥 Starting download: $filename"
