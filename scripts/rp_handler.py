@@ -642,6 +642,8 @@ def handler(job):
         last_progress_time = time.time()
         progress_stuck_count = 0
         max_stuck_count = 10  # 最大卡住次数
+        error_count = 0
+        max_error_count = 5  # 最大错误次数
 
         # 等待处理完成并监控进度
         print(f"runpod-worker-comfy - 开始处理任务 (Prompt ID: {prompt_id})...")
@@ -661,12 +663,23 @@ def handler(job):
                 progress_info = get_progress(prompt_id)
                 
                 if not progress_info:
+                    error_count += 1
+                    if error_count >= max_error_count:
+                        print(f"runpod-worker-comfy - 任务 {job_id} 获取进度失败次数过多")
+                        return {"error": "无法获取任务进度，请检查 ComfyUI 服务状态"}
                     time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                     retries += 1
                     continue
 
+                error_count = 0  # 重置错误计数
                 current_progress = progress_info.get('progress', 0)
                 current_status = progress_info.get('status', '')
+                current_detail = progress_info.get('detail', '')
+                
+                # 检查是否有错误状态
+                if current_status == 'error':
+                    print(f"runpod-worker-comfy - 任务 {job_id} 发生错误: {current_detail}")
+                    return {"error": f"任务执行错误: {current_detail}"}
                 
                 # 检查进度是否卡住
                 if current_progress == last_progress:
@@ -684,7 +697,7 @@ def handler(job):
 
                 # 只在进度变化时更新
                 if current_progress != last_progress:
-                    print(f"runpod-worker-comfy - 任务 {job_id} 进度: {current_progress}% - {current_status}")
+                    print(f"runpod-worker-comfy - 任务 {job_id} 进度: {current_progress}% - {current_status} - {current_detail}")
                     try:
                         runpod.serverless.progress_update(job, progress_info)
                     except Exception as progress_err:
@@ -702,14 +715,23 @@ def handler(job):
                                     print(f"runpod-worker-comfy - 任务 {job_id} 处理完成")
                                     workflow_completed = True
                                     break
+                                else:
+                                    print(f"runpod-worker-comfy - 任务 {job_id} 完成但没有输出")
+                                    return {"error": "任务完成但没有生成输出"}
                     except Exception as e:
                         print(f"runpod-worker-comfy - 获取输出失败: {e}")
+                        error_count += 1
+                        if error_count >= max_error_count:
+                            return {"error": "无法获取任务输出，请检查 ComfyUI 服务状态"}
 
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                 retries += 1
 
             except Exception as e:
                 print(f"runpod-worker-comfy - 进度监控错误: {str(e)}")
+                error_count += 1
+                if error_count >= max_error_count:
+                    return {"error": "进度监控发生错误，请检查 ComfyUI 服务状态"}
                 time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
                 retries += 1
 
