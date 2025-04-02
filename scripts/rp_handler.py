@@ -31,6 +31,8 @@ IMAGE_FILTER_BLUR_RADIUS = int(os.environ.get("IMAGE_FILTER_BLUR_RADIUS", 8))
 VIDEO_OUTPUT_PATH = "/workspace/ComfyUI/output"  # 修改默认路径
 IMAGE_OUTPUT_PATH = os.environ.get("IMAGE_OUTPUT_PATH", "/comfyui/output") # 明确图片输出路径
 SUPPORTED_VIDEO_FORMATS = ['.mp4', '.webm', '.avi', '.gif'] # 添加 gif 支持
+# Job timeout in seconds
+JOB_TIMEOUT_SECONDS = 900 # 15 minutes
 
 # --- B2 API 全局实例 ---
 b2_api_instance = None
@@ -554,19 +556,17 @@ def process_video_output(outputs, job_id):
 def wait_for_workflow_completion(prompt_id, job_id):
     """轮询 ComfyUI 直到工作流完成、失败或超时。"""
     print(f"runpod-worker-comfy - Waiting for workflow completion (Prompt ID: {prompt_id})...")
-    retries = 0
     start_time = time.time()
     last_error = None
     outputs = {}
-    timeout_seconds = 600 # 10 分钟超时
 
-    while retries < COMFY_POLLING_MAX_RETRIES:
+    while True:
         try:
             # 检查是否超时
             elapsed_time = time.time() - start_time
-            if elapsed_time > timeout_seconds:
-                print(f"runpod-worker-comfy - Job {job_id} timed out after {timeout_seconds} seconds (Prompt ID: {prompt_id})")
-                return {"status": "error", "error": f"Job processing timed out after {timeout_seconds} seconds"}
+            if elapsed_time > JOB_TIMEOUT_SECONDS:
+                print(f"runpod-worker-comfy - Job {job_id} timed out after {JOB_TIMEOUT_SECONDS} seconds (Prompt ID: {prompt_id})")
+                return {"status": "error", "error": f"Job processing timed out after {JOB_TIMEOUT_SECONDS} seconds"}
 
             # 检查工作流历史
             history_url = f"http://{COMFY_HOST}/history/{prompt_id}"
@@ -617,30 +617,30 @@ def wait_for_workflow_completion(prompt_id, job_id):
                 # Consider this a transient error and continue polling for a few retries? Or fail fast?
                 # Let's continue polling for now.
 
-            # Wait before next poll
+            # Wait before next poll (ensure this happens even after exceptions)
             time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-            retries += 1
 
         except requests.exceptions.Timeout:
              print(f"runpod-worker-comfy - Timeout connecting to ComfyUI history endpoint for {prompt_id}. Retrying...")
-             time.sleep(COMFY_POLLING_INTERVAL_MS / 1000) # Wait before retrying
-             # No increment to retries here, as it was a connection issue not a workflow status check
+             # Wait slightly longer on timeout before retrying
+             time.sleep(max(COMFY_POLLING_INTERVAL_MS / 1000, 1.0))
         except requests.exceptions.RequestException as e:
             print(f"runpod-worker-comfy - Error checking workflow status for {prompt_id}: {str(e)}. Retrying...")
+            # Wait before retrying on other request exceptions
             time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-            retries += 1 # Increment retries on connection errors too, to prevent infinite loops
 
-    # If loop finishes without success or specific error
-    final_error_message = "Workflow did not complete successfully after maximum retries."
-    if last_error:
-         final_error_message = f"Workflow failed after maximum retries: {last_error}"
+    # Remove the final block based on retries, as it should be unreachable
+    # # If loop finishes without success or specific error
+    # final_error_message = "Workflow did not complete successfully after maximum retries."
+    # if last_error:
+    #      final_error_message = f"Workflow failed after maximum retries: {last_error}"
+    # print(f"runpod-worker-comfy - {final_error_message} (Prompt ID: {prompt_id})")
+    # return {
+    #     "status": "error",
+    #     "error": final_error_message,
+    #     "detail": "Maximum polling retries reached or final state indicates failure."
+    # }
 
-    print(f"runpod-worker-comfy - {final_error_message} (Prompt ID: {prompt_id})")
-    return {
-        "status": "error",
-        "error": final_error_message,
-        "detail": "Maximum polling retries reached or final state indicates failure."
-    }
 
 # --- 主处理函数 ---
 def handler(job):
