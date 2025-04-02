@@ -11,6 +11,8 @@ import hashlib
 import subprocess
 import tempfile
 from pathlib import Path
+import torch
+import gc
 
 # --- 配置常量 ---
 # ComfyUI API 检查的时间间隔（毫秒）
@@ -655,6 +657,17 @@ def handler(job):
     7. 处理输出（图片或视频/GIF）
     8. 返回结果
     """
+    # 在处理新作业之前尝试清理 VRAM 缓存
+    try:
+        print("runpod-worker-comfy - Cleaning VRAM cache before new job...")
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        print("runpod-worker-comfy - VRAM cache cleaning attempt finished.")
+    except Exception as e:
+        print(f"runpod-worker-comfy - Error during VRAM cache cleaning: {e}")
+        # 不应阻止作业处理，只记录错误
+
     job_input = job.get("input", {})
     job_id = job.get("id", "unknown_job")
     print(f"runpod-worker-comfy - Received job: {job_id}")
