@@ -519,18 +519,24 @@ def process_video_output(outputs, job_id):
                         print(f"runpod-worker-comfy - Error removing local file {local_file_path}: {e}")
 
                 if file_url:
+                    # Determine the correct type based on the actual file extension
+                    actual_type = "gif" if file_ext == '.gif' else "video"
                     processed_results.append({
                         "url": file_url,
                         "thumbnail_url": thumbnail_url, # Will be None for GIFs or if thumbnail failed
-                        "type": output_type
+                        "type": actual_type # Use the type determined from the file extension
                     })
-                    print(f"runpod-worker-comfy - Successfully uploaded {output_type} to: {file_url}")
+                    print(f"runpod-worker-comfy - Successfully uploaded {actual_type} ({filename}) to: {file_url}")
                 else:
-                    errors.append(f"Failed to upload {output_type} {filename} to B2.")
+                    # Determine the type for the error message as well
+                    error_type_msg = "gif" if file_ext == '.gif' else "video"
+                    errors.append(f"Failed to upload {error_type_msg} {filename} to B2.")
 
 
             except Exception as e:
-                error_msg = f"Error processing {output_type or 'item'} {item_info.get('filename', 'Unknown Filename')}: {str(e)}"
+                # Try to determine the type for the error message if possible
+                error_type_indicator = output_type or "item" # Fallback to item if initial type detection failed
+                error_msg = f"Error processing {error_type_indicator} {item_info.get('filename', 'Unknown Filename')}: {str(e)}"
                 print(f"runpod-worker-comfy - {error_msg}")
                 errors.append(error_msg)
                  # Attempt cleanup even on error
