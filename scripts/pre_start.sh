@@ -8,23 +8,41 @@ export PATH="/workspace/bin:$PATH"
 mkdir -p /workspace
 chmod 755 /workspace
 
-# Check if models are already downloaded
+# Check if models are already downloaded in the final workspace location
 check_models_downloaded() {
-    local required_models=(
-        "/workspace/ComfyUI/models/diffusion_models/wan2.1_i2v_480p_14B_fp16.safetensors"
-        "/workspace/ComfyUI/models/loras/Titty_Drop_Wan_2.1_LoRA.safetensors"
-        "/workspace/ComfyUI/models/loras/wan_female_masturbation.safetensors"
-        "/workspace/ComfyUI/models/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
-        "/workspace/ComfyUI/models/clip_vision/clip_vision_h.safetensors"
-        "/workspace/ComfyUI/models/vae/wan_2.1_vae.safetensors"
-    )
-    
-    for model in "${required_models[@]}"; do
-        if [ ! -f "$model" ] || [ ! -s "$model" ]; then
-            return 1
+    echo "🔍 Checking for existing models using download_models.sh --list-files..."
+    # Get the list of required model files directly from the download script
+    # Use process substitution and mapfile to read paths into an array
+    mapfile -t required_models < <( /download_models.sh --list-files || echo "Error getting model list" >&2 )
+
+    # Check if mapfile failed (e.g., download_models.sh exited with error)
+    if [ ${#required_models[@]} -eq 0 ] || [[ "${required_models[0]}" == "Error getting model list" ]]; then
+        echo "❌ Failed to retrieve model list from /download_models.sh. Assuming models are not downloaded." >&2
+        return 1 # Indicate models are not downloaded or list is unavailable
+    fi
+
+    echo "Expected models in workspace:"
+    printf "  - %s\n" "${required_models[@]}"
+
+    local missing_or_empty=false
+    for model_path in "${required_models[@]}"; do
+        if [ ! -f "$model_path" ]; then
+            echo "    ❓ Missing: $(basename "$model_path")"
+            missing_or_empty=true
+        elif [ ! -s "$model_path" ]; then
+            echo "    ❓ Empty: $(basename "$model_path")"
+            missing_or_empty=true
         fi
+        # No need for an 'else' clause, we only care about missing/empty files
     done
-    return 0
+
+    if [ "$missing_or_empty" = true ]; then
+        echo "↳ Some models are missing or empty in the workspace."
+        return 1 # Indicate models need downloading/verification
+    else
+        echo "↳ All expected models found and are not empty in the workspace."
+        return 0 # Indicate models are present
+    fi
 }
 
 echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
