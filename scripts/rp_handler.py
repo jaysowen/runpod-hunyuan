@@ -218,40 +218,68 @@ def upload_images(images):
 
         # 确保文件名是安全的
         safe_filename = os.path.basename(name)
+        # Construct the full path in the ComfyUI input directory
         local_path = os.path.join(input_dir, safe_filename)
 
-        if image_data_str.startswith(('http://', 'https://')):
-            print(f"runpod-worker-comfy - Downloading image {name} from URL...")
-            blob = download_image(image_data_str)
-        else:
+        # Check if image_data_str is a URL
+        if isinstance(image_data_str, str) and image_data_str.startswith(('http://', 'https://')):
+            print(f"runpod-worker-comfy - Downloading image {name} from URL: {image_data_str[:100]}...") # Log truncated URL
+            try:
+                blob = download_image(image_data_str)
+                if blob is None:
+                    errors.append(f"Failed to download image '{name}' from URL.")
+                    continue # Skip to the next image if download failed
+            except Exception as e:
+                errors.append(f"Error downloading image '{name}' from URL: {e}")
+                continue
+        elif isinstance(image_data_str, str):
+             # Assume it's base64 if it's a string and not a URL
+            print(f"runpod-worker-comfy - Decoding base64 for image {name}...")
             try:
                 blob = base64.b64decode(image_data_str)
             except Exception as e:
                 errors.append(f"Failed to decode base64 for image '{name}': {e}")
-                continue
+                continue # Skip to next image if decoding failed
+        else:
+            # Handle cases where image data is not a string (unexpected format)
+            errors.append(f"Invalid image data format for image '{name}': Expected URL or base64 string.")
+            continue
 
+        # If blob was successfully obtained (downloaded or decoded)
         if blob:
             try:
-                # 直接保存到输入目录
+                # 保存下载或解码后的图片到 ComfyUI 输入目录
+                print(f"runpod-worker-comfy - Saving image '{name}' to {local_path}")
                 with open(local_path, 'wb') as f:
                     f.write(blob)
                 print(f"runpod-worker-comfy - Saved image to {local_path}")
-                
-                # 上传到 ComfyUI
-                files = {
-                    "image": (name, open(local_path, 'rb'), "image/png"),
-                    "overwrite": (None, "true"),
-                }
-                upload_url = f"http://{COMFY_HOST}/upload/image"
-                response = requests.post(upload_url, files=files)
-                
+
+                # 将本地文件上传到 ComfyUI API (保持现有逻辑)
+                print(f"runpod-worker-comfy - Uploading saved image '{name}' via ComfyUI API...")
+                # Make sure to open the *saved* local file for upload
+                with open(local_path, 'rb') as f_upload:
+                    files = {
+                        "image": (safe_filename, f_upload, "image/png"), # Use safe_filename for upload
+                        "overwrite": (None, "true"),
+                    }
+                    upload_url = f"http://{COMFY_HOST}/upload/image"
+                    response = requests.post(upload_url, files=files, timeout=30) # Add timeout to upload
+
                 if response.status_code == 200:
-                    uploaded_files_info.append(response.json())
+                    uploaded_info = response.json()
+                    # Add the local path info for reference if needed, though ComfyUI response is primary
+                    uploaded_info['local_path'] = local_path
+                    uploaded_files_info.append(uploaded_info)
                     print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
                 else:
-                    errors.append(f"Error uploading '{name}' to ComfyUI: {response.text}")
+                    errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
+                    # Attempt cleanup of local file if API upload fails?
+                    # cleanup_local_file(local_path, f"failed upload image {name}")
             except Exception as e:
-                errors.append(f"Error processing '{name}': {e}")
+                errors.append(f"Error processing/saving/uploading '{name}': {e}")
+                # Ensure cleanup if saving/uploading fails mid-way
+                cleanup_local_file(local_path, f"error processing image {name}")
+        # If blob is None (due to download/decode failure handled above), loop continues
 
     if errors:
         print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
