@@ -151,9 +151,10 @@ RUN find /ComfyUI/custom_nodes -name 'requirements.txt' -exec awk '{print $0}' {
     grep -vE '^torchaudio\\s*([=<>!~]=)?' | \
     grep -vE '^--extra-index-url' | \
     grep -vE '^[[:space:]]*$' > /tmp/all_requirements_filtered.txt && \
-    echo "--- Filtered requirements.txt --- " && \
+    # Explicitly show the filtered file content BEFORE pip install
+    echo "--- Filtered requirements.txt (Ready for pip install) --- " && \
     cat /tmp/all_requirements_filtered.txt && \
-    echo "-------------------------------" && \
+    echo "----------------------------------------------------------" && \
     # Install from the filtered list
     pip install --no-cache-dir -r /tmp/all_requirements_filtered.txt && \
     # Clean up temporary files
