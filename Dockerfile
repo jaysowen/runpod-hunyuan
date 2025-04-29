@@ -142,7 +142,8 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
 
 # Install requirements for custom nodes: Find all requirements.txt, merge them, and install in one step.
 # This makes dependency conflicts explicit and fails the build if they exist.
-RUN find /ComfyUI/custom_nodes -name 'requirements.txt' -exec cat {} + >> /tmp/all_requirements.txt && \
+# Use awk to print each line ensuring a newline, preventing merged lines from concatenated files.
+RUN find /ComfyUI/custom_nodes -name 'requirements.txt' -exec awk '{print $0}' {} + >> /tmp/all_requirements.txt && \
     echo "--- Merged requirements.txt --- " && \
     cat /tmp/all_requirements.txt && \
     echo "-------------------------------" && \
