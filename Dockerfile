@@ -140,15 +140,24 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/evanspearman/ComfyMath.git && \
     git clone https://github.com/zhangp365/ComfyUI-utils-nodes.git
 
-# Install requirements for custom nodes: Find all requirements.txt, merge them, and install in one step.
-# This makes dependency conflicts explicit and fails the build if they exist.
-# Use awk to print each line ensuring a newline, preventing merged lines from concatenated files.
-RUN find /ComfyUI/custom_nodes -name 'requirements.txt' -exec awk '{print $0}' {} + >> /tmp/all_requirements.txt && \
-    echo "--- Merged requirements.txt --- " && \
-    cat /tmp/all_requirements.txt && \
+# Install requirements for custom nodes: Find all requirements.txt, merge them, filter out torch/torchvision/torchaudio and index urls, and install the rest.
+# This relies on the PyTorch version already installed earlier in the Dockerfile.
+RUN find /ComfyUI/custom_nodes -name 'requirements.txt' -exec awk '{print $0}' {} + >> /tmp/all_requirements_raw.txt && \
+    echo "--- Merged Raw requirements.txt --- " && \
+    cat /tmp/all_requirements_raw.txt && \
+    # Filter out problematic lines
+    grep -vE '^torch\\s*([=<>!~]=)?' /tmp/all_requirements_raw.txt | \
+    grep -vE '^torchvision\\s*([=<>!~]=)?' | \
+    grep -vE '^torchaudio\\s*([=<>!~]=)?' | \
+    grep -vE '^--extra-index-url' | \
+    grep -vE '^[[:space:]]*$' > /tmp/all_requirements_filtered.txt && \
+    echo "--- Filtered requirements.txt --- " && \
+    cat /tmp/all_requirements_filtered.txt && \
     echo "-------------------------------" && \
-    pip install --no-cache-dir -r /tmp/all_requirements.txt && \
-    rm /tmp/all_requirements.txt
+    # Install from the filtered list
+    pip install --no-cache-dir -r /tmp/all_requirements_filtered.txt && \
+    # Clean up temporary files
+    rm /tmp/all_requirements_raw.txt /tmp/all_requirements_filtered.txt
 
 # Copy all scripts 
 COPY /test_input.json /
