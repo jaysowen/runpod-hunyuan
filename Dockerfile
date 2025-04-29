@@ -140,25 +140,16 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/evanspearman/ComfyMath.git && \
     git clone https://github.com/zhangp365/ComfyUI-utils-nodes.git
 
-# Install requirements for custom nodes: Find all requirements.txt, merge them, filter out torch/torchvision/torchaudio and index urls, and install the rest.
-# This relies on the PyTorch version already installed earlier in the Dockerfile.
-RUN find /ComfyUI/custom_nodes -name 'requirements.txt' -exec awk '{print $0}' {} + >> /tmp/all_requirements_raw.txt && \
-    echo "--- Merged Raw requirements.txt --- " && \
-    cat /tmp/all_requirements_raw.txt && \
-    # Filter out problematic lines
-    grep -vE '^torch\\s*([=<>!~]=)?' /tmp/all_requirements_raw.txt | \
-    grep -vE '^torchvision\\s*([=<>!~]=)?' | \
-    grep -vE '^torchaudio\\s*([=<>!~]=)?' | \
-    grep -vE '^--extra-index-url' | \
-    grep -vE '^[[:space:]]*$' > /tmp/all_requirements_filtered.txt && \
-    # Explicitly show the filtered file content BEFORE pip install
-    echo "--- Filtered requirements.txt (Ready for pip install) --- " && \
-    cat /tmp/all_requirements_filtered.txt && \
-    echo "----------------------------------------------------------" && \
-    # Install from the filtered list
-    pip install --no-cache-dir -r /tmp/all_requirements_filtered.txt && \
-    # Clean up temporary files
-    rm /tmp/all_requirements_raw.txt /tmp/all_requirements_filtered.txt
+# Install requirements for custom nodes (if any)
+# Reverted to installing requirements for each node individually, ignoring errors.
+# This allows the build to complete even if some dependencies conflict or fail,
+# potentially leading to runtime issues for specific nodes.
+RUN for dir in /ComfyUI/custom_nodes/*/; do \
+    if [ -f "${dir}requirements.txt" ]; then \
+        echo "Installing requirements for ${dir}..." && \
+        pip install --no-cache-dir -r "${dir}requirements.txt" || echo "WARNING: Failed to install requirements for ${dir}, continuing..."; \
+    fi \
+    done
 
 # Copy all scripts 
 COPY /test_input.json /
