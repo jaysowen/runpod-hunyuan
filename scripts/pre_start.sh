@@ -8,59 +8,13 @@ export PATH="/workspace/bin:$PATH"
 mkdir -p /workspace
 chmod 755 /workspace
 
-# Check if models are already downloaded in the final workspace location
-check_models_downloaded() {
-    echo "🔍 Checking for existing models using download_models.sh --list-files..."
-    # Get the list of required model files directly from the download script
-    # Use process substitution and mapfile to read paths into an array
-    mapfile -t required_models < <( /download_models.sh --list-files || echo "Error getting model list" >&2 )
+# --- Model Check and Download Logic Removed --- 
+# Models are now expected to be mounted via a network volume
+# and configured in src/extra_model_paths.yaml
 
-    # Check if mapfile failed (e.g., download_models.sh exited with error)
-    if [ ${#required_models[@]} -eq 0 ] || [[ "${required_models[0]}" == "Error getting model list" ]]; then
-        echo "❌ Failed to retrieve model list from /download_models.sh. Assuming models are not downloaded." >&2
-        return 1 # Indicate models are not downloaded or list is unavailable
-    fi
-
-    echo "Expected models in workspace:"
-    printf "  - %s\n" "${required_models[@]}"
-
-    local missing_or_empty=false
-    for model_path in "${required_models[@]}"; do
-        if [ ! -f "$model_path" ]; then
-            echo "    ❓ Missing: $(basename "$model_path")"
-            missing_or_empty=true
-        elif [ ! -s "$model_path" ]; then
-            echo "    ❓ Empty: $(basename "$model_path")"
-            missing_or_empty=true
-        fi
-        # No need for an 'else' clause, we only care about missing/empty files
-    done
-
-    if [ "$missing_or_empty" = true ]; then
-        echo "↳ Some models are missing or empty in the workspace."
-        return 1 # Indicate models need downloading/verification
-    else
-        echo "↳ All expected models found and are not empty in the workspace."
-        return 0 # Indicate models are present
-    fi
-}
-
-echo "**** CHECK NODES AND INSTALL IF NOT FOUND ****"
-if [ "${SKIP_NODES}" == "true" ]; then
-    echo "**** SKIPPING NODE INSTALLATION (SKIP_NODES=true) ****"
-else
-    /install_nodes.sh install_only
-fi
-
-# Check if downloads should be skipped
-if [ "${SKIP_DOWNLOADS}" == "true" ]; then
-    echo "**** SKIPPING MODEL DOWNLOADS (SKIP_DOWNLOADS=true) ****"
-elif check_models_downloaded; then
-    echo "**** MODELS ALREADY DOWNLOADED, SKIPPING DOWNLOAD ****"
-else
-    echo "**** DOWNLOADING - INSTALLING MODELS ****"
-    /download_models.sh
-fi
+# --- Node Installation Call Removed ---
+# Custom nodes are cloned and their requirements installed during Docker build.
+# No node installation/update is expected during startup.
 
 echo "MOVING COMFYUI TO WORKSPACE"
 # Ensure clean workspace/ComfyUI directory setup

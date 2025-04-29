@@ -1,0 +1,16 @@
+# Configuration primarily for ComfyUI to find models in external locations
+comfyui:
+  base_path: /workspace/ComfyUI # Keep this pointing to ComfyUI's code/default models
+  # Define absolute paths within the container where models are mounted from the network volume
+  checkpoints: /runpod-volume/models/checkpoints
+  configs: /runpod-volume/models/configs
+  vae: /runpod-volume/models/vae
+  loras: /runpod-volume/models/loras
+  upscale_models: /runpod-volume/models/upscale_models
+  embeddings: /runpod-volume/models/embeddings
+  hypernetworks: /runpod-volume/models/hypernetworks
+  controlnet: /runpod-volume/models/controlnet
+  clip_vision: /runpod-volume/models/clip_vision
+  diffusion_models: /runpod-volume/models/diffusion_models
+  text_encoders: /runpod-volume/models/text_encoders
+  # Add other model types if needed, ensuring the path exists in your network volume mount

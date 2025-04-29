@@ -5,12 +5,10 @@ import os
 import requests
 import base64
 from io import BytesIO
-from PIL import Image, ImageFilter
+from PIL import Image
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
-import hashlib
 import subprocess
 import tempfile
-from pathlib import Path
 import torch
 import gc
 
@@ -325,16 +323,6 @@ def queue_workflow(workflow):
         raise # 将异常重新抛出，以便上层处理
 
 # --- 输出处理 ---
-def base64_encode(file_path):
-    """将文件转换为 base64 字符串"""
-    try:
-        with open(file_path, "rb") as file:
-            encoded_string = base64.b64encode(file.read()).decode("utf-8")
-            return encoded_string
-    except Exception as e:
-        print(f"runpod-worker-comfy - Error encoding file {file_path} to base64: {e}")
-        return None
-
 def cleanup_local_file(file_path, file_description="file"):
     """尝试清理本地文件并记录错误"""
     if file_path and os.path.exists(file_path):

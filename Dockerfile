@@ -107,61 +107,71 @@ RUN pip install --no-cache-dir \
     accelerate \
     pyyaml \
     torchsde \
-    opencv-python \
-    gdown
+    opencv-python
 
-# Install runpod
+# Install runpod and B2 SDK (needed for uploads)
 RUN pip install runpod requests b2sdk
 
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
-RUN git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
+    git clone https://github.com/cubiq/ComfyUI_InstantID.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
     git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
-    git clone https://github.com/melMass/comfy_mtb.git && \
-    git clone https://github.com/Derfuu/Derfuu_ComfyUI_ModdedNodes.git && \
-    git clone https://github.com/jamesWalker55/comfyui-various.git && \
-    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
-    git clone https://github.com/cubiq/ComfyUI_essentials && \
-    git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
-    git clone https://github.com/kijai/ComfyUI-Florence2.git && \
-    git clone https://github.com/kijai/ComfyUI-segment-anything-2.git && \
     git clone https://github.com/storyicon/comfyui_segment_anything.git && \
+    git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
+    git clone https://github.com/cubiq/ComfyUI_essentials.git && \
+    git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
+    git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && \
-    git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git
+    git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git && \
+    git clone https://github.com/cubiq/ComfyUI_FaceAnalysis.git && \
+    git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git && \
+    git clone https://github.com/sipherxyz/comfyui-art-venture.git && \
+    git clone https://github.com/nicofdga/DZ-FaceDetailer.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git && \
+    git clone https://github.com/vuongminh1907/ComfyUI_ZenID.git && \
+    git clone https://github.com/dchatel/comfyui_facetools.git && \
+    git clone https://github.com/evanspearman/ComfyMath.git && \
+    git clone https://github.com/zhangp365/ComfyUI-utils-nodes.git
 
-# Install requirements for custom nodes (if any)
-RUN for dir in */; do \
-    if [ -f "${dir}requirements.txt" ]; then \
-        echo "Installing requirements for ${dir}..." && \
-        pip install --no-cache-dir -r "${dir}requirements.txt" || true; \
-    fi \
-    done
+# Install requirements for custom nodes: Find all requirements.txt, merge them, and install in one step.
+# This makes dependency conflicts explicit and fails the build if they exist.
+RUN find /ComfyUI/custom_nodes -name 'requirements.txt' -exec cat {} + >> /tmp/all_requirements.txt && \
+    echo "--- Merged requirements.txt --- " && \
+    cat /tmp/all_requirements.txt && \
+    echo "-------------------------------" && \
+    pip install --no-cache-dir -r /tmp/all_requirements.txt && \
+    rm /tmp/all_requirements.txt
 
 # Copy all scripts 
 COPY /test_input.json /
+# Copy model paths configuration
+COPY src/extra_model_paths.yaml ./
 COPY scripts/rp_handler.py /
 COPY scripts/*.sh /
 
 # Copy files to container root directory
-COPY manage-files/download-files.sh /
-COPY manage-files/files.txt /
+# COPY manage-files/download-files.sh /
+# COPY manage-files/files.txt /
 
 # Also create workspace directory structure
 RUN mkdir -p /workspace
 
-# Copy files to container root directory
-COPY manage-files/download-files.sh /workspace/
-COPY manage-files/files.txt /workspace/
+# Copy files to container root directory - REMOVED, no longer needed
+# COPY manage-files/download-files.sh /workspace/
+# COPY manage-files/files.txt /workspace/
 
 # Permissions and line ending fixes
-RUN dos2unix /*.sh && \
-    dos2unix /workspace/*.sh && \
-    chmod +x /*.sh && \
-    chmod +x /workspace/*.sh
+RUN dos2unix /start.sh /rp_handler.py /*.sh && \
+    # dos2unix /workspace/*.sh && # Removed as no sh scripts copied to workspace
+    chmod +x /start.sh /rp_handler.py /*.sh
+    # chmod +x /workspace/*.sh # Removed
 
 # Default command
 CMD ["/start.sh"]

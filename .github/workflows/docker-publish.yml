@@ -2,9 +2,9 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ "wanvideo1.0" ]
+    branches: [ "general" ]
   pull_request:
-    branches: [ "wanvideo1.0" ]
+    branches: [ "general" ]
 
 env:
   IMAGE_NAME: jaysowen/runpod-worker-comfy
