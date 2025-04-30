@@ -656,6 +656,20 @@ def handler(job):
     8. 返回结果
     """
 
+    # --- Add Debugging: List specific insightface model dir --- 
+    insightface_model_dir = "/runpod-volume/ComfyUI/models/insightface/models/antelopev2"
+    print(f"--- DEBUG: Listing {insightface_model_dir} contents recursively ---")
+    try:
+        result_insightface = subprocess.run(['ls', '-lR', insightface_model_dir], capture_output=True, text=True, check=False)
+        print(f"ls -lR {insightface_model_dir}:")
+        print(result_insightface.stdout)
+        if result_insightface.stderr:
+            print("Stderr:", result_insightface.stderr)
+    except Exception as e:
+        print(f"--- DEBUG: Error listing insightface directory: {e} ---")
+    print("--- DEBUG: End Insightface Listing ---")
+    # --- End Debugging ---
+
     # 在处理新作业之前尝试清理 VRAM 缓存
     try:
         print("runpod-worker-comfy - Cleaning VRAM cache before new job...")
