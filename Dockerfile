@@ -112,6 +112,9 @@ RUN pip install --no-cache-dir \
 # Install runpod and B2 SDK (needed for uploads)
 RUN pip install runpod requests b2sdk
 
+# Support for the network volume
+ADD src/extra_model_paths.yaml ./
+
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
 RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
@@ -151,10 +154,9 @@ RUN for dir in /ComfyUI/custom_nodes/*/; do \
     fi \
     done
 
-# Copy model paths configuration TO COMFYUI ROOT
-COPY src/extra_model_paths.yaml /workspace/ComfyUI/
-
-# Copy scripts 
+# Copy scripts to container root
+COPY scripts/rp_handler.py /
+COPY scripts/*.sh /
 COPY /test_input.json /
 
 # Copy files to container root directory
