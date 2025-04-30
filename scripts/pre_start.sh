@@ -21,8 +21,8 @@ echo "Creating model symlinks if necessary..."
 # Ensure the default models directory exists
 mkdir -p /workspace/ComfyUI/models
 
-# Path where the model *actually* exists on the mounted volume
-SEGFORMER_SOURCE_PATH="/runpod-volume/models/segformer_b3_clothes"
+# Path where the model *actually* exists on the mounted volume (Updated based on user feedback)
+SEGFORMER_SOURCE_PATH="/runpod-volume/ComfyUI/models/segformer_b3_clothes"
 # Path where the node *expects* the model to be
 SEGFORMER_TARGET_PATH="/workspace/ComfyUI/models/segformer_b3_clothes"
 
