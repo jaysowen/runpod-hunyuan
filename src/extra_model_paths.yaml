@@ -15,7 +15,7 @@ runpod_worker_comfy:
   text_encoders: ComfyUI/models/text_encoders/
   segformer: ComfyUI/models/segformer_b3_clothes/
   inpaint: ComfyUI/models/inpaint/
-  insightface:ComfyUI/models/insightface/
+  insightface: ComfyUI/models/insightface/
   instantid: ComfyUI/models/instantid/
   ipadapter: ComfyUI/models/ipadapter/
   landmarks: ComfyUI/models/landmarks/
