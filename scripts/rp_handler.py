@@ -392,6 +392,15 @@ def process_output_item(item_info, job_id):
     thumbnail_path = None
     try:
         filename = item_info.get("filename")
+        item_type_reported = item_info.get("type", "output") # Get type from ComfyUI history
+
+        # --- Add check for temporary files ---
+        # Skip processing if it looks like a temporary file based on name or type
+        if not filename or "_temp_" in filename or item_type_reported == "temp":
+            print(f"runpod-worker-comfy - Skipping likely temporary file: {filename} (type: {item_type_reported})")
+            return None, None # Return None for both result and error to indicate skipped
+        # --- End check ---
+
         if not filename:
             return None, f"Skipping item with missing filename: {item_info}"
 
