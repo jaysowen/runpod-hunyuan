@@ -151,12 +151,11 @@ RUN for dir in /ComfyUI/custom_nodes/*/; do \
     fi \
     done
 
-# Copy all scripts 
+# Copy model paths configuration TO COMFYUI ROOT
+COPY src/extra_model_paths.yaml /workspace/ComfyUI/
+
+# Copy scripts 
 COPY /test_input.json /
-# Copy model paths configuration
-COPY src/extra_model_paths.yaml ./
-COPY scripts/rp_handler.py /
-COPY scripts/*.sh /
 
 # Copy files to container root directory
 # COPY manage-files/download-files.sh /

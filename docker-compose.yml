@@ -1,6 +1,5 @@
 services:
   comfyui-worker:
-    build: .
     image: jaysowen/runpod-worker-comfy:general
     environment:
       - SERVE_API_LOCALLY=true
