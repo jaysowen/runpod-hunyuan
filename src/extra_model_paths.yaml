@@ -18,7 +18,7 @@ runpod_worker_comfy:
   hyper_lora: ComfyUI/models/hyper_lora/
   hypernetworks: ComfyUI/models/hypernetworks/
   inpaint: ComfyUI/models/inpaint/
-  insightface: ComfyUI/models/insightface/
+  insightface: ComfyUI/models/insightface/models/
   instantid: ComfyUI/models/instantid/
   ipadapter: ComfyUI/models/ipadapter/
   landmarks: ComfyUI/models/landmarks/
