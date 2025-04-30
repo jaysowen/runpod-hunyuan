@@ -11,6 +11,7 @@ import subprocess
 import tempfile
 import torch
 import gc
+import glob
 
 # --- 配置常量 ---
 # ComfyUI API 检查的时间间隔（毫秒）
@@ -654,6 +655,30 @@ def handler(job):
     7. 处理输出（图片或视频/GIF）
     8. 返回结果
     """
+    # --- Add Debugging: List volume contents --- 
+    print("--- DEBUG: Listing /runpod-volume contents ---")
+    try:
+        # Check base volume mount point
+        result_base = subprocess.run(['ls', '-l', '/runpod-volume'], capture_output=True, text=True, check=False)
+        print("ls -l /runpod-volume:")
+        print(result_base.stdout)
+        if result_base.stderr:
+            print("Stderr:", result_base.stderr)
+        
+        # Check the crucial models directory recursively
+        models_dir = "/runpod-volume/ComfyUI/models"
+        print(f"--- DEBUG: Listing {models_dir} contents recursively ---")
+        result_models = subprocess.run(['ls', '-lR', models_dir], capture_output=True, text=True, check=False) # Use -lR for recursive detail
+        print(f"ls -lR {models_dir}:")
+        print(result_models.stdout)
+        if result_models.stderr:
+            print("Stderr:", result_models.stderr)
+            
+    except Exception as e:
+        print(f"--- DEBUG: Error listing directories: {e} ---")
+    print("--- DEBUG: End Listing ---")
+    # --- End Debugging ---
+
     # 在处理新作业之前尝试清理 VRAM 缓存
     try:
         print("runpod-worker-comfy - Cleaning VRAM cache before new job...")
