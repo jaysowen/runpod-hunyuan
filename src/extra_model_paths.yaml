@@ -1,32 +1,30 @@
-# Configuration primarily for ComfyUI to find models in external locations
-comfyui:
-  base_path: /workspace/ComfyUI # Keep this pointing to ComfyUI's code/default models
-  # Define absolute paths within the container where models are mounted from the network volume
-  # Paths updated based on user feedback (models are under /runpod-volume/ComfyUI/models/)
-  checkpoints: /runpod-volume/ComfyUI/models/checkpoints # Updated path
-  clip: /runpod-volume/ComfyUI/models/clip # Updated path
-  clip_vision: /runpod-volume/ComfyUI/models/clip_vision # Updated path
-  configs: /runpod-volume/ComfyUI/models/configs # Updated path
-  controlnet: /runpod-volume/ComfyUI/models/controlnet # Updated path
-  deepface: /runpod-volume/ComfyUI/models/deepface # Updated path
-  vae: /runpod-volume/ComfyUI/models/vae # Updated path
-  loras: /runpod-volume/ComfyUI/models/loras # Updated path
-  upscale_models: /runpod-volume/ComfyUI/models/upscale_models # Updated path
-  embeddings: /runpod-volume/ComfyUI/models/embeddings # Updated path
-  hypernetworks: /runpod-volume/ComfyUI/models/hypernetworks # Updated path
-  diffusion_models: /runpod-volume/ComfyUI/models/diffusion_models # Updated path
-  text_encoders: /runpod-volume/ComfyUI/models/text_encoders # Updated path
-  segformer: /runpod-volume/ComfyUI/models/segformer # Updated path (parent dir for segformer models)
-  inpaint: /runpod-volume/ComfyUI/models/inpaint # Updated path
-  insightface: /runpod-volume/ComfyUI/models/insightface # Updated path
-  instantid: /runpod-volume/ComfyUI/models/instantid # Updated path
-  ipadapter: /runpod-volume/ComfyUI/models/ipadapter # Updated path
-  landmarks: /runpod-volume/ComfyUI/models/landmarks # Updated path
-  llm: /runpod-volume/ComfyUI/models/LLM # Updated path
-  onnx: /runpod-volume/ComfyUI/models/onnx # Updated path
-  photomaker: /runpod-volume/ComfyUI/models/photomaker # Updated path
-  sam2: /runpod-volume/ComfyUI/models/sam2 # Updated path
-  sams: /runpod-volume/ComfyUI/models/sams # Updated path
-  style_models: /runpod-volume/ComfyUI/models/style_models # Updated path
-  t5: /runpod-volume/ComfyUI/models/t5 # Updated path
-  unet: /runpod-volume/ComfyUI/models/unet # Updated path
+# Configuration using the format provided by the user
+runpod_worker_comfy:
+  base_path: /runpod-volume # Base path for relative paths below
+  checkpoints: ComfyUI/models/checkpoints/
+  clip: ComfyUI/models/clip/
+  clip_vision: ComfyUI/models/clip_vision/
+  configs: ComfyUI/models/configs/
+  controlnet: ComfyUI/models/controlnet/
+  deepface: ComfyUI/models/deepface/
+  vae: ComfyUI/models/vae/
+  loras: ComfyUI/models/loras/
+  upscale_models: ComfyUI/models/upscale_models/
+  embeddings: ComfyUI/models/embeddings/
+  hypernetworks: ComfyUI/models/hypernetworks/
+  diffusion_models: ComfyUI/models/diffusion_models/
+  text_encoders: ComfyUI/models/text_encoders/
+  segformer: ComfyUI/models/segformer/
+  inpaint: ComfyUI/models/inpaint/
+  insightface: ComfyUI/models/insightface/
+  instantid: ComfyUI/models/instantid/
+  ipadapter: ComfyUI/models/ipadapter/
+  landmarks: ComfyUI/models/landmarks/
+  llm: ComfyUI/models/LLM/
+  onnx: ComfyUI/models/onnx/
+  photomaker: ComfyUI/models/photomaker/
+  sam2: ComfyUI/models/sam2/
+  sams: ComfyUI/models/sams/
+  style_models: ComfyUI/models/style_models/
+  t5: ComfyUI/models/t5/
+  unet: ComfyUI/models/unet/
