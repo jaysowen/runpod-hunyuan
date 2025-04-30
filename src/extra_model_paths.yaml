@@ -1,32 +1,29 @@
-# Configuration primarily for ComfyUI to find models in external locations (Using standard format)
-comfyui:
-  base_path: /workspace/ComfyUI # Keep this pointing to ComfyUI's code/default models
-  # Define absolute paths within the container where models are mounted from the network volume
-  # Using standard 'comfyui:' key and absolute paths
-  checkpoints: /runpod-volume/ComfyUI/models/checkpoints
-  clip: /runpod-volume/ComfyUI/models/clip
-  clip_vision: /runpod-volume/ComfyUI/models/clip_vision
-  configs: /runpod-volume/ComfyUI/models/configs
-  controlnet: /runpod-volume/ComfyUI/models/controlnet
-  deepface: /runpod-volume/ComfyUI/models/deepface
-  vae: /runpod-volume/ComfyUI/models/vae
-  loras: /runpod-volume/ComfyUI/models/loras
-  upscale_models: /runpod-volume/ComfyUI/models/upscale_models
-  embeddings: /runpod-volume/ComfyUI/models/embeddings
-  hypernetworks: /runpod-volume/ComfyUI/models/hypernetworks
-  diffusion_models: /runpod-volume/ComfyUI/models/diffusion_models
-  text_encoders: /runpod-volume/ComfyUI/models/text_encoders
-  segformer: /runpod-volume/ComfyUI/models/segformer # Adjust if segformer models are elsewhere
-  inpaint: /runpod-volume/ComfyUI/models/inpaint
-  insightface: /runpod-volume/ComfyUI/models/insightface
-  instantid: /runpod-volume/ComfyUI/models/instantid
-  ipadapter: /runpod-volume/ComfyUI/models/ipadapter
-  landmarks: /runpod-volume/ComfyUI/models/landmarks
-  llm: /runpod-volume/ComfyUI/models/LLM
-  onnx: /runpod-volume/ComfyUI/models/onnx
-  photomaker: /runpod-volume/ComfyUI/models/photomaker
-  sam2: /runpod-volume/ComfyUI/models/sam2
-  sams: /runpod-volume/ComfyUI/models/sams
-  style_models: /runpod-volume/ComfyUI/models/style_models
-  t5: /runpod-volume/ComfyUI/models/t5
-  unet: /runpod-volume/ComfyUI/models/unet
+runpod_worker_comfy:
+  base_path: /runpod-volume 
+  checkpoints: ComfyUI/models/checkpoints/
+  clip: ComfyUI/models/clip/
+  clip_vision: ComfyUI/models/clip_vision/
+  configs: ComfyUI/models/configs/
+  controlnet: ComfyUI/models/controlnet/
+  deepface: ComfyUI/models/deepface/
+  vae: ComfyUI/models/vae/
+  loras: ComfyUI/models/loras/
+  upscale_models: ComfyUI/models/upscale_models/
+  embeddings: ComfyUI/models/embeddings/
+  hypernetworks: ComfyUI/models/hypernetworks/
+  diffusion_models: ComfyUI/models/diffusion_models/
+  text_encoders: ComfyUI/models/text_encoders/
+  segformer: ComfyUI/models/segformer_b3_clothes/
+  inpaint: ComfyUI/models/inpaint/
+  insightface:ComfyUI/models/insightface/
+  instantid: ComfyUI/models/instantid/
+  ipadapter: ComfyUI/models/ipadapter/
+  landmarks: ComfyUI/models/landmarks/
+  llm: ComfyUI/models/LLM/
+  onnx: ComfyUI/models/onnx/
+  photomaker: ComfyUI/models/photomaker/
+  sam2: ComfyUI/models/sam2/
+  sams: ComfyUI/models/sams/
+  style_models: ComfyUI/models/style_models/
+  t5: ComfyUI/models/t5/
+  unet: ComfyUI/models/unet/
