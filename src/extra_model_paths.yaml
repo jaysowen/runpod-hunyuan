@@ -6,14 +6,17 @@ runpod_worker_comfy:
   configs: ComfyUI/models/configs/
   controlnet: ComfyUI/models/controlnet/
   deepface: ComfyUI/models/deepface/
+  diffusers: ComfyUI/models/diffusers/
   vae: ComfyUI/models/vae/
   loras: ComfyUI/models/loras/
   upscale_models: ComfyUI/models/upscale_models/
   embeddings: ComfyUI/models/embeddings/
+  facedetection: ComfyUI/models/facedetection/
+  facerestore_models: ComfyUI/models/facerestore_models/
+  gligen: ComfyUI/models/gligen/
+  grounding_dino: ComfyUI/models/grounding-dino/
+  hyper_lora: ComfyUI/models/hyper_lora/
   hypernetworks: ComfyUI/models/hypernetworks/
-  diffusion_models: ComfyUI/models/diffusion_models/
-  text_encoders: ComfyUI/models/text_encoders/
-  segformer: ComfyUI/models/segformer_b3_clothes/
   inpaint: ComfyUI/models/inpaint/
   insightface: ComfyUI/models/insightface/
   instantid: ComfyUI/models/instantid/
@@ -24,6 +27,13 @@ runpod_worker_comfy:
   photomaker: ComfyUI/models/photomaker/
   sam2: ComfyUI/models/sam2/
   sams: ComfyUI/models/sams/
+  segformer: ComfyUI/models/segformer_b3_clothes/
   style_models: ComfyUI/models/style_models/
   t5: ComfyUI/models/t5/
+  text_encoders: ComfyUI/models/text_encoders/
   unet: ComfyUI/models/unet/
+  dz_facedetailer: ComfyUI/models/dz_facedetailer/
+  ultralytics: ComfyUI/models/ultralytics/
+  vae_approx: ComfyUI/models/vae_approx/
+  vitmatte: ComfyUI/models/vitmatte/
+  xlabs: ComfyUI/models/xlabs/
