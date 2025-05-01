@@ -1,7 +1,7 @@
 # =============================================================================
 # 1) BUILDER STAGE
 # =============================================================================
-FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 AS builder
+FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 AS builder
 
 # Install build dependencies
 RUN apt-get update && \
@@ -43,7 +43,7 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 # 2) FINAL STAGE - Only Jupyter pip packages removed
 # =============================================================================
-FROM nvidia/cuda:12.4.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && \
@@ -88,8 +88,18 @@ ENV CC=gcc \
 # Upgrade pip - UNCHANGED
 RUN pip install --no-cache-dir --upgrade pip
 
-# --- Install PyTorch for CUDA ---
-RUN pip install --no-cache-dir torch torchvision torchaudio
+# --- Install PyTorch for CUDA 12.1 (Specific Version) ---
+# Verify torchvision/torchaudio compatibility if necessary
+ENV PYTORCH_VERSION=2.5.1
+ENV TORCHVISION_VERSION=0.20.1
+ENV TORCHAUDIO_VERSION=2.5.1
+
+RUN echo "Installing PyTorch ${PYTORCH_VERSION}, torchvision ${TORCHVISION_VERSION}, torchaudio ${TORCHAUDIO_VERSION} for CUDA 12.1" && \
+    pip install --no-cache-dir \
+        torch==${PYTORCH_VERSION} \
+        torchvision==${TORCHVISION_VERSION} \
+        torchaudio==${TORCHAUDIO_VERSION} \
+        --index-url https://download.pytorch.org/whl/cu121
 
 # Copy ComfyUI from builder
 COPY --from=builder /ComfyUI /ComfyUI
@@ -127,10 +137,10 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
     git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone https://github.com/storyicon/comfyui_segment_anything.git && \
-    git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
+   # git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials.git && \
    # git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
-    git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
+   # git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git && \
     git clone https://github.com/cubiq/ComfyUI_FaceAnalysis.git && \
