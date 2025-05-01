@@ -46,6 +46,7 @@ create_model_symlink() {
 # --- Create Symlinks using the function ---
 create_model_symlink "/runpod-volume/ComfyUI/models/insightface" "/workspace/ComfyUI/models/insightface"
 create_model_symlink "/runpod-volume/ComfyUI/models/ultralytics" "/workspace/ComfyUI/models/ultralytics"
+create_model_symlink "/runpod-volume/ComfyUI/models/landmarks" "/workspace/ComfyUI/models/landmarks"
 
 # --- End Symlink Creation ---
 

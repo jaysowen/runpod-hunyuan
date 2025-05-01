@@ -13,22 +13,6 @@ import torch
 import gc
 import glob
 
-# --- Allowlist specific classes for torch.load (PyTorch >= 1.13+) ---
-try:
-    import ultralytics.nn.tasks
-    # Check if the function exists for compatibility
-    if hasattr(torch.serialization, 'add_safe_globals'):
-        # Allow loading ultralytics DetectionModel needed by some .pt files
-        torch.serialization.add_safe_globals([ultralytics.nn.tasks.DetectionModel])
-        print("runpod-worker-comfy - Added ultralytics.nn.tasks.DetectionModel to safe globals for torch.load.")
-    else:
-        print("runpod-worker-comfy - torch.serialization.add_safe_globals not found (likely older PyTorch version).")
-except ImportError:
-    print("runpod-worker-comfy - ultralytics not found, skipping safe global addition.")
-except Exception as e:
-    print(f"runpod-worker-comfy - Warning: Failed to add ultralytics safe global: {e}")
-# --- End Allowlist ---
-
 # --- 配置常量 ---
 # ComfyUI API 检查的时间间隔（毫秒）
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
