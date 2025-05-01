@@ -43,6 +43,31 @@ else
 fi
 # --- End InsightFace Symlink Creation ---
 
+# --- Create Symlink for Ultralytics models ---
+echo "Creating symlink for Ultralytics models if necessary..."
+
+ULTRALYTICS_SOURCE_DIR="/runpod-volume/ComfyUI/models/ultralytics"
+ULTRALYTICS_TARGET_DIR="/workspace/ComfyUI/models/ultralytics"
+
+# Ensure the parent directory for the target exists
+mkdir -p /workspace/ComfyUI/models
+
+# Check if the source directory exists on the volume
+if [ -d "${ULTRALYTICS_SOURCE_DIR}" ]; then
+  # Check if the target path doesn't exist or is not already a symlink
+  if [ ! -e "${ULTRALYTICS_TARGET_DIR}" ] && [ ! -L "${ULTRALYTICS_TARGET_DIR}" ]; then
+    echo "Creating symlink for Ultralytics: ${ULTRALYTICS_TARGET_DIR} -> ${ULTRALYTICS_SOURCE_DIR}"
+    ln -s "${ULTRALYTICS_SOURCE_DIR}" "${ULTRALYTICS_TARGET_DIR}"
+  elif [ -L "${ULTRALYTICS_TARGET_DIR}" ]; then
+     echo "Symlink ${ULTRALYTICS_TARGET_DIR} already exists."
+  else
+     echo "Warning: ${ULTRALYTICS_TARGET_DIR} exists but is not a symlink. Cannot create link."
+  fi
+else
+  echo "Warning: Source directory ${ULTRALYTICS_SOURCE_DIR} not found on volume. Cannot create symlink."
+fi
+# --- End Ultralytics Symlink Creation ---
+
 echo "MOVING COMFYUI TO WORKSPACE"
 # Ensure clean workspace/ComfyUI directory setup
 if [ -e "/workspace/ComfyUI" ]; then
