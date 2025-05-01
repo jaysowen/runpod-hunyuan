@@ -16,57 +16,38 @@ chmod 755 /workspace
 # Custom nodes are cloned and their requirements installed during Docker build.
 # No node installation/update is expected during startup.
 
-# --- Symlink creation logic removed ---
+# --- Function to create model symlinks ---
+create_model_symlink() {
+  local source_dir="$1"
+  local target_dir="$2"
+  local model_name="$(basename "${target_dir}")"
 
-# --- Create Symlink for InsightFace models ---
-echo "Creating symlink for InsightFace models if necessary..."
+  echo "Checking symlink for ${model_name} models..."
 
-INSIGHTFACE_SOURCE_DIR="/runpod-volume/ComfyUI/models/insightface"
-INSIGHTFACE_TARGET_DIR="/workspace/ComfyUI/models/insightface"
+  # Ensure the parent directory for the target exists
+  mkdir -p "$(dirname "${target_dir}")"
 
-# Ensure the parent directory for the target exists
-mkdir -p /workspace/ComfyUI/models
-
-# Check if the source directory exists on the volume
-if [ -d "${INSIGHTFACE_SOURCE_DIR}" ]; then
-  # Check if the target path doesn't exist or is not already a symlink
-  if [ ! -e "${INSIGHTFACE_TARGET_DIR}" ] && [ ! -L "${INSIGHTFACE_TARGET_DIR}" ]; then
-    echo "Creating symlink for InsightFace: ${INSIGHTFACE_TARGET_DIR} -> ${INSIGHTFACE_SOURCE_DIR}"
-    ln -s "${INSIGHTFACE_SOURCE_DIR}" "${INSIGHTFACE_TARGET_DIR}"
-  elif [ -L "${INSIGHTFACE_TARGET_DIR}" ]; then
-     echo "Symlink ${INSIGHTFACE_TARGET_DIR} already exists."
+  # Check if the source directory exists on the volume
+  if [ -d "${source_dir}" ]; then
+    # Check if the target path doesn't exist or is not already a symlink
+    if [ ! -e "${target_dir}" ] && [ ! -L "${target_dir}" ]; then
+      echo "Creating symlink for ${model_name}: ${target_dir} -> ${source_dir}"
+      ln -s "${source_dir}" "${target_dir}"
+    elif [ -L "${target_dir}" ]; then
+       echo "Symlink ${target_dir} already exists."
+    else
+       echo "Warning: ${target_dir} exists but is not a symlink. Cannot create link for ${model_name}."
+    fi
   else
-     echo "Warning: ${INSIGHTFACE_TARGET_DIR} exists but is not a symlink. Cannot create link."
+    echo "Warning: Source directory ${source_dir} not found on volume. Cannot create symlink for ${model_name}."
   fi
-else
-  echo "Warning: Source directory ${INSIGHTFACE_SOURCE_DIR} not found on volume. Cannot create symlink."
-fi
-# --- End InsightFace Symlink Creation ---
+}
 
-# --- Create Symlink for Ultralytics models ---
-echo "Creating symlink for Ultralytics models if necessary..."
+# --- Create Symlinks using the function ---
+create_model_symlink "/runpod-volume/ComfyUI/models/insightface" "/workspace/ComfyUI/models/insightface"
+create_model_symlink "/runpod-volume/ComfyUI/models/ultralytics" "/workspace/ComfyUI/models/ultralytics"
 
-ULTRALYTICS_SOURCE_DIR="/runpod-volume/ComfyUI/models/ultralytics"
-ULTRALYTICS_TARGET_DIR="/workspace/ComfyUI/models/ultralytics"
-
-# Ensure the parent directory for the target exists
-mkdir -p /workspace/ComfyUI/models
-
-# Check if the source directory exists on the volume
-if [ -d "${ULTRALYTICS_SOURCE_DIR}" ]; then
-  # Check if the target path doesn't exist or is not already a symlink
-  if [ ! -e "${ULTRALYTICS_TARGET_DIR}" ] && [ ! -L "${ULTRALYTICS_TARGET_DIR}" ]; then
-    echo "Creating symlink for Ultralytics: ${ULTRALYTICS_TARGET_DIR} -> ${ULTRALYTICS_SOURCE_DIR}"
-    ln -s "${ULTRALYTICS_SOURCE_DIR}" "${ULTRALYTICS_TARGET_DIR}"
-  elif [ -L "${ULTRALYTICS_TARGET_DIR}" ]; then
-     echo "Symlink ${ULTRALYTICS_TARGET_DIR} already exists."
-  else
-     echo "Warning: ${ULTRALYTICS_TARGET_DIR} exists but is not a symlink. Cannot create link."
-  fi
-else
-  echo "Warning: Source directory ${ULTRALYTICS_SOURCE_DIR} not found on volume. Cannot create symlink."
-fi
-# --- End Ultralytics Symlink Creation ---
+# --- End Symlink Creation ---
 
 echo "MOVING COMFYUI TO WORKSPACE"
 # Ensure clean workspace/ComfyUI directory setup
