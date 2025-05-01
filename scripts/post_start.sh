@@ -22,7 +22,7 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
     python3 main.py --disable-auto-launch --disable-metadata --listen
 else
     echo "runpod-worker-comfy: Starting ComfyUI with optimization"
-    python3 main.py --disable-auto-launch --disable-metadata --normalvram &
+    python3 main.py --disable-auto-launch --disable-metadata &
     COMFYUI_PID=$!
     echo "ComfyUI started in background (PID: $COMFYUI_PID)"
 

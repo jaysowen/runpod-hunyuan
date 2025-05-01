@@ -16,31 +16,7 @@ chmod 755 /workspace
 # Custom nodes are cloned and their requirements installed during Docker build.
 # No node installation/update is expected during startup.
 
-# --- Create Symlinks for models expected in default paths ---
-echo "Creating model symlinks if necessary..."
-# Ensure the default models directory exists
-mkdir -p /workspace/ComfyUI/models
-
-# Path where the model *actually* exists on the mounted volume (Updated based on user feedback)
-SEGFORMER_SOURCE_PATH="/runpod-volume/ComfyUI/models/segformer_b3_clothes"
-# Path where the node *expects* the model to be
-SEGFORMER_TARGET_PATH="/workspace/ComfyUI/models/segformer_b3_clothes"
-
-# Check if the source directory exists on the volume
-if [ -d "${SEGFORMER_SOURCE_PATH}" ]; then
-  # Check if the target path doesn't exist or is not already a symlink
-  if [ ! -e "${SEGFORMER_TARGET_PATH}" ] && [ ! -L "${SEGFORMER_TARGET_PATH}" ]; then
-    echo "Creating symlink for segformer_b3_clothes: ${SEGFORMER_TARGET_PATH} -> ${SEGFORMER_SOURCE_PATH}"
-    ln -s "${SEGFORMER_SOURCE_PATH}" "${SEGFORMER_TARGET_PATH}"
-  elif [ -L "${SEGFORMER_TARGET_PATH}" ]; then
-     echo "Symlink ${SEGFORMER_TARGET_PATH} already exists."
-  else
-     echo "Warning: ${SEGFORMER_TARGET_PATH} exists but is not a symlink. Cannot create link."
-  fi
-else
-  echo "Warning: Source directory ${SEGFORMER_SOURCE_PATH} not found on volume. Cannot create symlink."
-fi
-# --- End Symlink Creation ---
+# --- Symlink creation logic removed ---
 
 echo "MOVING COMFYUI TO WORKSPACE"
 # Ensure clean workspace/ComfyUI directory setup
