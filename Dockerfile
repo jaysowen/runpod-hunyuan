@@ -51,7 +51,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         wget \
         git \
-        ffmpeg \
         libgl1 \
         libglib2.0-0 \
         libsm6 \

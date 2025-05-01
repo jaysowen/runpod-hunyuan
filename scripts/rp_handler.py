@@ -7,11 +7,11 @@ import base64
 from io import BytesIO
 from PIL import Image
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
-import subprocess
-import tempfile
 import torch
 import gc
-import glob
+
+# --- Allowlist specific classes for torch.load (PyTorch >= 1.13+) ---
+# ... (Allowlist code remains the same) ...
 
 # --- 配置常量 ---
 # ComfyUI API 检查的时间间隔（毫秒）
@@ -333,90 +333,35 @@ def cleanup_local_file(file_path, file_description="file"):
         except OSError as e:
             print(f"runpod-worker-comfy - Error removing local {file_description} {file_path}: {e}")
 
-def generate_video_thumbnail(video_path, time_offset="00:00:01.000"):
-    """从视频生成缩略图"""
-    thumbnail_path = None
-    try:
-        # 创建一个临时文件名
-        with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
-            thumbnail_path = tmp_file.name
-
-        # 使用ffmpeg生成缩略图
-        cmd = [
-            'ffmpeg',
-            '-hide_banner', # 减少日志输出
-            '-loglevel', 'error', # 只输出错误
-            '-i', video_path,
-            '-ss', time_offset, # 精确到毫秒
-            '-vframes', '1',    # 只取一帧
-            '-vf', 'scale=320:-1', # 缩放宽度为320，高度自适应
-            '-q:v', '3',        # JPEG 质量 (2-5 是一个好范围)
-            '-y', thumbnail_path # 覆盖已存在的文件
-        ]
-
-        print(f"runpod-worker-comfy - Generating thumbnail for {video_path} at {thumbnail_path}")
-        process = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print(f"runpod-worker-comfy - Thumbnail generation successful for {video_path}")
-        return thumbnail_path
-
-    except FileNotFoundError:
-        print("runpod-worker-comfy - Error generating thumbnail: ffmpeg command not found. Ensure ffmpeg is installed and in PATH.")
-        cleanup_local_file(thumbnail_path, "thumbnail temp file") # 清理可能的空文件
-        return None
-    except subprocess.CalledProcessError as e:
-        print(f"runpod-worker-comfy - Error generating thumbnail for {video_path}: ffmpeg failed.")
-        print(f"ffmpeg stderr: {e.stderr}")
-        cleanup_local_file(thumbnail_path, "thumbnail temp file")
-        return None
-    except Exception as e:
-        print(f"runpod-worker-comfy - Unexpected error generating thumbnail for {video_path}: {str(e)}")
-        cleanup_local_file(thumbnail_path, "thumbnail temp file")
-        return None
-
 def process_output_item(item_info, job_id):
     """
     处理单个 ComfyUI 输出项（图像、视频或 GIF）。
-
     Args:
         item_info (dict): ComfyUI 输出列表中的单个项目信息。
-                          Expected keys: 'filename', 'subfolder', 'type' (e.g., 'output', 'temp').
-                          'fullpath' might be present for videos/gifs.
         job_id (str): 当前作业的 ID，用于 B2 路径。
-
     Returns:
         tuple: (result_dict, error_str)
-               result_dict: 包含 'url', 'thumbnail_url', 'type' 的字典，成功时返回。
+               result_dict: 包含 'url', 'type' 的字典，成功时返回。
                error_str: 描述错误的字符串，失败时返回。
                任一者为 None。
     """
     local_file_path = None
-    thumbnail_path = None
     try:
         filename = item_info.get("filename")
-        item_type_reported = item_info.get("type", "output") # Get type from ComfyUI history
+        item_type_reported = item_info.get("type", "output")
 
-        # --- Add check for temporary files ---
-        # Skip processing if it looks like a temporary file based on name or type
         if not filename or "_temp_" in filename or item_type_reported == "temp":
             print(f"runpod-worker-comfy - Skipping likely temporary file: {filename} (type: {item_type_reported})")
-            return None, None # Return None for both result and error to indicate skipped
-        # --- End check ---
-
-        if not filename:
-            return None, f"Skipping item with missing filename: {item_info}"
+            return None, None
 
         subfolder = item_info.get("subfolder", "")
-        # 'fullpath' is more reliable for videos/gifs if present
         local_file_path = item_info.get("fullpath")
 
         if not local_file_path:
-            # Construct path if fullpath is missing (common for images)
             relative_path = os.path.join(subfolder, filename)
-            # Use the unified output path
             local_file_path = os.path.join(COMFYUI_OUTPUT_PATH, relative_path.lstrip('/'))
 
         if not os.path.exists(local_file_path):
-            # Try the alternative base path just in case configuration is odd
             alt_path = os.path.join("/comfyui/output", relative_path.lstrip('/'))
             if os.path.exists(alt_path):
                 local_file_path = alt_path
@@ -427,7 +372,7 @@ def process_output_item(item_info, job_id):
         file_ext = os.path.splitext(filename)[1].lower()
         is_gif = file_ext == '.gif'
         is_video = file_ext in SUPPORTED_VIDEO_FORMATS and not is_gif
-        is_image = not is_video and not is_gif # Assume anything else is an image for now
+        is_image = not is_video and not is_gif
 
         if is_gif:
             storage_dir = 'gifs'
@@ -448,34 +393,13 @@ def process_output_item(item_info, job_id):
         file_url = upload_to_b2(local_file_path, b2_file_path)
 
         if not file_url:
-            # Don't clean up local file yet if upload failed, might be needed for retry/debug
             return None, f"Failed to upload {item_type} {filename} to B2."
-
-        thumbnail_url = None
-        if item_type == 'video': # Only generate thumbnails for videos (not gifs)
-            print(f"runpod-worker-comfy - Generating thumbnail for video: {filename}")
-            thumbnail_path = generate_video_thumbnail(local_file_path)
-            if thumbnail_path:
-                try:
-                    thumb_filename = f"{os.path.splitext(filename)[0]}_thumb.jpg"
-                    b2_thumbnail_path = f"{job_id}/thumbnails/{thumb_filename}"
-                    thumbnail_url = upload_to_b2(thumbnail_path, b2_thumbnail_path)
-                    if thumbnail_url:
-                        print(f"runpod-worker-comfy - Successfully uploaded thumbnail to: {thumbnail_url}")
-                    else:
-                        # Non-fatal: Log error but continue processing main video
-                        print(f"runpod-worker-comfy - Warning: Failed to upload thumbnail for {filename}")
-                finally:
-                    cleanup_local_file(thumbnail_path, "thumbnail")
-            else:
-                 print(f"runpod-worker-comfy - Warning: Failed to generate thumbnail for {filename}")
 
         # Main file uploaded successfully, now cleanup local file
         cleanup_local_file(local_file_path, item_type)
 
         result_data = {
             "url": file_url,
-            "thumbnail_url": thumbnail_url, # Will be None if not applicable or failed
             "type": item_type
         }
         print(f"runpod-worker-comfy - Successfully processed {item_type} ({filename}) to: {file_url}")
@@ -484,11 +408,8 @@ def process_output_item(item_info, job_id):
     except Exception as e:
         error_msg = f"Error processing output item {item_info.get('filename', 'Unknown Filename')}: {str(e)}"
         print(f"runpod-worker-comfy - {error_msg}")
-        # Attempt cleanup even on error
         cleanup_local_file(local_file_path, "output file on error")
-        cleanup_local_file(thumbnail_path, "thumbnail on error")
         return None, error_msg
-
 
 def process_comfyui_outputs(outputs, job_id):
     """
