@@ -18,6 +18,31 @@ chmod 755 /workspace
 
 # --- Symlink creation logic removed ---
 
+# --- Create Symlink for InsightFace models ---
+echo "Creating symlink for InsightFace models if necessary..."
+
+INSIGHTFACE_SOURCE_DIR="/runpod-volume/ComfyUI/models/insightface"
+INSIGHTFACE_TARGET_DIR="/workspace/ComfyUI/models/insightface"
+
+# Ensure the parent directory for the target exists
+mkdir -p /workspace/ComfyUI/models
+
+# Check if the source directory exists on the volume
+if [ -d "${INSIGHTFACE_SOURCE_DIR}" ]; then
+  # Check if the target path doesn't exist or is not already a symlink
+  if [ ! -e "${INSIGHTFACE_TARGET_DIR}" ] && [ ! -L "${INSIGHTFACE_TARGET_DIR}" ]; then
+    echo "Creating symlink for InsightFace: ${INSIGHTFACE_TARGET_DIR} -> ${INSIGHTFACE_SOURCE_DIR}"
+    ln -s "${INSIGHTFACE_SOURCE_DIR}" "${INSIGHTFACE_TARGET_DIR}"
+  elif [ -L "${INSIGHTFACE_TARGET_DIR}" ]; then
+     echo "Symlink ${INSIGHTFACE_TARGET_DIR} already exists."
+  else
+     echo "Warning: ${INSIGHTFACE_TARGET_DIR} exists but is not a symlink. Cannot create link."
+  fi
+else
+  echo "Warning: Source directory ${INSIGHTFACE_SOURCE_DIR} not found on volume. Cannot create symlink."
+fi
+# --- End InsightFace Symlink Creation ---
+
 echo "MOVING COMFYUI TO WORKSPACE"
 # Ensure clean workspace/ComfyUI directory setup
 if [ -e "/workspace/ComfyUI" ]; then
