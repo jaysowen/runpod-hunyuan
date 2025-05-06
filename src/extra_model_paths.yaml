@@ -1,5 +1,5 @@
 runpod_worker_comfy:
-  base_path: /runpod-volume/workspace 
+  base_path: /runpod-volume 
   checkpoints: ComfyUI/models/checkpoints/
   clip: ComfyUI/models/clip/
   clip_vision: ComfyUI/models/clip_vision/

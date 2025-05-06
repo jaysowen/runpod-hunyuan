@@ -566,16 +566,30 @@ def wait_for_workflow_completion(prompt_id, job_id):
 # --- 主处理函数 ---
 def handler(job):
     """
-    主处理函数，处理整个工作流程：
-    1. 初始化 B2 (如果配置)
-    2. 验证输入数据
-    3. 检查 ComfyUI 服务可用性
-    4. 上传输入图片（如果有）
-    5. 提交工作流到 ComfyUI
-    6. 等待处理完成
-    7. 处理输出（图片或视频/GIF）
-    8. 返回结果
+    RunPod Handler function
     """
+    job_id = job.get('id', 'unknown_job')
+    print(f"runpod-worker-comfy - Job {job_id} received.")
+
+    # --- 打印 SAMS 目录内容 ---
+    sams_model_path = "/runpod-volume/workspace/ComfyUI/models/sams/"
+    print(f"runpod-worker-comfy - Listing contents of {sams_model_path}:")
+    try:
+        if os.path.exists(sams_model_path) and os.path.isdir(sams_model_path):
+            contents = os.listdir(sams_model_path)
+            if contents:
+                for item in contents:
+                    print(f"runpod-worker-comfy -   Found: {item}")
+            else:
+                print(f"runpod-worker-comfy -   Directory is empty.")
+        else:
+            print(f"runpod-worker-comfy -   Directory does not exist or is not a directory.")
+    except Exception as e:
+        print(f"runpod-worker-comfy -   Error listing directory {sams_model_path}: {str(e)}")
+    # --- 结束打印 SAMS 目录内容 ---
+
+    # 记录开始时间
+    start_time = time.time()
 
     # 在处理新作业之前尝试清理 VRAM 缓存
     try:
@@ -589,7 +603,6 @@ def handler(job):
         # 不应阻止作业处理，只记录错误
 
     job_input = job.get("input", {})
-    job_id = job.get("id", "unknown_job")
     print(f"runpod-worker-comfy - Received job: {job_id}")
 
     # 1. 初始化 B2 (如果需要)
