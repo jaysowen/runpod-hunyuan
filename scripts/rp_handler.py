@@ -571,21 +571,47 @@ def handler(job):
     job_id = job.get('id', 'unknown_job')
     print(f"runpod-worker-comfy - Job {job_id} received.")
 
-    # --- 打印 SAMS 目录内容 ---
-    sams_model_path = "/runpod-volume/workspace/ComfyUI/models/sams/"
-    print(f"runpod-worker-comfy - Listing contents of {sams_model_path}:")
-    try:
-        if os.path.exists(sams_model_path) and os.path.isdir(sams_model_path):
-            contents = os.listdir(sams_model_path)
-            if contents:
-                for item in contents:
-                    print(f"runpod-worker-comfy -   Found: {item}")
+    # --- 打印多个潜在的 SAMS 目录内容进行诊断 ---
+    paths_to_check = {
+        "Symlink Source (extra_model_paths)": "/runpod-volume/ComfyUI/models/sams/",
+        "Handler's Original Check Path": "/runpod-volume/workspace/ComfyUI/models/sams/",
+        "Symlink Target Path": "/workspace/ComfyUI/models/sams/"
+    }
+
+    for description, path_to_list in paths_to_check.items():
+        print(f"runpod-worker-comfy - Diagnostic: Listing contents of '{description}': {path_to_list}")
+        try:
+            if os.path.exists(path_to_list):
+                if os.path.isdir(path_to_list):
+                    contents = os.listdir(path_to_list)
+                    if contents:
+                        for item in contents:
+                            print(f"runpod-worker-comfy -   Found in {path_to_list}: {item}")
+                    else:
+                        print(f"runpod-worker-comfy -   Directory {path_to_list} is empty.")
+                elif os.path.islink(path_to_list):
+                    link_target = os.readlink(path_to_list)
+                    print(f"runpod-worker-comfy -   Path {path_to_list} is a symlink pointing to: {link_target}")
+                    # Optionally, try listing the target if it's a directory
+                    if os.path.isdir(link_target) and os.path.exists(link_target): # Check if target is a directory and exists
+                        print(f"runpod-worker-comfy -   Listing contents of symlink target {link_target}:")
+                        target_contents = os.listdir(link_target)
+                        if target_contents:
+                            for item in target_contents:
+                                print(f"runpod-worker-comfy -     Found in {link_target}: {item}")
+                        else:
+                            print(f"runpod-worker-comfy -     Symlink target {link_target} is empty.")
+                    elif not os.path.exists(link_target):
+                         print(f"runpod-worker-comfy -     Symlink target {link_target} does not exist (broken link).")
+                    else:
+                        print(f"runpod-worker-comfy -     Symlink target {link_target} is not a directory.")
+
+                else:
+                    print(f"runpod-worker-comfy -   Path {path_to_list} exists but is not a directory or symlink.")
             else:
-                print(f"runpod-worker-comfy -   Directory is empty.")
-        else:
-            print(f"runpod-worker-comfy -   Directory does not exist or is not a directory.")
-    except Exception as e:
-        print(f"runpod-worker-comfy -   Error listing directory {sams_model_path}: {str(e)}")
+                print(f"runpod-worker-comfy -   Path {path_to_list} does not exist.")
+        except Exception as e:
+            print(f"runpod-worker-comfy -   Error listing directory {path_to_list}: {str(e)}")
     # --- 结束打印 SAMS 目录内容 ---
 
     # 记录开始时间
