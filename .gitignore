@@ -38,3 +38,4 @@ Thumbs.db
 # Logs
 *.log
 serverless_urpm_swapface.json
+test_input.json
