@@ -1,7 +1,7 @@
 # =============================================================================
 # 1) BUILDER STAGE
 # =============================================================================
-FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 AS builder
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04 AS builder
 
 # Install build dependencies
 RUN apt-get update && \
@@ -43,7 +43,7 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 # 2) FINAL STAGE - Only Jupyter pip packages removed
 # =============================================================================
-FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && \
@@ -87,18 +87,18 @@ ENV CC=gcc \
 # Upgrade pip - UNCHANGED
 RUN pip install --no-cache-dir --upgrade pip
 
-# --- Install PyTorch for CUDA 12.1 (Specific Version) ---
+# --- Install PyTorch for CUDA 12.4 (Specific Version) ---
 # Verify torchvision/torchaudio compatibility if necessary
 ENV PYTORCH_VERSION=2.5.1
 ENV TORCHVISION_VERSION=0.20.1
 ENV TORCHAUDIO_VERSION=2.5.1
 
-RUN echo "Installing PyTorch ${PYTORCH_VERSION}, torchvision ${TORCHVISION_VERSION}, torchaudio ${TORCHAUDIO_VERSION} for CUDA 12.1" && \
+RUN echo "Installing PyTorch ${PYTORCH_VERSION}, torchvision ${TORCHVISION_VERSION}, torchaudio ${TORCHAUDIO_VERSION} for CUDA 12.4" && \
     pip install --no-cache-dir \
         torch==${PYTORCH_VERSION} \
         torchvision==${TORCHVISION_VERSION} \
         torchaudio==${TORCHAUDIO_VERSION} \
-        --index-url https://download.pytorch.org/whl/cu121
+        --index-url https://download.pytorch.org/whl/cu124
 
 # Copy ComfyUI from builder
 COPY --from=builder /ComfyUI /ComfyUI
