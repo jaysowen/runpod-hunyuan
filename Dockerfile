@@ -128,7 +128,7 @@ ADD src/extra_model_paths.yaml ./
 WORKDIR /ComfyUI/custom_nodes
 RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
    # git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
-   # git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
+    git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
    # git clone https://github.com/cubiq/ComfyUI_InstantID.git && \
