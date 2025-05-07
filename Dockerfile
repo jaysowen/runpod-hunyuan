@@ -1,7 +1,7 @@
 # =============================================================================
 # 1) BUILDER STAGE
 # =============================================================================
-FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04 AS builder
+FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04 AS builder
 
 # Install build dependencies
 RUN apt-get update && \
@@ -43,7 +43,7 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 # =============================================================================
 # 2) FINAL STAGE - Only Jupyter pip packages removed
 # =============================================================================
-FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.0-devel-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && \
