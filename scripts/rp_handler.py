@@ -661,7 +661,8 @@ def handler(job):
     print(f"runpod-worker-comfy - Received job input payload for job: {job_id}")
 
     # Get blur generation flag and custom radius from the job input payload
-    should_generate_blur = job_input_payload.get("generate_blurred_image", True)
+    should_generate_blur = job_input_payload.get("generate_blurred_image", True) # Default to True
+    print(f"runpod-worker-comfy - Parsed 'should_generate_blur': {should_generate_blur} (Type: {type(should_generate_blur)})") # DEBUG LOG
     # Use API provided blur_radius if present and valid, otherwise default to ENV
     custom_blur_radius = job_input_payload.get("blur_radius")
     blur_radius_to_use = IMAGE_FILTER_BLUR_RADIUS # Default from ENV
