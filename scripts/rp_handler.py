@@ -401,8 +401,7 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
 
         result_data = {
             "url": original_file_url,
-            "type": item_type,
-            "filename": filename
+            "type": item_type
         }
 
         # --- Blur logic starts --- 
@@ -451,7 +450,6 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
                 
                 if blurred_file_url:
                     result_data['blurred_url'] = blurred_file_url
-                    result_data['blurred_filename'] = blurred_filename
                     print(f"runpod-worker-comfy - Successfully uploaded blurred image ({blurred_filename}) to: {blurred_file_url}")
                 else:
                     print(f"runpod-worker-comfy - Failed to upload blurred image ({blurred_filename}) to B2.")
