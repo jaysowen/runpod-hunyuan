@@ -5,7 +5,7 @@ import os
 import requests
 import base64
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageFilter
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
 import torch
 import gc
@@ -333,12 +333,14 @@ def cleanup_local_file(file_path, file_description="file"):
         except OSError as e:
             print(f"runpod-worker-comfy - Error removing local {file_description} {file_path}: {e}")
 
-def process_output_item(item_info, job_id):
+def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
     """
     处理单个 ComfyUI 输出项（图像、视频或 GIF）。
     Args:
         item_info (dict): ComfyUI 输出列表中的单个项目信息。
         job_id (str): 当前作业的 ID，用于 B2 路径。
+        should_generate_blur (bool): Whether to generate a blurred version of the output.
+        blur_radius (float): The radius for the blurred version.
     Returns:
         tuple: (result_dict, error_str)
                result_dict: 包含 'url', 'type' 的字典，成功时返回。
@@ -346,6 +348,7 @@ def process_output_item(item_info, job_id):
                任一者为 None。
     """
     local_file_path = None
+    local_blurred_file_path = None # Initialize for cleanup in broader scope
     try:
         filename = item_info.get("filename")
         item_type_reported = item_info.get("type", "output")
@@ -388,36 +391,104 @@ def process_output_item(item_info, job_id):
 
         print(f"runpod-worker-comfy - Processing {item_type} output: {local_file_path}")
 
-        # Upload the main file
-        b2_file_path = f"{job_id}/{storage_dir}/{filename}"
-        file_url = upload_to_b2(local_file_path, b2_file_path)
+        # Upload the main file (original)
+        b2_original_file_path = f"{job_id}/{storage_dir}/{filename}"
+        original_file_url = upload_to_b2(local_file_path, b2_original_file_path)
 
-        if not file_url:
-            return None, f"Failed to upload {item_type} {filename} to B2."
-
-        # Main file uploaded successfully, now cleanup local file
-        cleanup_local_file(local_file_path, item_type)
+        if not original_file_url:
+            cleanup_local_file(local_file_path, item_type) # Cleanup original if its upload failed
+            return None, f"Failed to upload original {item_type} {filename} to B2."
 
         result_data = {
-            "url": file_url,
-            "type": item_type
+            "url": original_file_url,
+            "type": item_type,
+            "filename": filename
         }
-        print(f"runpod-worker-comfy - Successfully processed {item_type} ({filename}) to: {file_url}")
+
+        # --- Blur logic starts --- 
+        if item_type == 'image' and should_generate_blur and blur_radius > 0:
+            print(f"runpod-worker-comfy - Generating blurred version for {filename} with radius {blur_radius}")
+            try:
+                img = Image.open(local_file_path)
+                # Ensure image is in a mode that supports blur (e.g., RGB, RGBA)
+                # Common modes: L (luminance), RGB, RGBA, CMYK, YCbCr, I (integer), F (float)
+                if img.mode not in ['RGB', 'RGBA', 'L']:
+                    # Attempt to convert to a suitable mode, prefer RGBA if alpha might be present
+                    # or L if it was grayscale, otherwise RGB.
+                    if img.mode == 'P': # Palette mode, often needs conversion
+                        img = img.convert('RGBA')
+                    elif 'A' in img.mode : # Check for modes like LA, PA etc.
+                        img = img.convert('RGBA')
+                    elif img.mode == 'L':
+                        pass # Already grayscale, blur should work
+                    else: # For others like CMYK, YCbCr, etc., convert to RGB
+                        img = img.convert('RGB')
+                    print(f"runpod-worker-comfy - Converted image {filename} from mode {img.info.get('original_mode', 'unknown')} to {img.mode} for blurring.")
+
+                blurred_img = img.filter(ImageFilter.GaussianBlur(radius=float(blur_radius))) # Ensure radius is float
+                
+                base, ext = os.path.splitext(filename)
+                blurred_filename = f"{base}_blurred{ext}"
+                
+                # Save blurred image next to the original, or use tempfile for more robust temp file handling
+                local_blurred_file_path = os.path.join(os.path.dirname(local_file_path), blurred_filename)
+                
+                save_format = None
+                original_ext_lower = ext.lower()
+                if original_ext_lower in ['.jpg', '.jpeg']:
+                    save_format = 'JPEG'
+                elif original_ext_lower == '.png':
+                    save_format = 'PNG'
+                
+                if save_format == 'JPEG' and blurred_img.mode == 'RGBA':
+                    blurred_img = blurred_img.convert('RGB')
+
+                blurred_img.save(local_blurred_file_path, format=save_format)
+                print(f"runpod-worker-comfy - Saved local blurred image to {local_blurred_file_path}")
+                
+                b2_blurred_file_path = f"{job_id}/{storage_dir}/{blurred_filename}"
+                blurred_file_url = upload_to_b2(local_blurred_file_path, b2_blurred_file_path)
+                
+                if blurred_file_url:
+                    result_data['blurred_url'] = blurred_file_url
+                    result_data['blurred_filename'] = blurred_filename
+                    print(f"runpod-worker-comfy - Successfully uploaded blurred image ({blurred_filename}) to: {blurred_file_url}")
+                else:
+                    print(f"runpod-worker-comfy - Failed to upload blurred image ({blurred_filename}) to B2.")
+                
+                # Cleanup local blurred file regardless of B2 upload success for this attempt
+                cleanup_local_file(local_blurred_file_path, "blurred " + item_type)
+
+            except Exception as blur_err:
+                print(f"runpod-worker-comfy - Error generating or uploading blurred version for {filename}: {str(blur_err)}")
+                # If local_blurred_file_path was set and exists, try to clean it up
+                if local_blurred_file_path and os.path.exists(local_blurred_file_path):
+                    cleanup_local_file(local_blurred_file_path, "failed blurred " + item_type)
+        # --- Blur logic ends ---
+
+        # Main file (original) uploaded successfully. Cleanup the original local file.
+        cleanup_local_file(local_file_path, item_type)
+
+        print(f"runpod-worker-comfy - Successfully processed original {item_type} ({filename}) to: {original_file_url}")
         return result_data, None
 
     except Exception as e:
         error_msg = f"Error processing output item {item_info.get('filename', 'Unknown Filename')}: {str(e)}"
         print(f"runpod-worker-comfy - {error_msg}")
         cleanup_local_file(local_file_path, "output file on error")
+        if local_blurred_file_path and os.path.exists(local_blurred_file_path): # Also cleanup blurred if it exists on main error
+             cleanup_local_file(local_blurred_file_path, "blurred output file on error")
         return None, error_msg
 
-def process_comfyui_outputs(outputs, job_id):
+def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius):
     """
     处理来自 ComfyUI 的所有输出（图像、视频、GIF）。
 
     Args:
         outputs (dict): ComfyUI /history/<prompt_id> 响应中的 'outputs' 字典。
         job_id (str): 当前作业 ID。
+        should_generate_blur (bool): Whether to generate a blurred version of the output.
+        blur_radius (float): The radius for the blurred version.
 
     Returns:
         dict: 包含处理结果和状态的字典。
@@ -450,7 +521,7 @@ def process_comfyui_outputs(outputs, job_id):
         print(f"runpod-worker-comfy - Found {len(output_items)} output item(s) in node {node_id}")
 
         for item_info in output_items:
-            result_data, error_str = process_output_item(item_info, job_id)
+            result_data, error_str = process_output_item(item_info, job_id, should_generate_blur, blur_radius)
             if error_str:
                 errors.append(error_str)
             if result_data:
@@ -628,8 +699,20 @@ def handler(job):
         print(f"runpod-worker-comfy - Error during VRAM cache cleaning: {e}")
         # 不应阻止作业处理，只记录错误
 
-    job_input = job.get("input", {})
-    print(f"runpod-worker-comfy - Received job: {job_id}")
+    # job_input is the raw input from RunPod, which should be a dict if JSON was sent
+    job_input_payload = job.get("input", {})
+    print(f"runpod-worker-comfy - Received job input payload for job: {job_id}")
+
+    # Get blur generation flag and custom radius from the job input payload
+    should_generate_blur = job_input_payload.get("generate_blurred_image", False)
+    # Use API provided blur_radius if present and valid, otherwise default to ENV
+    custom_blur_radius = job_input_payload.get("blur_radius")
+    blur_radius_to_use = IMAGE_FILTER_BLUR_RADIUS # Default from ENV
+    if isinstance(custom_blur_radius, (int, float)) and custom_blur_radius > 0:
+        blur_radius_to_use = custom_blur_radius
+        print(f"runpod-worker-comfy - Using custom blur radius from API: {blur_radius_to_use}")
+    else:
+        print(f"runpod-worker-comfy - Using default blur radius from ENV: {blur_radius_to_use}")
 
     # 1. 初始化 B2 (如果需要)
     initialize_b2()
@@ -637,7 +720,7 @@ def handler(job):
     try:
         # 2. 验证输入
         print("runpod-worker-comfy - Validating input...")
-        validated_data, error_message = validate_input(job_input)
+        validated_data, error_message = validate_input(job_input_payload)
         if error_message:
             print(f"runpod-worker-comfy - Input validation failed: {error_message}")
             return {"error": f"Input validation failed: {error_message}"}
@@ -692,7 +775,7 @@ def handler(job):
 
         # 7. 处理输出 (统一处理)
         print(f"runpod-worker-comfy - Processing ComfyUI outputs for job {job_id}...")
-        output_processing_result = process_comfyui_outputs(outputs, job_id)
+        output_processing_result = process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius_to_use)
 
         # 构建最终返回结果
         final_result = {
