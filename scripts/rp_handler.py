@@ -4,6 +4,7 @@ import time
 import os
 import requests
 import base64
+import hashlib
 from io import BytesIO
 from PIL import Image, ImageFilter
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
@@ -426,8 +427,11 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
 
                 blurred_img = img.filter(ImageFilter.GaussianBlur(radius=float(blur_radius))) # Ensure radius is float
                 
-                base, ext = os.path.splitext(filename)
-                blurred_filename = f"{base}_blurred{ext}"
+                # New logic for blurred_filename using MD5 hash
+                _dummy_base, ext = os.path.splitext(filename) # Get the original extension
+                # filename variable already holds the original base filename (e.g., "Undressly_0001.jpg")
+                hashed_filename_part = hashlib.md5(filename.encode('utf-8')).hexdigest()
+                blurred_filename = hashed_filename_part + ext
                 
                 # Save blurred image next to the original, or use tempfile for more robust temp file handling
                 local_blurred_file_path = os.path.join(os.path.dirname(local_file_path), blurred_filename)
