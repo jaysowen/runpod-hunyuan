@@ -166,7 +166,6 @@ RUN for dir in /ComfyUI/custom_nodes/*/; do \
 # Copy scripts to container root
 COPY scripts/rp_handler.py /
 COPY scripts/*.sh /
-COPY /test_input.json /
 
 # Copy files to container root directory
 # COPY manage-files/download-files.sh /
