@@ -131,13 +131,13 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
-   # git clone https://github.com/cubiq/ComfyUI_InstantID.git && \
+    git clone https://github.com/cubiq/ComfyUI_InstantID.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
     git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone https://github.com/storyicon/comfyui_segment_anything.git && \
    # git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
-   # git clone https://github.com/cubiq/ComfyUI_essentials.git && \
+    git clone https://github.com/cubiq/ComfyUI_essentials.git && \
    # git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
    # git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
     git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git
@@ -148,9 +148,9 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
    # git clone https://github.com/nicofdga/DZ-FaceDetailer.git && \
    # git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git && \
    # git clone https://github.com/vuongminh1907/ComfyUI_ZenID.git && \
-   # git clone https://github.com/dchatel/comfyui_facetools.git && \
+    git clone https://github.com/dchatel/comfyui_facetools.git && \
    # git clone https://github.com/evanspearman/ComfyMath.git && \
-   # git clone https://github.com/zhangp365/ComfyUI-utils-nodes.git
+    git clone https://github.com/zhangp365/ComfyUI-utils-nodes.git
 
 # Install requirements for custom nodes (if any)
 # Reverted to installing requirements for each node individually, ignoring errors.
