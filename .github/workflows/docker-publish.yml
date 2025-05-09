@@ -2,9 +2,9 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ "general" ]
+    branches: [ "general", "t2vfw" ]
   pull_request:
-    branches: [ "general" ]
+    branches: [ "general", "t2vfw" ]
 
 env:
   IMAGE_NAME: jaysowen/runpod-worker-comfy
@@ -58,6 +58,8 @@ jobs:
           tags: |
             type=raw,value=general,enable=${{ github.ref == 'refs/heads/general' }}
             type=raw,value=general-v0.1,enable=${{ github.ref == 'refs/heads/general' }}
+            type=raw,value=t2vfw,enable=${{ github.ref == 'refs/heads/t2vfw' }}
+            type=raw,value=t2vfw-v0.1,enable=${{ github.ref == 'refs/heads/t2vfw' }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push
