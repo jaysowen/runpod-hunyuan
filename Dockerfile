@@ -140,7 +140,7 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials.git && \
    # git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
    # git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
-    git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git \
+    git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && \
    # git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git && \
    # git clone https://github.com/cubiq/ComfyUI_FaceAnalysis.git && \
    # git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git && \
@@ -166,10 +166,6 @@ RUN for dir in /ComfyUI/custom_nodes/*/; do \
 # Copy scripts to container root
 COPY scripts/rp_handler.py /
 COPY scripts/*.sh /
-
-# Copy files to container root directory
-# COPY manage-files/download-files.sh /
-# COPY manage-files/files.txt /
 
 # Also create workspace directory structure
 RUN mkdir -p /workspace
