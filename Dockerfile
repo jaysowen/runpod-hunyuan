@@ -140,7 +140,7 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials.git && \
    # git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
    # git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
-    git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git
+    git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git \
    # git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git && \
    # git clone https://github.com/cubiq/ComfyUI_FaceAnalysis.git && \
    # git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git && \
