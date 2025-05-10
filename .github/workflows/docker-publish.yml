@@ -57,7 +57,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=general,enable=${{ github.ref == 'refs/heads/general' }}
-            type=raw,value=general-v0.1,enable=${{ github.ref == 'refs/heads/general' }}
+            type=raw,value=general-v0.2,enable=${{ github.ref == 'refs/heads/general' }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push
