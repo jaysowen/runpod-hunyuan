@@ -10,6 +10,10 @@ from PIL import Image, ImageFilter
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
 import torch
 import gc
+import urllib3 # Added import
+
+# Disable InsecureRequestWarning when verify=False is used with requests
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Added to disable warnings
 
 # --- Allowlist specific classes for torch.load (PyTorch >= 1.13+) ---
 # ... (Allowlist code remains the same) ...
@@ -178,7 +182,7 @@ def check_server(url, retries=COMFY_API_AVAILABLE_MAX_RETRIES, delay=COMFY_API_A
     print(f"runpod-worker-comfy - Checking ComfyUI API at {url}...")
     for i in range(retries):
         try:
-            response = requests.get(url, timeout=2) # 设置短暂超时
+            response = requests.get(url, timeout=2, verify=False) # Added verify=False
             if response.status_code == 200:
                 print(f"runpod-worker-comfy - ComfyUI API is reachable.")
                 return True
@@ -192,7 +196,8 @@ def check_server(url, retries=COMFY_API_AVAILABLE_MAX_RETRIES, delay=COMFY_API_A
 def download_image(url):
     """从URL下载图片"""
     try:
-        response = requests.get(url, timeout=20) # 增加下载超时时间
+        # 在这里为外部图片下载添加 verify=False
+        response = requests.get(url, timeout=20, verify=False) 
         response.raise_for_status()
         return response.content
     except requests.exceptions.RequestException as e:
@@ -247,39 +252,87 @@ def upload_images(images):
 
         # If blob was successfully obtained (downloaded or decoded)
         if blob:
+            processed_blob = None # Define before try block
             try:
-                # 保存下载或解码后的图片到 ComfyUI 输入目录
-                print(f"runpod-worker-comfy - Saving image '{name}' to {local_path}")
+                # --- EXIF Stripping Logic ---
+                print(f"runpod-worker-comfy - Attempting to process and potentially strip EXIF from image {name}...")
+                img = Image.open(BytesIO(blob))
+                
+                output_bytes_io = BytesIO()
+                img_pillow_format = img.format 
+
+                _original_root, original_ext = os.path.splitext(name)
+                original_ext = original_ext.lower()
+                final_save_format_pil = None 
+
+                if original_ext == '.gif':
+                    final_save_format_pil = 'GIF'
+                elif original_ext in ['.jpg', '.jpeg']:
+                    final_save_format_pil = 'JPEG'
+                elif original_ext == '.png':
+                    final_save_format_pil = 'PNG'
+                elif img_pillow_format: 
+                    if img_pillow_format.upper() == 'GIF': final_save_format_pil = 'GIF'
+                    elif img_pillow_format.upper() == 'JPEG': final_save_format_pil = 'JPEG'
+                    elif img_pillow_format.upper() == 'PNG': final_save_format_pil = 'PNG'
+                
+                if not final_save_format_pil: 
+                    print(f"runpod-worker-comfy - Could not determine original format for {name} reliably, defaulting to PNG for saving.")
+                    final_save_format_pil = 'PNG'
+
+                if final_save_format_pil == 'GIF':
+                    print(f"runpod-worker-comfy - Using original blob for GIF image {name} to preserve animation.")
+                    output_bytes_io.write(blob) 
+                else:
+                    if final_save_format_pil == 'JPEG' and img.mode == 'RGBA':
+                        print(f"runpod-worker-comfy - Converting RGBA image {name} to RGB before saving as JPEG (stripping EXIF).")
+                        img = img.convert('RGB')
+                    
+                    if final_save_format_pil == 'JPEG':
+                        img.save(output_bytes_io, format=final_save_format_pil, quality=95)
+                    else: 
+                        img.save(output_bytes_io, format=final_save_format_pil)
+                    print(f"runpod-worker-comfy - Image {name} processed (EXIF likely stripped) and re-saved as {final_save_format_pil}.")
+                
+                processed_blob = output_bytes_io.getvalue()
+                # --- End of EXIF Stripping ---
+
+                print(f"runpod-worker-comfy - Saving image '{name}' to {local_path} (as {final_save_format_pil})...")
                 with open(local_path, 'wb') as f:
-                    f.write(blob)
+                    f.write(processed_blob) 
                 print(f"runpod-worker-comfy - Saved image to {local_path}")
 
-                # 将本地文件上传到 ComfyUI API (保持现有逻辑)
                 print(f"runpod-worker-comfy - Uploading saved image '{name}' via ComfyUI API...")
-                # Make sure to open the *saved* local file for upload
                 with open(local_path, 'rb') as f_upload:
+                    content_type = "image/png" 
+                    if final_save_format_pil == 'JPEG':
+                        content_type = "image/jpeg"
+                    elif final_save_format_pil == 'GIF':
+                        content_type = "image/gif"
+                    
                     files = {
-                        "image": (safe_filename, f_upload, "image/png"), # Use safe_filename for upload
+                        "image": (safe_filename, f_upload, content_type),
                         "overwrite": (None, "true"),
                     }
                     upload_url = f"http://{COMFY_HOST}/upload/image"
-                    response = requests.post(upload_url, files=files, timeout=30) # Add timeout to upload
+                    response = requests.post(upload_url, files=files, timeout=30)
 
                 if response.status_code == 200:
                     uploaded_info = response.json()
-                    # Add the local path info for reference if needed, though ComfyUI response is primary
                     uploaded_info['local_path'] = local_path
                     uploaded_files_info.append(uploaded_info)
-                    print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
+                    print(f"runpod-worker-comfy - Successfully uploaded '{name}' (as {content_type}) to ComfyUI.")
                 else:
                     errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
-                    # Attempt cleanup of local file if API upload fails?
-                    # cleanup_local_file(local_path, f"failed upload image {name}")
+                    cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
+
             except Exception as e:
-                errors.append(f"Error processing/saving/uploading '{name}': {e}")
-                # Ensure cleanup if saving/uploading fails mid-way
-                cleanup_local_file(local_path, f"error processing image {name}")
-        # If blob is None (due to download/decode failure handled above), loop continues
+                import traceback
+                tb_str = traceback.format_exc()
+                error_msg = f"Error during image processing/saving (EXIF stripping or local save) for '{name}': {e}. Traceback: {tb_str}"
+                print(f"runpod-worker-comfy - {error_msg}")
+                errors.append(error_msg)
+                cleanup_local_file(local_path, f"error processing image {name}") 
 
     if errors:
         print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
@@ -551,18 +604,15 @@ def wait_for_workflow_completion(prompt_id, job_id):
     """轮询 ComfyUI 直到工作流完成、失败或超时。"""
     print(f"runpod-worker-comfy - Waiting for workflow completion (Prompt ID: {prompt_id})...")
     start_time = time.time()
-    last_error = None
     outputs = {}
 
     while True:
         try:
-            # 检查是否超时
             elapsed_time = time.time() - start_time
             if elapsed_time > JOB_TIMEOUT_SECONDS:
                 print(f"runpod-worker-comfy - Job {job_id} timed out after {JOB_TIMEOUT_SECONDS} seconds (Prompt ID: {prompt_id})")
                 return {"status": "error", "error": f"Job processing timed out after {JOB_TIMEOUT_SECONDS} seconds"}
 
-            # 检查工作流历史
             history_url = f"http://{COMFY_HOST}/history/{prompt_id}"
             response = requests.get(history_url, timeout=5)
 
@@ -570,70 +620,88 @@ def wait_for_workflow_completion(prompt_id, job_id):
                 history_data = response.json()
                 if prompt_id in history_data:
                     workflow_data = history_data[prompt_id]
-                    outputs = workflow_data.get("outputs", {})
+                    prompt_status_obj = workflow_data.get("status", {})
+                    current_outputs = workflow_data.get("outputs", {}) # Get current outputs
+                    # Update main outputs dict only if new outputs are found, to preserve last known outputs on error
+                    if current_outputs: 
+                        outputs = current_outputs
+                    
+                    last_error_message = None
 
-                    # 检查工作流级别的错误
-                    if "error" in workflow_data:
-                         last_error = workflow_data["error"]
-                         print(f"runpod-worker-comfy - Workflow error detected: {last_error}")
+                    if prompt_status_obj.get("status_str") == "error":
+                        messages = prompt_status_obj.get("messages", [])
+                        for msg_list in messages: # messages is a list of lists/tuples
+                            if isinstance(msg_list, (list, tuple)) and len(msg_list) > 1:
+                                msg_type = msg_list[0]
+                                msg_data = msg_list[1]
+                                if msg_type == "execution_error" and isinstance(msg_data, dict):
+                                    node_type = msg_data.get('node_type', 'UnknownNode')
+                                    node_id_err = msg_data.get('node_id', 'N/A')
+                                    exc_type = msg_data.get('exception_type', 'Error')
+                                    exc_msg = msg_data.get('exception_message', 'Unknown error')
+                                    # Traceback might be useful but can be very long
+                                    # exc_traceback = msg_data.get('traceback', '') 
+                                    last_error_message = f"Node {node_type} (ID: {node_id_err}): {exc_type}: {exc_msg}"
+                                    break 
+                        if not last_error_message:
+                            last_error_message = "Workflow status reported as 'error' by ComfyUI with no detailed message in status.messages."
+                        print(f"runpod-worker-comfy - ComfyUI reported workflow error. Status: {prompt_status_obj.get('status_str')}, Details: {last_error_message}")
 
-                    # 检查节点状态错误 (如果存在 status 字段)
-                    if "status" in workflow_data and isinstance(workflow_data["status"], dict):
-                        for node_id, node_data in workflow_data["status"].items():
-                             # Check if node_data is a dictionary and has an 'error' key
-                            if isinstance(node_data, dict) and "error" in node_data:
-                                node_error = node_data['error']
-                                print(f"runpod-worker-comfy - Node {node_id} error: {node_error}")
-                                # Use the first node error encountered if no workflow-level error exists
-                                if not last_error:
-                                    last_error = f"Node {node_id}: {node_error}"
+                    if not last_error_message and isinstance(outputs, dict):
+                        for node_id_out, node_output_data in outputs.items():
+                            if isinstance(node_output_data, dict) and "errors" in node_output_data and node_output_data["errors"]:
+                                try:
+                                    error_detail = node_output_data["errors"][0] 
+                                    err_type = error_detail.get('type', node_id_out) 
+                                    err_msg = error_detail.get('message', 'Unknown error in node output')
+                                    err_details = error_detail.get('details', '')
+                                    last_error_message = f"Node output error ({err_type} for node {node_id_out}): {err_msg}. Details: {err_details}"
+                                    print(f"runpod-worker-comfy - Error detected in node output '{node_id_out}': {last_error_message}")
+                                except Exception as e_parse:
+                                    last_error_message = f"Error detected in node output '{node_id_out}', but failed to parse details: {str(node_output_data['errors'])}. Parse error: {e_parse}"
+                                    print(f"runpod-worker-comfy - {last_error_message}")
+                                break 
+                    
+                    is_completed = prompt_status_obj.get("completed", False)
 
-
-                    # 检查是否完成 (有输出) 或失败 (有错误)
-                    if outputs:
-                        print(f"runpod-worker-comfy - Workflow completed successfully (Prompt ID: {prompt_id})")
-                        return {"status": "success", "outputs": outputs}
-                    elif last_error:
-                        print(f"runpod-worker-comfy - Workflow failed (Prompt ID: {prompt_id}): {last_error}")
+                    if last_error_message:
+                        print(f"runpod-worker-comfy - Workflow failed (Prompt ID: {prompt_id}): {last_error_message}")
                         return {
                             "status": "error",
-                            "error": f"Workflow execution failed: {last_error}",
-                            "detail": workflow_data # Optionally include full data for debugging
+                            "error": f"Workflow execution failed: {last_error_message}",
+                            "detail": workflow_data 
                         }
-                    # else: still running, continue polling
+
+                    if is_completed:
+                        if prompt_status_obj.get("status_str") == "success":
+                            print(f"runpod-worker-comfy - Workflow completed successfully (Prompt ID: {prompt_id})")
+                            return {"status": "success", "outputs": outputs}
+                        else:
+                            final_status_str = prompt_status_obj.get('status_str', 'unknown')
+                            unhandled_error_message = f"Workflow completed with unhandled status '{final_status_str}' and no specific error messages captured. Outputs: {bool(outputs)}"
+                            print(f"runpod-worker-comfy - {unhandled_error_message} (Prompt ID: {prompt_id})")
+                            return {
+                                "status": "error",
+                                "error": unhandled_error_message,
+                                "detail": workflow_data
+                            }
 
             elif response.status_code == 404:
-                # Prompt ID might not appear immediately, treat as still running for a while
                 print(f"runpod-worker-comfy - Prompt ID {prompt_id} not found in history yet, continuing poll...")
             else:
-                # Handle other unexpected HTTP statuses
                 print(f"runpod-worker-comfy - Unexpected HTTP status {response.status_code} when checking history for {prompt_id}. Response: {response.text}")
-                # Consider this a transient error and continue polling for a few retries? Or fail fast?
-                # Let's continue polling for now.
 
-            # Wait before next poll (ensure this happens even after exceptions)
             time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
 
         except requests.exceptions.Timeout:
              print(f"runpod-worker-comfy - Timeout connecting to ComfyUI history endpoint for {prompt_id}. Retrying...")
-             # Wait slightly longer on timeout before retrying
              time.sleep(max(COMFY_POLLING_INTERVAL_MS / 1000, 1.0))
         except requests.exceptions.RequestException as e:
             print(f"runpod-worker-comfy - Error checking workflow status for {prompt_id}: {str(e)}. Retrying...")
-            # Wait before retrying on other request exceptions
             time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
-
-    # Remove the final block based on retries, as it should be unreachable
-    # # If loop finishes without success or specific error
-    # final_error_message = "Workflow did not complete successfully after maximum retries."
-    # if last_error:
-    #      final_error_message = f"Workflow failed after maximum retries: {last_error}"
-    # print(f"runpod-worker-comfy - {final_error_message} (Prompt ID: {prompt_id})")
-    # return {
-    #     "status": "error",
-    #     "error": final_error_message,
-    #     "detail": "Maximum polling retries reached or final state indicates failure."
-    # }
+        except json.JSONDecodeError as e:
+            print(f"runpod-worker-comfy - Error decoding JSON from history for {prompt_id}: {str(e)}. Response: {response.text if 'response' in locals() else 'N/A'}. Retrying...")
+            time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
 
 
 # --- 主处理函数 ---
