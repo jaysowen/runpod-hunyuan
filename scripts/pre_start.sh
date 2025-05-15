@@ -8,7 +8,7 @@ export PATH="/workspace/bin:$PATH"
 mkdir -p /workspace
 chmod 755 /workspace
 
-# --- Model Check and Download Logic Removed --- 
+# --- Model Check and Download Logic Removed ---
 # Models are now expected to be mounted via a network volume
 # and configured in src/extra_model_paths.yaml
 
@@ -16,70 +16,85 @@ chmod 755 /workspace
 # Custom nodes are cloned and their requirements installed during Docker build.
 # No node installation/update is expected during startup.
 
-# --- Function to create model symlinks ---
-create_model_symlink() {
-  local source_dir="$1"
-  local target_dir="$2"
-  local model_name="$(basename "${target_dir}")"
+# --- Function to replace a workspace directory with a symlink to a volume directory ---
+replace_with_symlink_from_volume() {
+  local volume_source_dir="$1"    # e.g., /runpod-volume/ComfyUI/models/embeddings
+  local workspace_target_dir="$2" # e.g., /workspace/ComfyUI/models/embeddings
+  local model_name="$(basename "${workspace_target_dir}")"
 
-  echo "Checking symlink for ${model_name} models..."
+  echo "Attempting to link ${model_name} models from volume..."
 
-  # Ensure the parent directory for the target exists
-  mkdir -p "$(dirname "${target_dir}")"
+  # Ensure the parent directory for the workspace target exists (e.g. /workspace/ComfyUI/models)
+  # This should already be created by the initial copy of /ComfyUI to /workspace/ComfyUI
+  mkdir -p "$(dirname "${workspace_target_dir}")"
 
   # Check if the source directory exists on the volume
-  if [ -d "${source_dir}" ]; then
-    # Check if the target path doesn't exist or is not already a symlink
-    if [ ! -e "${target_dir}" ] && [ ! -L "${target_dir}" ]; then
-      echo "Creating symlink for ${model_name}: ${target_dir} -> ${source_dir}"
-      ln -s "${source_dir}" "${target_dir}"
-    elif [ -L "${target_dir}" ]; then
-       echo "Symlink ${target_dir} already exists."
-    else
-       echo "Warning: ${target_dir} exists but is not a symlink. Cannot create link for ${model_name}."
+  if [ -d "${volume_source_dir}" ]; then
+    # Remove the directory/symlink if it exists in the workspace (it would have been copied from original /ComfyUI)
+    if [ -e "${workspace_target_dir}" ] || [ -L "${workspace_target_dir}" ]; then
+      echo "Removing existing ${workspace_target_dir} before creating symlink to volume."
+      rm -rf "${workspace_target_dir}"
     fi
+    echo "Creating symlink for ${model_name}: ${workspace_target_dir} -> ${volume_source_dir}"
+    ln -s "${volume_source_dir}" "${workspace_target_dir}"
   else
-    echo "Warning: Source directory ${source_dir} not found on volume. Cannot create symlink for ${model_name}."
+    echo "Warning: Source directory ${volume_source_dir} for ${model_name} not found on volume."
+    echo "${model_name} will use the version from the base image, if it exists at ${workspace_target_dir}."
+    # If it doesn't exist on volume, we leave whatever was copied from the original /ComfyUI/models/${model_name}
+    # or if it wasn't in original image, it won't be in /workspace/ComfyUI/models/${model_name} either.
   fi
 }
 
-# --- Create Symlinks using the function ---
-create_model_symlink "/runpod-volume/ComfyUI/models/insightface" "/workspace/ComfyUI/models/insightface"
-create_model_symlink "/runpod-volume/ComfyUI/models/ultralytics" "/workspace/ComfyUI/models/ultralytics"
-create_model_symlink "/runpod-volume/ComfyUI/models/landmarks" "/workspace/ComfyUI/models/landmarks"
-create_model_symlink "/runpod-volume/ComfyUI/models/sams" "/workspace/ComfyUI/models/sams"
-create_model_symlink "/runpod-volume/ComfyUI/models/segformer_b3_clothes" "/workspace/ComfyUI/models/segformer_b3_clothes"
-create_model_symlink "/runpod-volume/ComfyUI/models/grounding-dino" "/workspace/ComfyUI/models/grounding-dino"
-create_model_symlink "/runpod-volume/ComfyUI/models/hyper_lora" "/workspace/ComfyUI/models/hyper_lora"
-create_model_symlink "/runpod-volume/ComfyUI/models/embeddings" "/workspace/ComfyUI/models/embeddings"
-
-# --- End Symlink Creation ---
-
-echo "MOVING COMFYUI TO WORKSPACE"
-# Ensure clean workspace/ComfyUI directory setup
-if [ -e "/workspace/ComfyUI" ]; then
-    if [ ! -d "/workspace/ComfyUI" ]; then
-        echo "Removing invalid /workspace/ComfyUI"
-        rm -f /workspace/ComfyUI
-    fi
-fi
-
-# Create fresh ComfyUI directory
+echo "PREPARING WORKSPACE AND COPYING BASE COMFYUI"
+# Create /workspace/ComfyUI directory if it doesn't exist
 mkdir -p /workspace/ComfyUI
 chmod 755 /workspace/ComfyUI
 
-# Check if /ComfyUI exists and is not already a symlink
+# Check if /ComfyUI (original image content) exists and is not a symlink
 if [ -d "/ComfyUI" ] && [ ! -L "/ComfyUI" ]; then
-    echo "**** SETTING UP COMFYUI IN WORKSPACE ****"
-    # Copy files instead of moving to avoid potential issues
-    cp -rf /ComfyUI/* /workspace/ComfyUI/
-    cp -rf /ComfyUI/.??* /workspace/ComfyUI/ 2>/dev/null || true
-    rm -rf /ComfyUI
-    # Create symlink
-    ln -sf /workspace/ComfyUI /ComfyUI
+    echo "**** COPYING BASE COMFYUI FROM /ComfyUI TO /workspace/ComfyUI ****"
+    # Copy contents of /ComfyUI (including hidden files) into /workspace/ComfyUI/
+    # Using -a to preserve attributes and handle symlinks properly during copy.
+    # The trailing /. ensures contents are copied into the target directory.
+    cp -a /ComfyUI/. /workspace/ComfyUI/
+else
+    echo "/ComfyUI is already a symlink or does not exist as a directory. Skipping initial copy."
 fi
 
-# Ensure proper permissions
+echo "REPLACING MODEL DIRECTORIES IN WORKSPACE WITH SYMLINKS TO VOLUME"
+# Call replace_with_symlink_from_volume for each model type
+# These paths should match your volume structure and ComfyUI's expectations
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/checkpoints" "/workspace/ComfyUI/models/checkpoints"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/loras" "/workspace/ComfyUI/models/loras"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/vae" "/workspace/ComfyUI/models/vae"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/controlnet" "/workspace/ComfyUI/models/controlnet"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/clip_vision" "/workspace/ComfyUI/models/clip_vision"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/gligen" "/workspace/ComfyUI/models/gligen"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/upscale_models" "/workspace/ComfyUI/models/upscale_models"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/insightface" "/workspace/ComfyUI/models/insightface"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/ultralytics" "/workspace/ComfyUI/models/ultralytics"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/landmarks" "/workspace/ComfyUI/models/landmarks"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/sams" "/workspace/ComfyUI/models/sams"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/segformer_b3_clothes" "/workspace/ComfyUI/models/segformer_b3_clothes"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/grounding-dino" "/workspace/ComfyUI/models/grounding-dino"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/hyper_lora" "/workspace/ComfyUI/models/hyper_lora"
+replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/embeddings" "/workspace/ComfyUI/models/embeddings"
+# Add any other model types you need to link from the volume
+
+echo "FINALIZING /ComfyUI SYMLINK TO POINT TO /workspace/ComfyUI"
+# Remove original /ComfyUI directory if it exists and was copied from
+if [ -d "/ComfyUI" ] && [ ! -L "/ComfyUI" ]; then
+    echo "Removing original /ComfyUI directory after copy..."
+    rm -rf /ComfyUI
+fi
+
+# Ensure /ComfyUI is a symlink to /workspace/ComfyUI
+# Use -sfn to force symlink creation/update, even if /ComfyUI exists (as a symlink or file)
+# -n (--no-dereference) is important if /ComfyUI itself could be a symlink, to replace the symlink itself.
+echo "Ensuring /ComfyUI symlinks to /workspace/ComfyUI"
+ln -sfn /workspace/ComfyUI /ComfyUI
+
+# Ensure proper permissions on the final workspace content
 chmod -R 755 /workspace/ComfyUI
 
 echo "✨ Pre-start completed successfully ✨"
