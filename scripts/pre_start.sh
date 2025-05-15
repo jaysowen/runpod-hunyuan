@@ -51,6 +51,7 @@ create_model_symlink "/runpod-volume/ComfyUI/models/sams" "/workspace/ComfyUI/mo
 create_model_symlink "/runpod-volume/ComfyUI/models/segformer_b3_clothes" "/workspace/ComfyUI/models/segformer_b3_clothes"
 create_model_symlink "/runpod-volume/ComfyUI/models/grounding-dino" "/workspace/ComfyUI/models/grounding-dino"
 create_model_symlink "/runpod-volume/ComfyUI/models/hyper_lora" "/workspace/ComfyUI/models/hyper_lora"
+create_model_symlink "/runpod-volume/ComfyUI/models/embeddings" "/workspace/ComfyUI/models/embeddings"
 
 # --- End Symlink Creation ---
 
