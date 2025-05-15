@@ -64,13 +64,6 @@ fi
 echo "REPLACING MODEL DIRECTORIES IN WORKSPACE WITH SYMLINKS TO VOLUME"
 # Call replace_with_symlink_from_volume for each model type
 # These paths should match your volume structure and ComfyUI's expectations
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/checkpoints" "/workspace/ComfyUI/models/checkpoints"
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/loras" "/workspace/ComfyUI/models/loras"
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/vae" "/workspace/ComfyUI/models/vae"
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/controlnet" "/workspace/ComfyUI/models/controlnet"
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/clip_vision" "/workspace/ComfyUI/models/clip_vision"
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/gligen" "/workspace/ComfyUI/models/gligen"
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/upscale_models" "/workspace/ComfyUI/models/upscale_models"
 replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/insightface" "/workspace/ComfyUI/models/insightface"
 replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/ultralytics" "/workspace/ComfyUI/models/ultralytics"
 replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/landmarks" "/workspace/ComfyUI/models/landmarks"
