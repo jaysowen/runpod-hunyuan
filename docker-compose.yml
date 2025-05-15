@@ -1,6 +1,6 @@
 services:
   comfyui-worker:
-    image: jaysowen/runpod-worker-comfy:t2vfw-v0.1
+    image: jaysowen/runpod-worker-comfy:t2vfw-v0.2
     environment:
       - SERVE_API_LOCALLY=true
     deploy:

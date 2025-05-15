@@ -71,7 +71,6 @@ replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/sams" "/workspac
 replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/segformer_b3_clothes" "/workspace/ComfyUI/models/segformer_b3_clothes"
 replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/grounding-dino" "/workspace/ComfyUI/models/grounding-dino"
 replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/hyper_lora" "/workspace/ComfyUI/models/hyper_lora"
-replace_with_symlink_from_volume "/runpod-volume/ComfyUI/models/embeddings" "/workspace/ComfyUI/models/embeddings"
 # Add any other model types you need to link from the volume
 
 echo "FINALIZING /ComfyUI SYMLINK TO POINT TO /workspace/ComfyUI"
