@@ -10,6 +10,10 @@ from PIL import Image, ImageFilter
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
 import torch
 import gc
+import urllib3 # Added import
+
+# Disable InsecureRequestWarning when verify=False is used with requests
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Added to disable warnings
 
 # --- Allowlist specific classes for torch.load (PyTorch >= 1.13+) ---
 # ... (Allowlist code remains the same) ...
@@ -178,7 +182,7 @@ def check_server(url, retries=COMFY_API_AVAILABLE_MAX_RETRIES, delay=COMFY_API_A
     print(f"runpod-worker-comfy - Checking ComfyUI API at {url}...")
     for i in range(retries):
         try:
-            response = requests.get(url, timeout=2) # 设置短暂超时
+            response = requests.get(url, timeout=2, verify=False) # Added verify=False
             if response.status_code == 200:
                 print(f"runpod-worker-comfy - ComfyUI API is reachable.")
                 return True
@@ -192,7 +196,8 @@ def check_server(url, retries=COMFY_API_AVAILABLE_MAX_RETRIES, delay=COMFY_API_A
 def download_image(url):
     """从URL下载图片"""
     try:
-        response = requests.get(url, timeout=20) # 增加下载超时时间
+        # 在这里为外部图片下载添加 verify=False
+        response = requests.get(url, timeout=20, verify=False) 
         response.raise_for_status()
         return response.content
     except requests.exceptions.RequestException as e:
@@ -254,14 +259,11 @@ def upload_images(images):
                 img = Image.open(BytesIO(blob))
                 
                 output_bytes_io = BytesIO()
-                # Store original Pillow format name (e.g., 'JPEG', 'PNG', 'GIF')
-                # img.format might be None if loaded directly from BytesIO without a clear source like a file.
                 img_pillow_format = img.format 
 
-                # Determine the intended save format, which also guides ComfyUI upload content type
                 _original_root, original_ext = os.path.splitext(name)
                 original_ext = original_ext.lower()
-                final_save_format_pil = None # Will be 'JPEG', 'PNG', or 'GIF'
+                final_save_format_pil = None 
 
                 if original_ext == '.gif':
                     final_save_format_pil = 'GIF'
@@ -269,50 +271,44 @@ def upload_images(images):
                     final_save_format_pil = 'JPEG'
                 elif original_ext == '.png':
                     final_save_format_pil = 'PNG'
-                elif img_pillow_format: # Fallback to Pillow's detected format if extension is unknown/unreliable
+                elif img_pillow_format: 
                     if img_pillow_format.upper() == 'GIF': final_save_format_pil = 'GIF'
                     elif img_pillow_format.upper() == 'JPEG': final_save_format_pil = 'JPEG'
                     elif img_pillow_format.upper() == 'PNG': final_save_format_pil = 'PNG'
                 
-                if not final_save_format_pil: # Ultimate fallback
+                if not final_save_format_pil: 
                     print(f"runpod-worker-comfy - Could not determine original format for {name} reliably, defaulting to PNG for saving.")
                     final_save_format_pil = 'PNG'
 
                 if final_save_format_pil == 'GIF':
                     print(f"runpod-worker-comfy - Using original blob for GIF image {name} to preserve animation.")
-                    output_bytes_io.write(blob) # Use original blob for GIFs
+                    output_bytes_io.write(blob) 
                 else:
-                    # For other formats (especially JPEG, PNG), re-save to strip EXIF.
                     if final_save_format_pil == 'JPEG' and img.mode == 'RGBA':
                         print(f"runpod-worker-comfy - Converting RGBA image {name} to RGB before saving as JPEG (stripping EXIF).")
                         img = img.convert('RGB')
                     
-                    # When saving, by not passing an 'exif' argument, Pillow should omit it.
                     if final_save_format_pil == 'JPEG':
                         img.save(output_bytes_io, format=final_save_format_pil, quality=95)
-                    else: # For PNG and other formats Pillow supports saving as
+                    else: 
                         img.save(output_bytes_io, format=final_save_format_pil)
                     print(f"runpod-worker-comfy - Image {name} processed (EXIF likely stripped) and re-saved as {final_save_format_pil}.")
                 
                 processed_blob = output_bytes_io.getvalue()
                 # --- End of EXIF Stripping ---
 
-                # 保存下载或解码后的图片到 ComfyUI 输入目录 (using processed_blob)
                 print(f"runpod-worker-comfy - Saving image '{name}' to {local_path} (as {final_save_format_pil})...")
                 with open(local_path, 'wb') as f:
-                    f.write(processed_blob) # Use the processed blob
+                    f.write(processed_blob) 
                 print(f"runpod-worker-comfy - Saved image to {local_path}")
 
-                # 将本地文件上传到 ComfyUI API
                 print(f"runpod-worker-comfy - Uploading saved image '{name}' via ComfyUI API...")
                 with open(local_path, 'rb') as f_upload:
-                    # Determine content-type for ComfyUI API upload based on final_save_format_pil
-                    content_type = "image/png" # Default
+                    content_type = "image/png" 
                     if final_save_format_pil == 'JPEG':
                         content_type = "image/jpeg"
                     elif final_save_format_pil == 'GIF':
                         content_type = "image/gif"
-                    # PNG is already default
                     
                     files = {
                         "image": (safe_filename, f_upload, content_type),
@@ -336,9 +332,7 @@ def upload_images(images):
                 error_msg = f"Error during image processing/saving (EXIF stripping or local save) for '{name}': {e}. Traceback: {tb_str}"
                 print(f"runpod-worker-comfy - {error_msg}")
                 errors.append(error_msg)
-                cleanup_local_file(local_path, f"error processing image {name}") # Clean up if partially saved before error
-
-        # If blob is None (due to download/decode failure handled above), loop continues to next image
+                cleanup_local_file(local_path, f"error processing image {name}") 
 
     if errors:
         print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
@@ -393,7 +387,7 @@ def cleanup_local_file(file_path, file_description="file"):
         except OSError as e:
             print(f"runpod-worker-comfy - Error removing local {file_description} {file_path}: {e}")
 
-def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
+def process_output_item(item_info, job_id, should_generate_blur, blur_radius, thumbnail_width, thumbnail_quality, thumbnail_format):
     """
     处理单个 ComfyUI 输出项（图像、视频或 GIF）。
     Args:
@@ -401,6 +395,9 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
         job_id (str): 当前作业的 ID，用于 B2 路径。
         should_generate_blur (bool): Whether to generate a blurred version of the output.
         blur_radius (float): The radius for the blurred version.
+        thumbnail_width (int): The width for the thumbnail.
+        thumbnail_quality (int): The quality for the thumbnail.
+        thumbnail_format (str): The format for the thumbnail.
     Returns:
         tuple: (result_dict, error_str)
                result_dict: 包含 'url', 'type' 的字典，成功时返回。
@@ -409,6 +406,7 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
     """
     local_file_path = None
     local_blurred_file_path = None # Initialize for cleanup in broader scope
+    local_thumbnail_path = None # For thumbnail cleanup
     try:
         filename = item_info.get("filename")
         item_type_reported = item_info.get("type", "output")
@@ -463,6 +461,49 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
             "url": original_file_url,
             "type": item_type
         }
+
+        # --- Thumbnail generation logic (for images only) ---
+        if item_type == 'image':
+            print(f"runpod-worker-comfy - Generating thumbnail for {filename}")
+            try:
+                with Image.open(local_file_path) as img:
+                    original_width, original_height = img.size
+                    if original_width == 0 or original_height == 0:
+                        raise ValueError("Image dimensions are zero.")
+
+                    w_percent = (thumbnail_width / float(original_width))
+                    h_size = int((float(original_height) * float(w_percent)))
+                    if h_size <= 0: # Ensure height is positive
+                        h_size = 1 
+
+                    thumbnail_img = img.resize((thumbnail_width, h_size), Image.Resampling.LANCZOS)
+                    
+                    # Define thumbnail filename
+                    base_filename, _ = os.path.splitext(filename)
+                    thumbnail_filename = f"thumb_{base_filename}.{thumbnail_format}"
+                    local_thumbnail_path = os.path.join(os.path.dirname(local_file_path), thumbnail_filename)
+                    
+                    # Save thumbnail locally
+                    thumbnail_img.save(local_thumbnail_path, format=thumbnail_format.upper(), quality=thumbnail_quality)
+                    print(f"runpod-worker-comfy - Saved local thumbnail to {local_thumbnail_path}")
+                    
+                    # Upload thumbnail to B2
+                    b2_thumbnail_file_path = f"{job_id}/{storage_dir}/{thumbnail_filename}"
+                    thumbnail_url = upload_to_b2(local_thumbnail_path, b2_thumbnail_file_path)
+                    
+                    if thumbnail_url:
+                        result_data['thumbnail_url'] = thumbnail_url
+                        print(f"runpod-worker-comfy - Successfully uploaded thumbnail ({thumbnail_filename}) to: {thumbnail_url}")
+                    else:
+                        print(f"runpod-worker-comfy - Failed to upload thumbnail ({thumbnail_filename}) to B2.")
+                
+            except Exception as thumb_err:
+                print(f"runpod-worker-comfy - Error generating or uploading thumbnail for {filename}: {str(thumb_err)}")
+            finally:
+                # Cleanup local thumbnail file regardless of B2 upload success for this attempt
+                if local_thumbnail_path and os.path.exists(local_thumbnail_path):
+                    cleanup_local_file(local_thumbnail_path, "thumbnail")
+        # --- Thumbnail logic ends ---
 
         # --- Blur logic starts --- 
         if item_type == 'image' and should_generate_blur and blur_radius > 0:
@@ -539,9 +580,11 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
         cleanup_local_file(local_file_path, "output file on error")
         if local_blurred_file_path and os.path.exists(local_blurred_file_path): # Also cleanup blurred if it exists on main error
              cleanup_local_file(local_blurred_file_path, "blurred output file on error")
+        if local_thumbnail_path and os.path.exists(local_thumbnail_path): # Also cleanup thumbnail if it exists on main error
+            cleanup_local_file(local_thumbnail_path, "thumbnail file on error")
         return None, error_msg
 
-def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius):
+def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius, thumbnail_width, thumbnail_quality, thumbnail_format):
     """
     处理来自 ComfyUI 的所有输出（图像、视频、GIF）。
 
@@ -550,6 +593,9 @@ def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius):
         job_id (str): 当前作业 ID。
         should_generate_blur (bool): Whether to generate a blurred version of the output.
         blur_radius (float): The radius for the blurred version.
+        thumbnail_width (int): The width for the thumbnail.
+        thumbnail_quality (int): The quality for the thumbnail.
+        thumbnail_format (str): The format for the thumbnail.
 
     Returns:
         dict: 包含处理结果和状态的字典。
@@ -582,7 +628,7 @@ def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius):
         print(f"runpod-worker-comfy - Found {len(output_items)} output item(s) in node {node_id}")
 
         for item_info in output_items:
-            result_data, error_str = process_output_item(item_info, job_id, should_generate_blur, blur_radius)
+            result_data, error_str = process_output_item(item_info, job_id, should_generate_blur, blur_radius, thumbnail_width, thumbnail_quality, thumbnail_format)
             if error_str:
                 errors.append(error_str)
             if result_data:
@@ -614,13 +660,11 @@ def wait_for_workflow_completion(prompt_id, job_id):
 
     while True:
         try:
-            # 检查是否超时
             elapsed_time = time.time() - start_time
             if elapsed_time > JOB_TIMEOUT_SECONDS:
                 print(f"runpod-worker-comfy - Job {job_id} timed out after {JOB_TIMEOUT_SECONDS} seconds (Prompt ID: {prompt_id})")
                 return {"status": "error", "error": f"Job processing timed out after {JOB_TIMEOUT_SECONDS} seconds"}
 
-            # 检查工作流历史
             history_url = f"http://{COMFY_HOST}/history/{prompt_id}"
             response = requests.get(history_url, timeout=5)
 
@@ -629,31 +673,38 @@ def wait_for_workflow_completion(prompt_id, job_id):
                 if prompt_id in history_data:
                     workflow_data = history_data[prompt_id]
                     prompt_status_obj = workflow_data.get("status", {})
-                    outputs = workflow_data.get("outputs", {}) # Keep fetching outputs
+                    current_outputs = workflow_data.get("outputs", {}) # Get current outputs
+                    # Update main outputs dict only if new outputs are found, to preserve last known outputs on error
+                    if current_outputs: 
+                        outputs = current_outputs
+                    
                     last_error_message = None
 
-                    # 1. Check the primary status string and messages from ComfyUI
                     if prompt_status_obj.get("status_str") == "error":
                         messages = prompt_status_obj.get("messages", [])
-                        for msg_type, msg_data in messages:
-                            if msg_type == "execution_error" and isinstance(msg_data, dict):
-                                node_type = msg_data.get('node_type', 'UnknownNode')
-                                node_id_err = msg_data.get('node_id', 'N/A')
-                                exc_type = msg_data.get('exception_type', 'Error')
-                                exc_msg = msg_data.get('exception_message', 'Unknown error')
-                                last_error_message = f"Node {node_type} (ID: {node_id_err}): {exc_type}: {exc_msg}"
-                                break # Take the first execution error
+                        for msg_list in messages: # messages is a list of lists/tuples
+                            if isinstance(msg_list, (list, tuple)) and len(msg_list) > 1:
+                                msg_type = msg_list[0]
+                                msg_data = msg_list[1]
+                                if msg_type == "execution_error" and isinstance(msg_data, dict):
+                                    node_type = msg_data.get('node_type', 'UnknownNode')
+                                    node_id_err = msg_data.get('node_id', 'N/A')
+                                    exc_type = msg_data.get('exception_type', 'Error')
+                                    exc_msg = msg_data.get('exception_message', 'Unknown error')
+                                    # Traceback might be useful but can be very long
+                                    # exc_traceback = msg_data.get('traceback', '') 
+                                    last_error_message = f"Node {node_type} (ID: {node_id_err}): {exc_type}: {exc_msg}"
+                                    break 
                         if not last_error_message:
                             last_error_message = "Workflow status reported as 'error' by ComfyUI with no detailed message in status.messages."
                         print(f"runpod-worker-comfy - ComfyUI reported workflow error. Status: {prompt_status_obj.get('status_str')}, Details: {last_error_message}")
 
-                    # 2. If no error from status_str, check for errors in node outputs
-                    if not last_error_message:
+                    if not last_error_message and isinstance(outputs, dict):
                         for node_id_out, node_output_data in outputs.items():
                             if isinstance(node_output_data, dict) and "errors" in node_output_data and node_output_data["errors"]:
                                 try:
-                                    error_detail = node_output_data["errors"][0] # Take the first error
-                                    err_type = error_detail.get('type', node_id_out) # 'type' might be exception type or node type
+                                    error_detail = node_output_data["errors"][0] 
+                                    err_type = error_detail.get('type', node_id_out) 
                                     err_msg = error_detail.get('message', 'Unknown error in node output')
                                     err_details = error_detail.get('details', '')
                                     last_error_message = f"Node output error ({err_type} for node {node_id_out}): {err_msg}. Details: {err_details}"
@@ -661,9 +712,8 @@ def wait_for_workflow_completion(prompt_id, job_id):
                                 except Exception as e_parse:
                                     last_error_message = f"Error detected in node output '{node_id_out}', but failed to parse details: {str(node_output_data['errors'])}. Parse error: {e_parse}"
                                     print(f"runpod-worker-comfy - {last_error_message}")
-                                break # Found an error, stop checking outputs
-
-                    # 3. Determine outcome based on errors and completion status
+                                break 
+                    
                     is_completed = prompt_status_obj.get("completed", False)
 
                     if last_error_message:
@@ -671,7 +721,7 @@ def wait_for_workflow_completion(prompt_id, job_id):
                         return {
                             "status": "error",
                             "error": f"Workflow execution failed: {last_error_message}",
-                            "detail": workflow_data # Full data for debugging
+                            "detail": workflow_data 
                         }
 
                     if is_completed:
@@ -679,35 +729,27 @@ def wait_for_workflow_completion(prompt_id, job_id):
                             print(f"runpod-worker-comfy - Workflow completed successfully (Prompt ID: {prompt_id})")
                             return {"status": "success", "outputs": outputs}
                         else:
-                            # Completed, but status is not 'success' and no specific error was parsed.
                             final_status_str = prompt_status_obj.get('status_str', 'unknown')
-                            unhandled_error_message = f"Workflow completed with unhandled status '{final_status_str}' and no specific error messages captured."
+                            unhandled_error_message = f"Workflow completed with unhandled status '{final_status_str}' and no specific error messages captured. Outputs: {bool(outputs)}"
                             print(f"runpod-worker-comfy - {unhandled_error_message} (Prompt ID: {prompt_id})")
                             return {
                                 "status": "error",
                                 "error": unhandled_error_message,
                                 "detail": workflow_data
                             }
-                    # If not completed and no error yet, continue polling (implicit by not returning)
 
             elif response.status_code == 404:
-                # Prompt ID might not appear immediately, treat as still running for a while
                 print(f"runpod-worker-comfy - Prompt ID {prompt_id} not found in history yet, continuing poll...")
             else:
-                # Handle other unexpected HTTP statuses
                 print(f"runpod-worker-comfy - Unexpected HTTP status {response.status_code} when checking history for {prompt_id}. Response: {response.text}")
-                # Consider this a transient error and continue polling.
 
-            # Wait before next poll (ensure this happens even after exceptions)
             time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
 
         except requests.exceptions.Timeout:
              print(f"runpod-worker-comfy - Timeout connecting to ComfyUI history endpoint for {prompt_id}. Retrying...")
-             # Wait slightly longer on timeout before retrying
              time.sleep(max(COMFY_POLLING_INTERVAL_MS / 1000, 1.0))
         except requests.exceptions.RequestException as e:
             print(f"runpod-worker-comfy - Error checking workflow status for {prompt_id}: {str(e)}. Retrying...")
-            # Wait before retrying on other request exceptions
             time.sleep(COMFY_POLLING_INTERVAL_MS / 1000)
         except json.JSONDecodeError as e:
             print(f"runpod-worker-comfy - Error decoding JSON from history for {prompt_id}: {str(e)}. Response: {response.text if 'response' in locals() else 'N/A'}. Retrying...")
@@ -751,6 +793,39 @@ def handler(job):
         print(f"runpod-worker-comfy - Using custom blur radius from API: {blur_radius_to_use}")
     else:
         print(f"runpod-worker-comfy - Using default blur radius from ENV: {blur_radius_to_use}")
+
+    # Thumbnail parameters
+    thumb_width_param = job_input_payload.get("thumbnail_width", 256)
+    thumb_quality_param = job_input_payload.get("thumbnail_quality", 75)
+    thumb_format_param = job_input_payload.get("thumbnail_format", "webp").lower()
+
+    # Validate thumbnail parameters
+    try:
+        thumbnail_width = int(thumb_width_param)
+        if thumbnail_width <= 0:
+            thumbnail_width = 256 # Default if invalid
+            print(f"runpod-worker-comfy - Invalid thumbnail_width, using default {thumbnail_width}")
+    except ValueError:
+        thumbnail_width = 256
+        print(f"runpod-worker-comfy - thumbnail_width not an int, using default {thumbnail_width}")
+
+    try:
+        thumbnail_quality = int(thumb_quality_param)
+        if not (1 <= thumbnail_quality <= 100):
+            thumbnail_quality = 75 # Default if out of range
+            print(f"runpod-worker-comfy - Invalid thumbnail_quality, using default {thumbnail_quality}")
+    except ValueError:
+        thumbnail_quality = 75
+        print(f"runpod-worker-comfy - thumbnail_quality not an int, using default {thumbnail_quality}")
+
+    valid_formats = ["webp", "jpeg", "png"]
+    if thumb_format_param not in valid_formats:
+        thumbnail_format = "webp" # Default if invalid
+        print(f"runpod-worker-comfy - Invalid thumbnail_format '{thumb_format_param}', using default {thumbnail_format}")
+    else:
+        thumbnail_format = thumb_format_param
+    
+    print(f"runpod-worker-comfy - Using thumbnail params: width={thumbnail_width}, quality={thumbnail_quality}, format={thumbnail_format}")
 
     # 1. 初始化 B2 (如果需要)
     initialize_b2()
@@ -813,7 +888,7 @@ def handler(job):
 
         # 7. 处理输出 (统一处理)
         print(f"runpod-worker-comfy - Processing ComfyUI outputs for job {job_id}...")
-        output_processing_result = process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius_to_use)
+        output_processing_result = process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius_to_use, thumbnail_width, thumbnail_quality, thumbnail_format)
 
         # 构建最终返回结果
         final_result = {
