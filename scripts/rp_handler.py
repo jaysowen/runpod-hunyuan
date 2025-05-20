@@ -387,7 +387,7 @@ def cleanup_local_file(file_path, file_description="file"):
         except OSError as e:
             print(f"runpod-worker-comfy - Error removing local {file_description} {file_path}: {e}")
 
-def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
+def process_output_item(item_info, job_id, should_generate_blur, blur_radius, thumbnail_width, thumbnail_quality, thumbnail_format):
     """
     处理单个 ComfyUI 输出项（图像、视频或 GIF）。
     Args:
@@ -395,6 +395,9 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
         job_id (str): 当前作业的 ID，用于 B2 路径。
         should_generate_blur (bool): Whether to generate a blurred version of the output.
         blur_radius (float): The radius for the blurred version.
+        thumbnail_width (int): The width for the thumbnail.
+        thumbnail_quality (int): The quality for the thumbnail.
+        thumbnail_format (str): The format for the thumbnail.
     Returns:
         tuple: (result_dict, error_str)
                result_dict: 包含 'url', 'type' 的字典，成功时返回。
@@ -403,6 +406,7 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
     """
     local_file_path = None
     local_blurred_file_path = None # Initialize for cleanup in broader scope
+    local_thumbnail_path = None # For thumbnail cleanup
     try:
         filename = item_info.get("filename")
         item_type_reported = item_info.get("type", "output")
@@ -457,6 +461,49 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
             "url": original_file_url,
             "type": item_type
         }
+
+        # --- Thumbnail generation logic (for images only) ---
+        if item_type == 'image':
+            print(f"runpod-worker-comfy - Generating thumbnail for {filename}")
+            try:
+                with Image.open(local_file_path) as img:
+                    original_width, original_height = img.size
+                    if original_width == 0 or original_height == 0:
+                        raise ValueError("Image dimensions are zero.")
+
+                    w_percent = (thumbnail_width / float(original_width))
+                    h_size = int((float(original_height) * float(w_percent)))
+                    if h_size <= 0: # Ensure height is positive
+                        h_size = 1 
+
+                    thumbnail_img = img.resize((thumbnail_width, h_size), Image.Resampling.LANCZOS)
+                    
+                    # Define thumbnail filename
+                    base_filename, _ = os.path.splitext(filename)
+                    thumbnail_filename = f"thumb_{base_filename}.{thumbnail_format}"
+                    local_thumbnail_path = os.path.join(os.path.dirname(local_file_path), thumbnail_filename)
+                    
+                    # Save thumbnail locally
+                    thumbnail_img.save(local_thumbnail_path, format=thumbnail_format.upper(), quality=thumbnail_quality)
+                    print(f"runpod-worker-comfy - Saved local thumbnail to {local_thumbnail_path}")
+                    
+                    # Upload thumbnail to B2
+                    b2_thumbnail_file_path = f"{job_id}/{storage_dir}/{thumbnail_filename}"
+                    thumbnail_url = upload_to_b2(local_thumbnail_path, b2_thumbnail_file_path)
+                    
+                    if thumbnail_url:
+                        result_data['thumbnail_url'] = thumbnail_url
+                        print(f"runpod-worker-comfy - Successfully uploaded thumbnail ({thumbnail_filename}) to: {thumbnail_url}")
+                    else:
+                        print(f"runpod-worker-comfy - Failed to upload thumbnail ({thumbnail_filename}) to B2.")
+                
+            except Exception as thumb_err:
+                print(f"runpod-worker-comfy - Error generating or uploading thumbnail for {filename}: {str(thumb_err)}")
+            finally:
+                # Cleanup local thumbnail file regardless of B2 upload success for this attempt
+                if local_thumbnail_path and os.path.exists(local_thumbnail_path):
+                    cleanup_local_file(local_thumbnail_path, "thumbnail")
+        # --- Thumbnail logic ends ---
 
         # --- Blur logic starts --- 
         if item_type == 'image' and should_generate_blur and blur_radius > 0:
@@ -533,9 +580,11 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius):
         cleanup_local_file(local_file_path, "output file on error")
         if local_blurred_file_path and os.path.exists(local_blurred_file_path): # Also cleanup blurred if it exists on main error
              cleanup_local_file(local_blurred_file_path, "blurred output file on error")
+        if local_thumbnail_path and os.path.exists(local_thumbnail_path): # Also cleanup thumbnail if it exists on main error
+            cleanup_local_file(local_thumbnail_path, "thumbnail file on error")
         return None, error_msg
 
-def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius):
+def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius, thumbnail_width, thumbnail_quality, thumbnail_format):
     """
     处理来自 ComfyUI 的所有输出（图像、视频、GIF）。
 
@@ -544,6 +593,9 @@ def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius):
         job_id (str): 当前作业 ID。
         should_generate_blur (bool): Whether to generate a blurred version of the output.
         blur_radius (float): The radius for the blurred version.
+        thumbnail_width (int): The width for the thumbnail.
+        thumbnail_quality (int): The quality for the thumbnail.
+        thumbnail_format (str): The format for the thumbnail.
 
     Returns:
         dict: 包含处理结果和状态的字典。
@@ -576,7 +628,7 @@ def process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius):
         print(f"runpod-worker-comfy - Found {len(output_items)} output item(s) in node {node_id}")
 
         for item_info in output_items:
-            result_data, error_str = process_output_item(item_info, job_id, should_generate_blur, blur_radius)
+            result_data, error_str = process_output_item(item_info, job_id, should_generate_blur, blur_radius, thumbnail_width, thumbnail_quality, thumbnail_format)
             if error_str:
                 errors.append(error_str)
             if result_data:
@@ -742,6 +794,39 @@ def handler(job):
     else:
         print(f"runpod-worker-comfy - Using default blur radius from ENV: {blur_radius_to_use}")
 
+    # Thumbnail parameters
+    thumb_width_param = job_input_payload.get("thumbnail_width", 256)
+    thumb_quality_param = job_input_payload.get("thumbnail_quality", 75)
+    thumb_format_param = job_input_payload.get("thumbnail_format", "webp").lower()
+
+    # Validate thumbnail parameters
+    try:
+        thumbnail_width = int(thumb_width_param)
+        if thumbnail_width <= 0:
+            thumbnail_width = 256 # Default if invalid
+            print(f"runpod-worker-comfy - Invalid thumbnail_width, using default {thumbnail_width}")
+    except ValueError:
+        thumbnail_width = 256
+        print(f"runpod-worker-comfy - thumbnail_width not an int, using default {thumbnail_width}")
+
+    try:
+        thumbnail_quality = int(thumb_quality_param)
+        if not (1 <= thumbnail_quality <= 100):
+            thumbnail_quality = 75 # Default if out of range
+            print(f"runpod-worker-comfy - Invalid thumbnail_quality, using default {thumbnail_quality}")
+    except ValueError:
+        thumbnail_quality = 75
+        print(f"runpod-worker-comfy - thumbnail_quality not an int, using default {thumbnail_quality}")
+
+    valid_formats = ["webp", "jpeg", "png"]
+    if thumb_format_param not in valid_formats:
+        thumbnail_format = "webp" # Default if invalid
+        print(f"runpod-worker-comfy - Invalid thumbnail_format '{thumb_format_param}', using default {thumbnail_format}")
+    else:
+        thumbnail_format = thumb_format_param
+    
+    print(f"runpod-worker-comfy - Using thumbnail params: width={thumbnail_width}, quality={thumbnail_quality}, format={thumbnail_format}")
+
     # 1. 初始化 B2 (如果需要)
     initialize_b2()
 
@@ -803,7 +888,7 @@ def handler(job):
 
         # 7. 处理输出 (统一处理)
         print(f"runpod-worker-comfy - Processing ComfyUI outputs for job {job_id}...")
-        output_processing_result = process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius_to_use)
+        output_processing_result = process_comfyui_outputs(outputs, job_id, should_generate_blur, blur_radius_to_use, thumbnail_width, thumbnail_quality, thumbnail_format)
 
         # 构建最终返回结果
         final_result = {
