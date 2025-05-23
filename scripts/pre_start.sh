@@ -47,7 +47,7 @@ create_model_symlink() {
 create_model_symlink "/runpod-volume/ComfyUI/models/insightface" "/workspace/ComfyUI/models/insightface"
 create_model_symlink "/runpod-volume/ComfyUI/models/ultralytics" "/workspace/ComfyUI/models/ultralytics"
 create_model_symlink "/runpod-volume/ComfyUI/models/landmarks" "/workspace/ComfyUI/models/landmarks"
-create_model_symlink "/runpod-volume/ComfyUI/models/sams" "/workspace/ComfyUI/models/sams"
+create_model_symlink "/runpod-volume/ComfyUI/models/sams2" "/workspace/ComfyUI/models/sams2"
 create_model_symlink "/runpod-volume/ComfyUI/models/segformer_b3_clothes" "/workspace/ComfyUI/models/segformer_b3_clothes"
 create_model_symlink "/runpod-volume/ComfyUI/models/grounding-dino" "/workspace/ComfyUI/models/grounding-dino"
 
