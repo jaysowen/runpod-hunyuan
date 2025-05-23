@@ -127,7 +127,6 @@ ADD src/extra_model_paths.yaml ./
 # Clone custom nodes
 WORKDIR /ComfyUI/custom_nodes
 RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
-   # git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
     git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
@@ -135,12 +134,10 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
     git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
     git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
-    git clone https://github.com/storyicon/comfyui_segment_anything.git && \
-   # git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
+    git clone https://github.com/neverbiasu/ComfyUI-SAM2.git && \
    # git clone https://github.com/cubiq/ComfyUI_essentials.git && \
    # git clone https://github.com/welltop-cn/ComfyUI-TeaCache.git && \
-   # git clone https://github.com/chrisgoringe/cg-use-everywhere.git && \
-    git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && \
+   # git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && \
    # git clone https://github.com/ltdrdata/ComfyUI-Inspire-Pack.git && \
    # git clone https://github.com/cubiq/ComfyUI_FaceAnalysis.git && \
    # git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git && \
