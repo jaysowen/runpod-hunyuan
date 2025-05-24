@@ -252,64 +252,30 @@ def upload_images(images):
 
         # If blob was successfully obtained (downloaded or decoded)
         if blob:
-            processed_blob = None # Define before try block
             try:
-                # --- EXIF Stripping Logic ---
-                print(f"runpod-worker-comfy - Attempting to process and potentially strip EXIF from image {name}...")
-                img = Image.open(BytesIO(blob))
+                # --- 直接保存原始图片数据，保留EXIF信息 ---
+                print(f"runpod-worker-comfy - Saving original image {name} without EXIF processing...")
                 
-                output_bytes_io = BytesIO()
-                img_pillow_format = img.format 
+                # 直接使用原始blob数据，不进行任何处理
+                print(f"runpod-worker-comfy - Saving image '{name}' to {local_path}...")
+                with open(local_path, 'wb') as f:
+                    f.write(blob) 
+                print(f"runpod-worker-comfy - Saved image to {local_path}")
 
+                # 确定content_type用于上传
                 _original_root, original_ext = os.path.splitext(name)
                 original_ext = original_ext.lower()
-                final_save_format_pil = None 
-
+                
+                content_type = "image/png"  # 默认
                 if original_ext == '.gif':
-                    final_save_format_pil = 'GIF'
+                    content_type = "image/gif"
                 elif original_ext in ['.jpg', '.jpeg']:
-                    final_save_format_pil = 'JPEG'
+                    content_type = "image/jpeg"
                 elif original_ext == '.png':
-                    final_save_format_pil = 'PNG'
-                elif img_pillow_format: 
-                    if img_pillow_format.upper() == 'GIF': final_save_format_pil = 'GIF'
-                    elif img_pillow_format.upper() == 'JPEG': final_save_format_pil = 'JPEG'
-                    elif img_pillow_format.upper() == 'PNG': final_save_format_pil = 'PNG'
-                
-                if not final_save_format_pil: 
-                    print(f"runpod-worker-comfy - Could not determine original format for {name} reliably, defaulting to PNG for saving.")
-                    final_save_format_pil = 'PNG'
-
-                if final_save_format_pil == 'GIF':
-                    print(f"runpod-worker-comfy - Using original blob for GIF image {name} to preserve animation.")
-                    output_bytes_io.write(blob) 
-                else:
-                    if final_save_format_pil == 'JPEG' and img.mode == 'RGBA':
-                        print(f"runpod-worker-comfy - Converting RGBA image {name} to RGB before saving as JPEG (stripping EXIF).")
-                        img = img.convert('RGB')
-                    
-                    if final_save_format_pil == 'JPEG':
-                        img.save(output_bytes_io, format=final_save_format_pil, quality=95)
-                    else: 
-                        img.save(output_bytes_io, format=final_save_format_pil)
-                    print(f"runpod-worker-comfy - Image {name} processed (EXIF likely stripped) and re-saved as {final_save_format_pil}.")
-                
-                processed_blob = output_bytes_io.getvalue()
-                # --- End of EXIF Stripping ---
-
-                print(f"runpod-worker-comfy - Saving image '{name}' to {local_path} (as {final_save_format_pil})...")
-                with open(local_path, 'wb') as f:
-                    f.write(processed_blob) 
-                print(f"runpod-worker-comfy - Saved image to {local_path}")
+                    content_type = "image/png"
 
                 print(f"runpod-worker-comfy - Uploading saved image '{name}' via ComfyUI API...")
                 with open(local_path, 'rb') as f_upload:
-                    content_type = "image/png" 
-                    if final_save_format_pil == 'JPEG':
-                        content_type = "image/jpeg"
-                    elif final_save_format_pil == 'GIF':
-                        content_type = "image/gif"
-                    
                     files = {
                         "image": (safe_filename, f_upload, content_type),
                         "overwrite": (None, "true"),
@@ -329,10 +295,10 @@ def upload_images(images):
             except Exception as e:
                 import traceback
                 tb_str = traceback.format_exc()
-                error_msg = f"Error during image processing/saving (EXIF stripping or local save) for '{name}': {e}. Traceback: {tb_str}"
+                error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
                 print(f"runpod-worker-comfy - {error_msg}")
                 errors.append(error_msg)
-                cleanup_local_file(local_path, f"error processing image {name}") 
+                cleanup_local_file(local_path, f"error processing image {name}")
 
     if errors:
         print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
