@@ -133,7 +133,7 @@ RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
     git clone https://github.com/cubiq/ComfyUI_InstantID.git && \
     git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
-   # git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
+    git clone https://github.com/WASasquatch/was-node-suite-comfyui.git && \
    # git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone https://github.com/storyicon/comfyui_segment_anything.git && \
    # git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git && \
