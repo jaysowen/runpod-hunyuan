@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+1. 每次推送代码的时候自动给docker镜像的版本号加上0.1,同时修改所有相关文件.比如现在的docker文件代码是jaysowen/runpod-worker-comfy:t2vfw-v0.2, 则本次改动之后自动修改为jaysowen/runpod-worker-comfy:t2vfw-v0.3。
