@@ -476,11 +476,11 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius, th
                     if original_width >= original_height:
                         # 横图：宽度设为 thumbnail_width，按比例计算高度
                         new_width = thumbnail_width
-                        new_height = int((original_height * thumbnail_width) / original_width)
+                        new_height = round((original_height * thumbnail_width) / original_width)
                     else:
                         # 竖图：高度设为 thumbnail_width，按比例计算宽度  
                         new_height = thumbnail_width
-                        new_width = int((original_width * thumbnail_width) / original_height)
+                        new_width = round((original_width * thumbnail_width) / original_height)
                     
                     # 确保尺寸至少为1
                     new_width = max(1, new_width)
