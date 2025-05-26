@@ -802,7 +802,7 @@ def handler(job):
 
     # Thumbnail parameters
     thumb_width_param = job_input_payload.get("thumbnail_width", 256)
-    thumb_quality_param = job_input_payload.get("thumbnail_quality", 75)
+    thumb_quality_param = job_input_payload.get("thumbnail_quality", 90)
     thumb_format_param = job_input_payload.get("thumbnail_format", "webp").lower()
 
     # Validate thumbnail parameters
@@ -818,10 +818,10 @@ def handler(job):
     try:
         thumbnail_quality = int(thumb_quality_param)
         if not (1 <= thumbnail_quality <= 100):
-            thumbnail_quality = 75 # Default if out of range
+            thumbnail_quality = 90 # Default if out of range
             print(f"runpod-worker-comfy - Invalid thumbnail_quality, using default {thumbnail_quality}")
     except ValueError:
-        thumbnail_quality = 75
+        thumbnail_quality = 90
         print(f"runpod-worker-comfy - thumbnail_quality not an int, using default {thumbnail_quality}")
 
     valid_formats = ["webp", "jpeg", "png"]
