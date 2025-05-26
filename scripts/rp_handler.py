@@ -467,11 +467,22 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius, th
                     if original_width == 0 or original_height == 0:
                         raise ValueError("Image dimensions are zero.")
 
-                    # 计算缩略图尺寸，保持原图比例且适合指定的最大宽度
-                    # 使用 thumbnail() 方法可以自动保持比例并且不会超过指定尺寸
-                    max_size = (thumbnail_width, thumbnail_width)  # 使用正方形作为最大尺寸
-                    thumbnail_img = img.copy()
-                    thumbnail_img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                    # 计算缩略图尺寸，保持原图比例并确保清晰度
+                    # 让较长的边达到 thumbnail_width，保持原有的清晰度
+                    if original_width >= original_height:
+                        # 横图：宽度设为 thumbnail_width，按比例计算高度
+                        new_width = thumbnail_width
+                        new_height = int((original_height * thumbnail_width) / original_width)
+                    else:
+                        # 竖图：高度设为 thumbnail_width，按比例计算宽度  
+                        new_height = thumbnail_width
+                        new_width = int((original_width * thumbnail_width) / original_height)
+                    
+                    # 确保尺寸至少为1
+                    new_width = max(1, new_width)
+                    new_height = max(1, new_height)
+                    
+                    thumbnail_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
                     
                     # Define thumbnail filename
                     base_filename, _ = os.path.splitext(filename)
