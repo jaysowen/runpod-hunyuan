@@ -116,8 +116,7 @@ RUN pip install --no-cache-dir \
     accelerate \
     pyyaml \
     torchsde \
-    opencv-python \
-    transformers
+    opencv-python
 
 # Install runpod and B2 SDK (needed for uploads)
 RUN pip install runpod requests b2sdk
@@ -164,21 +163,6 @@ RUN for dir in /ComfyUI/custom_nodes/*/; do \
         pip install --no-cache-dir -r "${dir}requirements.txt" || echo "WARNING: Failed to install requirements for ${dir}, continuing..."; \
     fi \
     done
-
-# Pre-download common models to reduce runtime downloads and disk usage
-RUN python3 -c "import os; os.environ['HF_HUB_CACHE'] = '/workspace/.cache/huggingface'; \
-from transformers import AutoTokenizer, AutoModel; \
-print('Pre-downloading bert-base-uncased...'); \
-AutoTokenizer.from_pretrained('bert-base-uncased'); \
-AutoModel.from_pretrained('bert-base-uncased'); \
-print('Successfully pre-downloaded bert-base-uncased')" || echo "Model pre-download failed, continuing..."
-
-# Clean up unnecessary files to save space
-RUN apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    pip cache purge && \
-    find /tmp -type f -delete && \
-    find /var/tmp -type f -delete
 
 # Copy scripts to container root
 COPY scripts/rp_handler.py /
