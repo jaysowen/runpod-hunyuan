@@ -36,3 +36,4 @@ runpod_worker_comfy:
   ultralytics: ComfyUI/models/ultralytics/
   vae_approx: ComfyUI/models/vae_approx/
   vitmatte: ComfyUI/models/vitmatte/
+  xlabs: ComfyUI/models/xlabs/
