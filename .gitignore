@@ -39,3 +39,6 @@ Thumbs.db
 *.log
 serverless_urpm_swapface.json
 test_input.json
+
+# Markdown compiled files
+*.mdc
