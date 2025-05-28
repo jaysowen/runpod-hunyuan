@@ -6,7 +6,7 @@ import requests
 import base64
 import hashlib
 from io import BytesIO
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageFilter
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
 import torch
 import gc
@@ -253,50 +253,26 @@ def upload_images(images):
         # If blob was successfully obtained (downloaded or decoded)
         if blob:
             try:
-                # --- 智能EXIF处理：保留方向信息，清除其他EXIF数据 ---
-                print(f"runpod-worker-comfy - Processing image {name} with smart EXIF handling...")
-                
-                # 先用PIL打开图片
-                img = Image.open(BytesIO(blob))
-                
-                # 应用EXIF方向信息到图片像素数据中，然后清除EXIF
-                img = ImageOps.exif_transpose(img)  # 这会根据EXIF方向信息旋转图片
-                
-                # 确定文件格式
+                # --- 保存原始图片数据，不做任何EXIF处理 ---
+                print(f"runpod-worker-comfy - Saving original image {name} without EXIF processing...")
+
+                # 直接使用原始blob数据
+                processed_blob = blob
+
+                # 根据文件扩展名设置content_type
                 _original_root, original_ext = os.path.splitext(name)
                 original_ext = original_ext.lower()
-                
-                # 确定保存格式和content_type
+
                 if original_ext == '.gif':
-                    # 对于GIF，保持原始数据以保留动画
-                    print(f"runpod-worker-comfy - Using original blob for GIF image {name} to preserve animation.")
-                    processed_blob = blob
                     content_type = "image/gif"
+                elif original_ext in ['.jpg', '.jpeg']:
+                    content_type = "image/jpeg"
+                elif original_ext == '.png':
+                    content_type = "image/png"
                 else:
-                    # 对于其他格式，处理方向信息后重新保存（不含EXIF）
-                    output_bytes_io = BytesIO()
-                    
-                    if original_ext in ['.jpg', '.jpeg']:
-                        save_format = 'JPEG'
-                        content_type = "image/jpeg"
-                        # JPEG不支持透明度，转换RGBA到RGB
-                        if img.mode == 'RGBA':
-                            print(f"runpod-worker-comfy - Converting RGBA image {name} to RGB for JPEG format.")
-                            img = img.convert('RGB')
-                        img.save(output_bytes_io, format=save_format, quality=95)
-                    elif original_ext == '.png':
-                        save_format = 'PNG'
-                        content_type = "image/png"
-                        img.save(output_bytes_io, format=save_format)
-                    else:
-                        # 其他格式默认保存为PNG
-                        save_format = 'PNG'
-                        content_type = "image/png"
-                        print(f"runpod-worker-comfy - Unknown format for {name}, saving as PNG.")
-                        img.save(output_bytes_io, format=save_format)
-                    
-                    processed_blob = output_bytes_io.getvalue()
-                    print(f"runpod-worker-comfy - Image {name} processed: orientation applied, EXIF removed, saved as {save_format}.")
+                    content_type = "image/png"  # 默认为PNG
+
+                print(f"runpod-worker-comfy - Using original image data for {name} (content-type: {content_type})")
                 
                 # 保存处理后的图片到本地
                 print(f"runpod-worker-comfy - Saving processed image '{name}' to {local_path}...")
