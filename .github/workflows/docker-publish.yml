@@ -2,9 +2,9 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [ "general" ]
+    branches: [ "wanvideo1.0" ]
   pull_request:
-    branches: [ "general" ]
+    branches: [ "wanvideo1.0" ]
 
 env:
   IMAGE_NAME: jaysowen/runpod-worker-comfy
@@ -16,6 +16,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -44,11 +45,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
+      - name: Log into Docker Hub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
-          username: ${{ vars.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PAT }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata
         id: meta
@@ -56,8 +58,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=general,enable=${{ github.ref == 'refs/heads/general' }}
-            type=raw,value=general-v0.3,enable=${{ github.ref == 'refs/heads/general' }}
+            type=raw,value=wanvideo1.0,enable=${{ github.ref == 'refs/heads/wanvideo1.0' }}
+            type=raw,value=wanvideo1.0-v0.1,enable=${{ github.ref == 'refs/heads/wanvideo1.0' }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push
