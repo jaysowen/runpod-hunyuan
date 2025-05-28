@@ -37,3 +37,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Markdown compiled files
+*.mdc
