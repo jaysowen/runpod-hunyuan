@@ -307,14 +307,6 @@ def upload_images(images):
 def queue_workflow(workflow):
     """向 ComfyUI 提交工作流"""
     try:
-        # 在提交工作流之前确保所有引用的图片文件存在
-        input_dir = "/workspace/ComfyUI/input"
-        for node_id, node_data in workflow.items():
-            if isinstance(node_data, dict) and node_data.get("class_type") == "LoadImage":
-                image_path = os.path.join(input_dir, node_data.get("inputs", {}).get("image", ""))
-                if not os.path.exists(image_path):
-                    print(f"Warning: Image file not found: {image_path}")
-        
         # 使用 requests 提交工作流
         prompt_data = {"prompt": workflow}
         response = requests.post(
@@ -730,17 +722,6 @@ def handler(job):
 
     # 记录开始时间
     start_time = time.time()
-
-    # 在处理新作业之前尝试清理 VRAM 缓存
-    try:
-        print("runpod-worker-comfy - Cleaning VRAM cache before new job...")
-        gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-        print("runpod-worker-comfy - VRAM cache cleaning attempt finished.")
-    except Exception as e:
-        print(f"runpod-worker-comfy - Error during VRAM cache cleaning: {e}")
-        # 不应阻止作业处理，只记录错误
 
     # job_input is the raw input from RunPod, which should be a dict if JSON was sent
     job_input_payload = job.get("input", {})
