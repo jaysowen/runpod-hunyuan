@@ -253,37 +253,19 @@ def upload_images(images):
         # If blob was successfully obtained (downloaded or decoded)
         if blob:
             try:
-                # --- 保存原始图片数据，不做任何EXIF处理 ---
-                print(f"runpod-worker-comfy - Saving original image {name} without EXIF processing...")
+                # --- 完全保持原始图片数据，不做任何处理 ---
+                print(f"runpod-worker-comfy - Saving original image {name} without any processing...")
 
-                # 直接使用原始blob数据
-                processed_blob = blob
-
-                # 根据文件扩展名设置content_type
-                _original_root, original_ext = os.path.splitext(name)
-                original_ext = original_ext.lower()
-
-                if original_ext == '.gif':
-                    content_type = "image/gif"
-                elif original_ext in ['.jpg', '.jpeg']:
-                    content_type = "image/jpeg"
-                elif original_ext == '.png':
-                    content_type = "image/png"
-                else:
-                    content_type = "image/png"  # 默认为PNG
-
-                print(f"runpod-worker-comfy - Using original image data for {name} (content-type: {content_type})")
-                
-                # 保存处理后的图片到本地
-                print(f"runpod-worker-comfy - Saving image '{name}' to {local_path}...")
+                # 直接保存原始blob数据到本地文件
                 with open(local_path, 'wb') as f:
-                    f.write(processed_blob) 
-                print(f"runpod-worker-comfy - Saved image to {local_path}")
+                    f.write(blob) 
+                print(f"runpod-worker-comfy - Saved original image to {local_path}")
 
-                print(f"runpod-worker-comfy - Uploading saved image '{name}' via ComfyUI API...")
+                # 上传到ComfyUI API，让ComfyUI自行判断文件类型
+                print(f"runpod-worker-comfy - Uploading '{name}' via ComfyUI API...")
                 with open(local_path, 'rb') as f_upload:
                     files = {
-                        "image": (safe_filename, f_upload, content_type),
+                        "image": (safe_filename, f_upload),
                         "overwrite": (None, "true"),
                     }
                     upload_url = f"http://{COMFY_HOST}/upload/image"
@@ -293,7 +275,7 @@ def upload_images(images):
                     uploaded_info = response.json()
                     uploaded_info['local_path'] = local_path
                     uploaded_files_info.append(uploaded_info)
-                    print(f"runpod-worker-comfy - Successfully uploaded '{name}' (as {content_type}) to ComfyUI.")
+                    print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
                 else:
                     errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
                     cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
