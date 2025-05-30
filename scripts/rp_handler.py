@@ -73,30 +73,80 @@ def check_exif_division_by_zero(image, image_blob=None):
 
 def fix_image_with_orientation_preserved(image_blob):
     """
-    修复图片EXIF问题，同时保持正确的方向
+    修复图片EXIF问题，同时尽力保持正确的方向
+    安全地处理有问题的EXIF数据，避免除零错误
     """
     try:
         image = Image.open(BytesIO(image_blob))
         
-        # 应用EXIF方向信息，然后移除EXIF
-        image = ImageOps.exif_transpose(image)
+        # 首先尝试安全地应用EXIF方向信息
+        try:
+            # 尝试使用ImageOps.exif_transpose，这是最好的方法
+            image = ImageOps.exif_transpose(image)
+            print("runpod-worker-comfy - Successfully applied EXIF orientation")
+        except (ZeroDivisionError, ValueError, KeyError, TypeError) as exif_error:
+            print(f"runpod-worker-comfy - EXIF transpose failed ({type(exif_error).__name__}: {exif_error}), trying manual orientation handling...")
+            
+            # 如果ImageOps.exif_transpose失败，尝试手动处理方向
+            try:
+                exif_dict = image._getexif()
+                if exif_dict is not None:
+                    orientation = exif_dict.get(274)  # 274是Orientation标签
+                    if orientation:
+                        if orientation == 3:
+                            image = image.rotate(180, expand=True)
+                        elif orientation == 6:
+                            image = image.rotate(270, expand=True)
+                        elif orientation == 8:
+                            image = image.rotate(90, expand=True)
+                        print(f"runpod-worker-comfy - Manually applied orientation {orientation}")
+                    else:
+                        print("runpod-worker-comfy - No orientation tag found in EXIF")
+                else:
+                    print("runpod-worker-comfy - No EXIF data found")
+            except Exception as manual_error:
+                print(f"runpod-worker-comfy - Manual orientation handling also failed: {manual_error}")
+                print("runpod-worker-comfy - Proceeding without orientation correction")
         
         # 保存为新的图片数据（不包含EXIF）
         output_buffer = BytesIO()
         
-        # 保持原始格式
+        # 保持原始格式，但确保没有有问题的EXIF数据
         format = image.format if image.format else 'JPEG'
         if format.upper() == 'JPEG':
-            image.save(output_buffer, format='JPEG', quality=95, optimize=True)
+            # 保存时不包含EXIF数据，这样可以避免有问题的EXIF被保留
+            image.save(output_buffer, format='JPEG', quality=95, optimize=True, exif=b'')
         else:
             image.save(output_buffer, format=format)
         
+        print("runpod-worker-comfy - Successfully fixed EXIF issues and removed problematic data")
         return output_buffer.getvalue()
         
     except Exception as e:
-        print(f"Error fixing image: {e}")
-        # 如果修复失败，返回原始数据
-        return image_blob
+        print(f"runpod-worker-comfy - Complete EXIF fix failed: {e}")
+        
+        # 最后的回退：简单地重新保存图片，移除所有EXIF数据
+        try:
+            image = Image.open(BytesIO(image_blob))
+            output_buffer = BytesIO()
+            # 强制保存为JPEG，不包含任何EXIF数据
+            if image.mode in ['RGBA', 'LA']:
+                # 处理透明度
+                background = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'RGBA':
+                    background.paste(image, mask=image.split()[-1])
+                else:  # LA
+                    background.paste(image, mask=image.convert('RGBA').split()[-1])
+                image = background
+            elif image.mode not in ['RGB', 'L']:
+                image = image.convert('RGB')
+            
+            image.save(output_buffer, format='JPEG', quality=95, optimize=True)
+            print("runpod-worker-comfy - Used fallback method: converted to JPEG without EXIF")
+            return output_buffer.getvalue()
+        except Exception as fallback_error:
+            print(f"runpod-worker-comfy - Even fallback fix failed: {fallback_error}, returning original data")
+            return image_blob
 
 def check_and_resize_large_image(image, image_blob, name="image"):
     """
@@ -356,7 +406,7 @@ def validate_input(job_input):
             return None, "Invalid JSON format in input string"
 
     if not isinstance(job_input, dict):
-         return None, "Input must be a JSON object"
+        return None, "Input must be a JSON object"
 
     workflow = job_input.get("workflow")
     if workflow is None:
@@ -512,7 +562,7 @@ def upload_images(images):
                                 # 修复EXIF问题，保持方向
                                 processed_blob = fix_image_with_orientation_preserved(processed_blob)
                                 print(f"runpod-worker-comfy - Successfully fixed EXIF issues in {name}")
-                            else:
+                            else: 
                                 print(f"runpod-worker-comfy - JPEG EXIF data is safe in {name}: {problem_desc}")
                         else:
                             if was_format_fixed:
@@ -559,7 +609,7 @@ def upload_images(images):
                     error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
                     print(f"runpod-worker-comfy - {error_msg}")
                     errors.append(error_msg)
-                    cleanup_local_file(local_path, f"error processing image {name}")
+                    cleanup_local_file(local_path, f"error processing image {name}") 
 
         if errors:
             print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
