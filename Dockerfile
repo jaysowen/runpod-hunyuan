@@ -137,7 +137,9 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/jamesWalker55/comfyui-various.git && \
     git clone https://github.com/melMass/comfy_mtb.git && \
     git clone https://github.com/Derfuu/Derfuu_ComfyUI_ModdedNodes.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git && \
+    git clone https://github.com/cubiq/ComfyUI-HyperLoRA.git
 
 # Install requirements for custom nodes (if any)
 # Reverted to installing requirements for each node individually, ignoring errors.

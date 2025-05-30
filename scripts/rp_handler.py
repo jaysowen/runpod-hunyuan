@@ -626,73 +626,76 @@ def wait_for_workflow_completion(prompt_id, job_id):
 
             if response.status_code == 200:
                 history_data = response.json()
-                if prompt_id in history_data:
-                    workflow_data = history_data[prompt_id]
-                    prompt_status_obj = workflow_data.get("status", {})
-                    current_outputs = workflow_data.get("outputs", {}) # Get current outputs
-                    # Update main outputs dict only if new outputs are found, to preserve last known outputs on error
-                    if current_outputs: 
-                        outputs = current_outputs
-                    
-                    last_error_message = None
+                prompt_status_obj = history_data.get(prompt_id, {})
+                outputs = prompt_status_obj.get("outputs", {})
 
-                    if prompt_status_obj.get("status_str") == "error":
-                        messages = prompt_status_obj.get("messages", [])
-                        for msg_list in messages: # messages is a list of lists/tuples
-                            if isinstance(msg_list, (list, tuple)) and len(msg_list) > 1:
-                                msg_type = msg_list[0]
-                                msg_data = msg_list[1]
-                                if msg_type == "execution_error" and isinstance(msg_data, dict):
-                                    node_type = msg_data.get('node_type', 'UnknownNode')
-                                    node_id_err = msg_data.get('node_id', 'N/A')
-                                    exc_type = msg_data.get('exception_type', 'Error')
-                                    exc_msg = msg_data.get('exception_message', 'Unknown error')
-                                    # Traceback might be useful but can be very long
-                                    # exc_traceback = msg_data.get('traceback', '') 
-                                    last_error_message = f"Node {node_type} (ID: {node_id_err}): {exc_type}: {exc_msg}"
-                                    break 
-                        if not last_error_message:
-                            last_error_message = "Workflow status reported as 'error' by ComfyUI with no detailed message in status.messages."
-                        print(f"runpod-worker-comfy - ComfyUI reported workflow error. Status: {prompt_status_obj.get('status_str')}, Details: {last_error_message}")
+                # 检查是否有错误状态
+                status_str = prompt_status_obj.get("status", {}).get("status_str", "")
+                last_error_message = None
 
-                    if not last_error_message and isinstance(outputs, dict):
-                        for node_id_out, node_output_data in outputs.items():
-                            if isinstance(node_output_data, dict) and "errors" in node_output_data and node_output_data["errors"]:
-                                try:
-                                    error_detail = node_output_data["errors"][0] 
-                                    err_type = error_detail.get('type', node_id_out) 
-                                    err_msg = error_detail.get('message', 'Unknown error in node output')
-                                    err_details = error_detail.get('details', '')
-                                    last_error_message = f"Node output error ({err_type} for node {node_id_out}): {err_msg}. Details: {err_details}"
-                                    print(f"runpod-worker-comfy - Error detected in node output '{node_id_out}': {last_error_message}")
-                                except Exception as e_parse:
-                                    last_error_message = f"Error detected in node output '{node_id_out}', but failed to parse details: {str(node_output_data['errors'])}. Parse error: {e_parse}"
-                                    print(f"runpod-worker-comfy - {last_error_message}")
-                                break 
-                    
-                    is_completed = prompt_status_obj.get("completed", False)
+                if status_str == "error":
+                    # 详细的错误信息提取，特别关注LoRA相关错误
+                    status_messages = prompt_status_obj.get("status", {}).get("messages", [])
+                    for message in status_messages:
+                        if isinstance(message, list) and len(message) >= 2:
+                            msg_type, msg_content = message[0], message[1]
+                            if msg_type == "execution_error":
+                                node_id = msg_content.get("node_id", "unknown")
+                                node_type = msg_content.get("node_type", "unknown")
+                                exception_message = msg_content.get("exception_message", "")
+                                exception_type = msg_content.get("exception_type", "")
+                                
+                                # 特别处理LoRA相关错误
+                                if "LoRA" in node_type or "lora" in exception_message.lower():
+                                    last_error_message = f"LoRA Error in node {node_id} ({node_type}): {exception_type} - {exception_message}. 请检查LoRA模型文件是否存在于 /runpod-volume/ComfyUI/models/loras/ 或 /runpod-volume/ComfyUI/models/hyper_lora/ 目录中"
+                                elif "torch.cat" in exception_message and "empty list" in exception_message:
+                                    if "HyperLoRA" in node_type or "hyperlora" in exception_message.lower():
+                                        last_error_message = f"HyperLoRA人脸检测失败 in node {node_id} ({node_type}): {exception_message}. 可能原因：1) 输入图像中没有检测到人脸 2) InsightFace模型缺失，请确保 /runpod-volume/ComfyUI/models/insightface/ 目录中有必要的人脸检测模型 3) 图像质量过低或人脸不清晰"
+                                    else:
+                                        last_error_message = f"Tensor concatenation error in node {node_id} ({node_type}): {exception_message}. 这通常表示某个输入为空，请检查节点 {node_id} 的所有输入连接"
+                                else:
+                                    last_error_message = f"Node {node_id} ({node_type}): {exception_type} - {exception_message}"
+                                print(f"runpod-worker-comfy - {last_error_message}")
+                                break
 
-                    if last_error_message:
-                        print(f"runpod-worker-comfy - Workflow failed (Prompt ID: {prompt_id}): {last_error_message}")
+                if not last_error_message and isinstance(outputs, dict):
+                    for node_id_out, node_output_data in outputs.items():
+                        if isinstance(node_output_data, dict) and "errors" in node_output_data and node_output_data["errors"]:
+                            try:
+                                error_detail = node_output_data["errors"][0] 
+                                err_type = error_detail.get('type', node_id_out) 
+                                err_msg = error_detail.get('message', 'Unknown error in node output')
+                                err_details = error_detail.get('details', '')
+                                last_error_message = f"Node output error ({err_type} for node {node_id_out}): {err_msg}. Details: {err_details}"
+                                print(f"runpod-worker-comfy - Error detected in node output '{node_id_out}': {last_error_message}")
+                            except Exception as e_parse:
+                                last_error_message = f"Error detected in node output '{node_id_out}', but failed to parse details: {str(node_output_data['errors'])}. Parse error: {e_parse}"
+                                print(f"runpod-worker-comfy - {last_error_message}")
+                            break 
+                
+                is_completed = prompt_status_obj.get("completed", False)
+
+                if last_error_message:
+                    print(f"runpod-worker-comfy - Workflow failed (Prompt ID: {prompt_id}): {last_error_message}")
+                    return {
+                        "status": "error",
+                        "error": f"Workflow execution failed: {last_error_message}",
+                        "detail": prompt_status_obj 
+                    }
+
+                if is_completed:
+                    if prompt_status_obj.get("status_str") == "success":
+                        print(f"runpod-worker-comfy - Workflow completed successfully (Prompt ID: {prompt_id})")
+                        return {"status": "success", "outputs": outputs}
+                    else:
+                        final_status_str = prompt_status_obj.get('status_str', 'unknown')
+                        unhandled_error_message = f"Workflow completed with unhandled status '{final_status_str}' and no specific error messages captured. Outputs: {bool(outputs)}"
+                        print(f"runpod-worker-comfy - {unhandled_error_message} (Prompt ID: {prompt_id})")
                         return {
                             "status": "error",
-                            "error": f"Workflow execution failed: {last_error_message}",
-                            "detail": workflow_data 
+                            "error": unhandled_error_message,
+                            "detail": prompt_status_obj
                         }
-
-                    if is_completed:
-                        if prompt_status_obj.get("status_str") == "success":
-                            print(f"runpod-worker-comfy - Workflow completed successfully (Prompt ID: {prompt_id})")
-                            return {"status": "success", "outputs": outputs}
-                        else:
-                            final_status_str = prompt_status_obj.get('status_str', 'unknown')
-                            unhandled_error_message = f"Workflow completed with unhandled status '{final_status_str}' and no specific error messages captured. Outputs: {bool(outputs)}"
-                            print(f"runpod-worker-comfy - {unhandled_error_message} (Prompt ID: {prompt_id})")
-                            return {
-                                "status": "error",
-                                "error": unhandled_error_message,
-                                "detail": workflow_data
-                            }
 
             elif response.status_code == 404:
                 print(f"runpod-worker-comfy - Prompt ID {prompt_id} not found in history yet, continuing poll...")
