@@ -19,7 +19,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Added to d
 def check_exif_division_by_zero(image, image_blob=None):
     """
     检测图片EXIF数据是否可能导致除零错误
-    接收已打开的image对象，避免重复打开
+    使用实际的ImageOps.exif_transpose测试来检测问题
     返回: (has_problem, problem_description)
     """
     try:
@@ -41,31 +41,20 @@ def check_exif_division_by_zero(image, image_blob=None):
         if not exif_data:
             return False, "JPEG format but empty EXIF data"
         
-        # 检查可能导致除零错误的EXIF字段
-        problematic_fields = []
-        
-        for tag_id, value in exif_data.items():
-            tag_name = TAGS.get(tag_id, tag_id)
-            
-            # 检查分辨率相关字段
-            if tag_name in ['XResolution', 'YResolution']:
-                if isinstance(value, tuple) and len(value) == 2:
-                    if value[1] == 0:  # 分母为0
-                        problematic_fields.append(f"{tag_name}: {value[0]}/{value[1]}")
-                elif value == 0:
-                    problematic_fields.append(f"{tag_name}: {value}")
-            
-            # 检查其他可能的除零字段
-            elif tag_name in ['FocalLength', 'ExposureTime', 'FNumber', 'ISOSpeedRatings']:
-                if isinstance(value, tuple) and len(value) == 2 and value[1] == 0:
-                    problematic_fields.append(f"{tag_name}: {value[0]}/{value[1]}")
-                elif value == 0 and tag_name in ['FocalLength', 'FNumber']:
-                    problematic_fields.append(f"{tag_name}: {value}")
-        
-        if problematic_fields:
-            return True, f"JPEG EXIF issues: {', '.join(problematic_fields)}"
-        
-        return False, "JPEG EXIF data looks safe"
+        # **关键改进：实际测试ImageOps.exif_transpose**
+        # 这是最准确的检测方法，因为它测试的就是真实的处理过程
+        try:
+            # 创建图片副本进行测试，避免影响原图
+            test_image = image.copy()
+            ImageOps.exif_transpose(test_image)
+            # 如果没有异常，说明EXIF数据是安全的
+            return False, "JPEG EXIF data tested safe with ImageOps.exif_transpose"
+        except (ZeroDivisionError, ValueError, KeyError, TypeError) as test_error:
+            # 如果测试失败，说明确实有问题
+            return True, f"JPEG EXIF ImageOps.exif_transpose test failed: {type(test_error).__name__}: {test_error}"
+        except Exception as unexpected_error:
+            # 其他未预期的错误也视为有问题
+            return True, f"JPEG EXIF unexpected error during test: {type(unexpected_error).__name__}: {unexpected_error}"
         
     except Exception as e:
         # 如果检测过程出错，为安全起见返回True
