@@ -29,6 +29,7 @@ def check_exif_division_by_zero(image, image_blob=None):
         elif image is None:
             return True, "No image object or blob provided"
         
+        # **修复：移除MPO检测，因为MPO已经在format validation中转换了**
         # 只对JPEG格式进行EXIF检测，其他格式直接返回安全
         if image.format not in ['JPEG']:
             return False, f"Format {image.format} - No EXIF check needed"
@@ -42,7 +43,6 @@ def check_exif_division_by_zero(image, image_blob=None):
             return False, "JPEG format but empty EXIF data"
         
         # **关键改进：实际测试ImageOps.exif_transpose**
-        # 这是最准确的检测方法，因为它测试的就是真实的处理过程
         try:
             # 创建图片副本进行测试，避免影响原图
             test_image = image.copy()
@@ -67,6 +67,7 @@ def fix_image_with_orientation_preserved(image_blob):
     """
     try:
         image = Image.open(BytesIO(image_blob))
+        original_format = image.format
         
         # 首先尝试安全地应用EXIF方向信息
         try:
@@ -97,16 +98,28 @@ def fix_image_with_orientation_preserved(image_blob):
                 print(f"runpod-worker-comfy - Manual orientation handling also failed: {manual_error}")
                 print("runpod-worker-comfy - Proceeding without orientation correction")
         
-        # 保存为新的图片数据（不包含EXIF）
+        # **修复：更安全的保存逻辑**
         output_buffer = BytesIO()
         
-        # 保持原始格式，但确保没有有问题的EXIF数据
-        format = image.format if image.format else 'JPEG'
-        if format.upper() == 'JPEG':
-            # 保存时不包含EXIF数据，这样可以避免有问题的EXIF被保留
-            image.save(output_buffer, format='JPEG', quality=95, optimize=True, exif=b'')
+        # 确保图片模式正确
+        if image.mode not in ['RGB', 'L']:
+            if image.mode in ['RGBA', 'LA']:
+                # 处理透明度
+                background = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'RGBA':
+                    background.paste(image, mask=image.split()[-1])
+                else:  # LA
+                    background.paste(image, mask=image.convert('RGBA').split()[-1])
+                image = background
+            else:
+                image = image.convert('RGB')
+        
+        # **关键修复：移除有问题的exif参数**
+        if original_format and original_format.upper() == 'JPEG':
+            image.save(output_buffer, format='JPEG', quality=95, optimize=True)
         else:
-            image.save(output_buffer, format=format)
+            # 非JPEG格式转为JPEG
+            image.save(output_buffer, format='JPEG', quality=95, optimize=True)
         
         print("runpod-worker-comfy - Successfully fixed EXIF issues and removed problematic data")
         return output_buffer.getvalue()
@@ -202,6 +215,16 @@ def quick_image_validation(image_blob, name="image"):
         # 快速检查：只获取基本信息，不加载像素数据
         width, height = temp_image.size
         
+        # **关键修复：检查MPO格式**
+        if image_format == 'MPO':
+            print(f"runpod-worker-comfy - Image {name} is MPO format, converting to JPEG for ComfyUI compatibility...")
+            fixed_blob, was_fixed, desc = _convert_mpo_to_jpeg(image_blob, name)
+            if was_fixed:
+                fixed_image = Image.open(BytesIO(fixed_blob))
+                return fixed_image, fixed_blob, True, desc
+            else:
+                return temp_image, image_blob, False, desc
+        
         # 如果能正常获取信息，说明格式OK，返回image对象
         return temp_image, image_blob, False, f"Format {image_format} OK"
         
@@ -210,22 +233,67 @@ def quick_image_validation(image_blob, name="image"):
         error_msg = str(e).lower()
         
         # 快速判断是否是格式问题
-        if "not a jpeg" in error_msg or "cannot identify" in error_msg or "syntaxerror" in error_msg:
+        if any(keyword in error_msg for keyword in ["not a jpeg", "cannot identify", "syntaxerror", "truncated", "broken"]):
+            print(f"runpod-worker-comfy - Image {name} validation failed: {e}, attempting fix...")
             fixed_blob, was_fixed, desc = _fix_corrupted_image(image_blob, name, str(e))
             if was_fixed:
-                # 重新打开修复后的图片
-                fixed_image = Image.open(BytesIO(fixed_blob))
-                return fixed_image, fixed_blob, True, desc
-            else:
-                # 修复失败，尝试原始数据
                 try:
-                    temp_image = Image.open(BytesIO(image_blob))
-                    return temp_image, image_blob, False, desc
-                except:
-                    return None, image_blob, False, desc
+                    # 重新打开修复后的图片
+                    fixed_image = Image.open(BytesIO(fixed_blob))
+                    return fixed_image, fixed_blob, True, desc
+                except Exception as reopen_error:
+                    print(f"runpod-worker-comfy - Failed to reopen fixed image: {reopen_error}")
+                    return None, image_blob, False, f"Fix failed on reopen: {reopen_error}"
+            else:
+                # 修复失败，返回原始数据
+                return None, image_blob, False, desc
         else:
             # 其他错误直接返回原数据
             return None, image_blob, False, f"Validation skipped: {str(e)}"
+
+def _convert_mpo_to_jpeg(image_blob, name):
+    """
+    将MPO格式转换为标准JPEG格式
+    MPO (Multi-Picture Object) 格式通常包含多个图片帧，我们提取第一个帧
+    """
+    try:
+        print(f"runpod-worker-comfy - Converting MPO {name} to JPEG...")
+        
+        # 打开MPO文件
+        mpo_image = Image.open(BytesIO(image_blob))
+        
+        # MPO文件可能包含多个帧，我们只取第一个帧（主图片）
+        # 确保我们在第一帧
+        mpo_image.seek(0)
+        
+        # 获取第一帧的图片数据
+        # 创建一个新的图片对象，只包含第一帧
+        first_frame = mpo_image.copy()
+        
+        # 确保颜色模式正确
+        if first_frame.mode not in ['RGB', 'L']:
+            if first_frame.mode in ['RGBA', 'LA']:
+                # 处理透明度：创建白色背景
+                background = Image.new('RGB', first_frame.size, (255, 255, 255))
+                if first_frame.mode == 'RGBA':
+                    background.paste(first_frame, mask=first_frame.split()[-1])
+                else:  # LA
+                    background.paste(first_frame, mask=first_frame.convert('RGBA').split()[-1])
+                first_frame = background
+            else:
+                first_frame = first_frame.convert('RGB')
+        
+        # 保存为标准JPEG格式
+        output_buffer = BytesIO()
+        first_frame.save(output_buffer, format='JPEG', quality=95, optimize=True)
+        
+        print(f"runpod-worker-comfy - Successfully converted MPO {name} to JPEG")
+        return output_buffer.getvalue(), True, "Converted MPO to JPEG"
+        
+    except Exception as e:
+        print(f"runpod-worker-comfy - MPO conversion failed for {name}: {e}")
+        # 如果MPO转换失败，尝试通用的图片修复
+        return _fix_corrupted_image(image_blob, name, f"MPO conversion failed: {e}")
 
 def _fix_corrupted_image(image_blob, name, original_error):
     """
@@ -244,7 +312,10 @@ def _fix_corrupted_image(image_blob, name, original_error):
             if temp_image.mode in ['RGBA', 'LA']:
                 # 创建白色背景
                 background = Image.new('RGB', temp_image.size, (255, 255, 255))
-                background.paste(temp_image, mask=temp_image.split()[-1])
+                if temp_image.mode == 'RGBA':
+                    background.paste(temp_image, mask=temp_image.split()[-1])
+                else:  # LA
+                    background.paste(temp_image, mask=temp_image.convert('RGBA').split()[-1])
                 temp_image = background
             else:
                 temp_image = temp_image.convert('RGB')
@@ -476,10 +547,10 @@ def upload_images(images):
             name = image_input["name"]
             image_data_str = image_input["image"]
             blob = None
+            local_path = None  # 添加这行初始化
 
             # 确保文件名是安全的
             safe_filename = os.path.basename(name)
-            # Construct the full path in the ComfyUI input directory
             local_path = os.path.join(input_dir, safe_filename)
 
             # Check if image_data_str is a URL
@@ -491,7 +562,11 @@ def upload_images(images):
                         errors.append(f"Failed to download image '{name}' from URL.")
                         continue # Skip to the next image if download failed
                 except Exception as e:
-                    errors.append(f"Error downloading image '{name}' from URL: {e}")
+                    import traceback
+                    tb_str = traceback.format_exc()
+                    error_msg = f"Error downloading image '{name}' from URL: {e}. Traceback: {tb_str}"
+                    print(f"runpod-worker-comfy - {error_msg}")
+                    errors.append(error_msg)
                     continue
             elif isinstance(image_data_str, str):
                  # Assume it's base64 if it's a string and not a URL
@@ -511,11 +586,16 @@ def upload_images(images):
                 try:
                     # --- 高性能图片处理流程 ---
                     # 1. 快速格式验证（只在出错时修复）
-                    processed_image, processed_blob, was_format_fixed, format_desc = quick_image_validation(blob, name)
+                    processed_image, processed_blob, was_fixed, format_desc = quick_image_validation(blob, name)
                     
-                    if was_format_fixed:
+                    if was_fixed:
                         print(f"runpod-worker-comfy - {name} was repaired: {format_desc}")
-                        image_format = "JPEG"  # 修复后统一为JPEG
+                        # 重新获取修复后的格式
+                        if processed_image:
+                            image_format = processed_image.format
+                            print(f"runpod-worker-comfy - Fixed image format: {image_format} for {name}")
+                        else:
+                            image_format = "JPEG"  # 如果无法获取，默认为JPEG
                         performance_stats["image_opens_saved"] += 1  # 避免了重复打开
                     else:
                         # 正常情况：从已有的image对象获取格式
@@ -537,9 +617,12 @@ def upload_images(images):
                         processed_image = None  # 重置image对象，因为已经缩放
                     else:
                         print(f"runpod-worker-comfy - {name} size check: {size_desc}")
-                        
-                        # 3. EXIF检测（仅JPEG且未修复且未缩放的图片）
-                        if not was_format_fixed and not was_resized and image_format == 'JPEG' and processed_image:
+                    
+                    # 3. EXIF检测（更安全的检测逻辑）
+                    if not was_resized and processed_image:
+                        # 重新检查图片格式，避免依赖可能不准确的image_format变量
+                        actual_format = processed_image.format
+                        if actual_format == 'JPEG':
                             print(f"runpod-worker-comfy - JPEG detected, checking EXIF data for potential issues in {name}...")
                             has_problem, problem_desc = check_exif_division_by_zero(processed_image)
                             performance_stats["image_opens_saved"] += 1  # 避免了重复打开
@@ -554,12 +637,12 @@ def upload_images(images):
                             else: 
                                 print(f"runpod-worker-comfy - JPEG EXIF data is safe in {name}: {problem_desc}")
                         else:
-                            if was_format_fixed:
-                                print(f"runpod-worker-comfy - {name} was format-fixed, skipping EXIF check")
-                            elif was_resized:
-                                print(f"runpod-worker-comfy - {name} was resized, skipping EXIF check")
-                            else:
-                                print(f"runpod-worker-comfy - {image_format} format, no EXIF check needed")
+                            print(f"runpod-worker-comfy - {actual_format} format, no EXIF check needed for {name}")
+                    else:
+                        if was_resized:
+                            print(f"runpod-worker-comfy - {name} was resized, skipping EXIF check")
+                        else:
+                            print(f"runpod-worker-comfy - No valid image object for EXIF check in {name}")
 
                     # 统计PIL限制设置的节省
                     # 原来每个函数都会设置/恢复PIL限制，现在统一管理节省了：
@@ -598,7 +681,8 @@ def upload_images(images):
                     error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
                     print(f"runpod-worker-comfy - {error_msg}")
                     errors.append(error_msg)
-                    cleanup_local_file(local_path, f"error processing image {name}") 
+                    if local_path:  # 添加检查，避免None值
+                        cleanup_local_file(local_path, f"error processing image {name}")
 
         if errors:
             print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
