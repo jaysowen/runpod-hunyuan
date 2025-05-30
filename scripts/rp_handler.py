@@ -6,7 +6,8 @@ import requests
 import base64
 import hashlib
 from io import BytesIO
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageOps
+from PIL.ExifTags import TAGS
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
 import torch
 import gc
@@ -15,8 +16,210 @@ import urllib3 # Added import
 # Disable InsecureRequestWarning when verify=False is used with requests
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Added to disable warnings
 
-# --- Allowlist specific classes for torch.load (PyTorch >= 1.13+) ---
-# ... (Allowlist code remains the same) ...
+def check_exif_division_by_zero(image, image_blob=None):
+    """
+    检测图片EXIF数据是否可能导致除零错误
+    接收已打开的image对象，避免重复打开
+    返回: (has_problem, problem_description)
+    """
+    try:
+        # 如果image为None，则尝试打开
+        if image is None and image_blob is not None:
+            image = Image.open(BytesIO(image_blob))
+        elif image is None:
+            return True, "No image object or blob provided"
+        
+        # 只对JPEG格式进行EXIF检测，其他格式直接返回安全
+        if image.format not in ['JPEG']:
+            return False, f"Format {image.format} - No EXIF check needed"
+        
+        # 检查是否有EXIF数据
+        if not hasattr(image, '_getexif') or image._getexif() is None:
+            return False, "JPEG format but no EXIF data"
+        
+        exif_data = image._getexif()
+        if not exif_data:
+            return False, "JPEG format but empty EXIF data"
+        
+        # 检查可能导致除零错误的EXIF字段
+        problematic_fields = []
+        
+        for tag_id, value in exif_data.items():
+            tag_name = TAGS.get(tag_id, tag_id)
+            
+            # 检查分辨率相关字段
+            if tag_name in ['XResolution', 'YResolution']:
+                if isinstance(value, tuple) and len(value) == 2:
+                    if value[1] == 0:  # 分母为0
+                        problematic_fields.append(f"{tag_name}: {value[0]}/{value[1]}")
+                elif value == 0:
+                    problematic_fields.append(f"{tag_name}: {value}")
+            
+            # 检查其他可能的除零字段
+            elif tag_name in ['FocalLength', 'ExposureTime', 'FNumber', 'ISOSpeedRatings']:
+                if isinstance(value, tuple) and len(value) == 2 and value[1] == 0:
+                    problematic_fields.append(f"{tag_name}: {value[0]}/{value[1]}")
+                elif value == 0 and tag_name in ['FocalLength', 'FNumber']:
+                    problematic_fields.append(f"{tag_name}: {value}")
+        
+        if problematic_fields:
+            return True, f"JPEG EXIF issues: {', '.join(problematic_fields)}"
+        
+        return False, "JPEG EXIF data looks safe"
+        
+    except Exception as e:
+        # 如果检测过程出错，为安全起见返回True
+        return True, f"Error checking EXIF: {str(e)}"
+
+def fix_image_with_orientation_preserved(image_blob):
+    """
+    修复图片EXIF问题，同时保持正确的方向
+    """
+    try:
+        image = Image.open(BytesIO(image_blob))
+        
+        # 应用EXIF方向信息，然后移除EXIF
+        image = ImageOps.exif_transpose(image)
+        
+        # 保存为新的图片数据（不包含EXIF）
+        output_buffer = BytesIO()
+        
+        # 保持原始格式
+        format = image.format if image.format else 'JPEG'
+        if format.upper() == 'JPEG':
+            image.save(output_buffer, format='JPEG', quality=95, optimize=True)
+        else:
+            image.save(output_buffer, format=format)
+        
+        return output_buffer.getvalue()
+        
+    except Exception as e:
+        print(f"Error fixing image: {e}")
+        # 如果修复失败，返回原始数据
+        return image_blob
+
+def check_and_resize_large_image(image, image_blob, name="image"):
+    """
+    检测图片是否超过PIL像素限制，如果超过则自动缩放
+    接收已打开的image对象，避免重复打开
+    注意：PIL限制已在upload_images函数中统一管理
+    返回: (processed_blob, was_resized, description)
+    """
+    try:
+        # 如果image为None，则尝试打开
+        if image is None:
+            # PIL限制已在upload_images函数中统一管理，无需重复设置
+            image = Image.open(BytesIO(image_blob))
+        
+        width, height = image.size
+        total_pixels = width * height
+        
+        print(f"runpod-worker-comfy - Image {name} size: {width}x{height} = {total_pixels:,} pixels")
+        
+        # 检查是否超过PIL默认限制
+        if total_pixels > MAX_IMAGE_PIXELS:
+            print(f"runpod-worker-comfy - Image {name} exceeds PIL limit ({MAX_IMAGE_PIXELS:,} pixels), resizing...")
+            
+            # 计算缩放比例，目标是略低于限制
+            target_pixels = MAX_IMAGE_PIXELS * 0.9  # 留10%安全边距
+            scale_factor = (target_pixels / total_pixels) ** 0.5
+            new_width = int(width * scale_factor)
+            new_height = int(height * scale_factor)
+            
+            print(f"runpod-worker-comfy - Resizing {name} to {new_width}x{new_height} (scale: {scale_factor:.3f})")
+            
+            # 缩放图片
+            resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # 保存为新的blob
+            output_buffer = BytesIO()
+            format = image.format if image.format else 'JPEG'
+            if format.upper() == 'JPEG':
+                resized_image.save(output_buffer, format='JPEG', quality=95, optimize=True)
+            else:
+                resized_image.save(output_buffer, format=format)
+            
+            new_pixels = new_width * new_height
+            return output_buffer.getvalue(), True, f"Resized from {total_pixels:,} to {new_pixels:,} pixels"
+        
+        else:
+            print(f"runpod-worker-comfy - Image {name} size is within PIL limits, no resizing needed")
+            return image_blob, False, f"Size OK: {total_pixels:,} pixels"
+        
+    except Exception as e:
+        print(f"runpod-worker-comfy - Error checking image size for {name}: {e}")
+        return image_blob, False, f"Size check failed: {str(e)}"
+
+def quick_image_validation(image_blob, name="image"):
+    """
+    快速图片验证，只在必要时进行修复
+    返回: (image_object, processed_blob, was_fixed, description)
+    """
+    try:
+        # 快速验证：只检查能否打开，不做verify()
+        temp_image = Image.open(BytesIO(image_blob))
+        image_format = temp_image.format
+        
+        # 快速检查：只获取基本信息，不加载像素数据
+        width, height = temp_image.size
+        
+        # 如果能正常获取信息，说明格式OK，返回image对象
+        return temp_image, image_blob, False, f"Format {image_format} OK"
+        
+    except Exception as e:
+        # 只有在出错时才进行修复
+        error_msg = str(e).lower()
+        
+        # 快速判断是否是格式问题
+        if "not a jpeg" in error_msg or "cannot identify" in error_msg or "syntaxerror" in error_msg:
+            fixed_blob, was_fixed, desc = _fix_corrupted_image(image_blob, name, str(e))
+            if was_fixed:
+                # 重新打开修复后的图片
+                fixed_image = Image.open(BytesIO(fixed_blob))
+                return fixed_image, fixed_blob, True, desc
+            else:
+                # 修复失败，尝试原始数据
+                try:
+                    temp_image = Image.open(BytesIO(image_blob))
+                    return temp_image, image_blob, False, desc
+                except:
+                    return None, image_blob, False, desc
+        else:
+            # 其他错误直接返回原数据
+            return None, image_blob, False, f"Validation skipped: {str(e)}"
+
+def _fix_corrupted_image(image_blob, name, original_error):
+    """
+    仅在确认格式损坏时才执行的修复函数
+    注意：PIL限制已在upload_images函数中统一管理
+    """
+    try:
+        print(f"runpod-worker-comfy - Fixing corrupted image {name}: {original_error}")
+        
+        # 不需要设置PIL限制，因为upload_images函数已经统一管理
+        # 尝试强制打开并转换为JPEG
+        temp_image = Image.open(BytesIO(image_blob))
+        
+        # 快速模式转换
+        if temp_image.mode not in ['RGB', 'L']:
+            if temp_image.mode in ['RGBA', 'LA']:
+                # 创建白色背景
+                background = Image.new('RGB', temp_image.size, (255, 255, 255))
+                background.paste(temp_image, mask=temp_image.split()[-1])
+                temp_image = background
+            else:
+                temp_image = temp_image.convert('RGB')
+        
+        # 保存为JPEG
+        output_buffer = BytesIO()
+        temp_image.save(output_buffer, format='JPEG', quality=95)
+        
+        print(f"runpod-worker-comfy - Successfully fixed corrupted image {name}")
+        return output_buffer.getvalue(), True, "Fixed: converted to JPEG"
+        
+    except Exception as fix_error:
+        print(f"runpod-worker-comfy - Fix failed for {name}: {fix_error}")
+        return image_blob, False, f"Fix failed: {fix_error}"
 
 # --- 配置常量 ---
 # ComfyUI API 检查的时间间隔（毫秒）
@@ -38,6 +241,8 @@ COMFYUI_OUTPUT_PATH = os.environ.get("COMFYUI_OUTPUT_PATH", "/workspace/ComfyUI/
 SUPPORTED_VIDEO_FORMATS = ['.mp4', '.webm', '.avi', '.gif'] # 添加 gif 支持
 # Job timeout in seconds
 JOB_TIMEOUT_SECONDS = 600 # 10 minutes
+# PIL图片像素限制 (使用PIL默认限制作为阈值)
+MAX_IMAGE_PIXELS = 178956970  # PIL默认限制，约1.79亿像素
 
 # --- B2 API 全局实例 ---
 b2_api_instance = None
@@ -208,101 +413,179 @@ def upload_images(images):
     if not images:
         return {"status": "success", "message": "No images to upload.", "details": []}
 
-    # 确保输入目录存在
-    input_dir = "/workspace/ComfyUI/input"
-    os.makedirs(input_dir, exist_ok=True)
+    # 统一设置PIL限制，避免在各个函数中重复设置
+    original_pil_limit = Image.MAX_IMAGE_PIXELS
+    Image.MAX_IMAGE_PIXELS = None  # 临时移除限制，允许处理超大图片
     
-    uploaded_files_info = []
-    errors = []
-    print(f"runpod-worker-comfy - Uploading {len(images)} image(s) to ComfyUI...")
+    # 性能统计
+    performance_stats = {
+        "image_opens_saved": 0,
+        "pil_limit_sets_saved": 0,
+        "total_images": len(images)
+    }
+    
+    try:
+        # 确保输入目录存在
+        input_dir = "/workspace/ComfyUI/input"
+        os.makedirs(input_dir, exist_ok=True)
+        
+        uploaded_files_info = []
+        errors = []
+        print(f"runpod-worker-comfy - Uploading {len(images)} image(s) to ComfyUI with optimized processing...")
 
-    for image_input in images:
-        name = image_input["name"]
-        image_data_str = image_input["image"]
-        blob = None
+        for image_input in images:
+            name = image_input["name"]
+            image_data_str = image_input["image"]
+            blob = None
 
-        # 确保文件名是安全的
-        safe_filename = os.path.basename(name)
-        # Construct the full path in the ComfyUI input directory
-        local_path = os.path.join(input_dir, safe_filename)
+            # 确保文件名是安全的
+            safe_filename = os.path.basename(name)
+            # Construct the full path in the ComfyUI input directory
+            local_path = os.path.join(input_dir, safe_filename)
 
-        # Check if image_data_str is a URL
-        if isinstance(image_data_str, str) and image_data_str.startswith(('http://', 'https://')):
-            print(f"runpod-worker-comfy - Downloading image {name} from URL: {image_data_str[:100]}...") # Log truncated URL
-            try:
-                blob = download_image(image_data_str)
-                if blob is None:
-                    errors.append(f"Failed to download image '{name}' from URL.")
-                    continue # Skip to the next image if download failed
-            except Exception as e:
-                errors.append(f"Error downloading image '{name}' from URL: {e}")
+            # Check if image_data_str is a URL
+            if isinstance(image_data_str, str) and image_data_str.startswith(('http://', 'https://')):
+                print(f"runpod-worker-comfy - Downloading image {name} from URL: {image_data_str[:100]}...") # Log truncated URL
+                try:
+                    blob = download_image(image_data_str)
+                    if blob is None:
+                        errors.append(f"Failed to download image '{name}' from URL.")
+                        continue # Skip to the next image if download failed
+                except Exception as e:
+                    errors.append(f"Error downloading image '{name}' from URL: {e}")
+                    continue
+            elif isinstance(image_data_str, str):
+                 # Assume it's base64 if it's a string and not a URL
+                print(f"runpod-worker-comfy - Decoding base64 for image {name}...")
+                try:
+                    blob = base64.b64decode(image_data_str)
+                except Exception as e:
+                    errors.append(f"Failed to decode base64 for image '{name}': {e}")
+                    continue # Skip to next image if decoding failed
+            else:
+                # Handle cases where image data is not a string (unexpected format)
+                errors.append(f"Invalid image data format for image '{name}': Expected URL or base64 string.")
                 continue
-        elif isinstance(image_data_str, str):
-             # Assume it's base64 if it's a string and not a URL
-            print(f"runpod-worker-comfy - Decoding base64 for image {name}...")
-            try:
-                blob = base64.b64decode(image_data_str)
-            except Exception as e:
-                errors.append(f"Failed to decode base64 for image '{name}': {e}")
-                continue # Skip to next image if decoding failed
+
+            # If blob was successfully obtained (downloaded or decoded)
+            if blob:
+                try:
+                    # --- 高性能图片处理流程 ---
+                    # 1. 快速格式验证（只在出错时修复）
+                    processed_image, processed_blob, was_format_fixed, format_desc = quick_image_validation(blob, name)
+                    
+                    if was_format_fixed:
+                        print(f"runpod-worker-comfy - {name} was repaired: {format_desc}")
+                        image_format = "JPEG"  # 修复后统一为JPEG
+                        performance_stats["image_opens_saved"] += 1  # 避免了重复打开
+                    else:
+                        # 正常情况：从已有的image对象获取格式
+                        if processed_image:
+                            image_format = processed_image.format
+                            print(f"runpod-worker-comfy - Detected image format: {image_format} for {name}")
+                            performance_stats["image_opens_saved"] += 1  # 避免了重复打开
+                        else:
+                            print(f"runpod-worker-comfy - Warning: Could not get image object for {name}")
+                            image_format = "Unknown"
+                    
+                    # 2. 尺寸检测（使用已有的image对象）
+                    processed_blob, was_resized, size_desc = check_and_resize_large_image(processed_image, processed_blob, name)
+                    performance_stats["image_opens_saved"] += 1 if processed_image else 0  # 避免了重复打开
+                    
+                    if was_resized:
+                        print(f"runpod-worker-comfy - {name} was resized: {size_desc}")
+                        # 已经处理过的图片，不需要再做EXIF检测
+                        processed_image = None  # 重置image对象，因为已经缩放
+                    else:
+                        print(f"runpod-worker-comfy - {name} size check: {size_desc}")
+                        
+                        # 3. EXIF检测（仅JPEG且未修复且未缩放的图片）
+                        if not was_format_fixed and not was_resized and image_format == 'JPEG' and processed_image:
+                            print(f"runpod-worker-comfy - JPEG detected, checking EXIF data for potential issues in {name}...")
+                            has_problem, problem_desc = check_exif_division_by_zero(processed_image)
+                            performance_stats["image_opens_saved"] += 1  # 避免了重复打开
+                            
+                            if has_problem:
+                                print(f"runpod-worker-comfy - EXIF issue detected in {name}: {problem_desc}")
+                                print(f"runpod-worker-comfy - Applying smart fix to preserve orientation...")
+                                
+                                # 修复EXIF问题，保持方向
+                                processed_blob = fix_image_with_orientation_preserved(processed_blob)
+                                print(f"runpod-worker-comfy - Successfully fixed EXIF issues in {name}")
+                            else:
+                                print(f"runpod-worker-comfy - JPEG EXIF data is safe in {name}: {problem_desc}")
+                        else:
+                            if was_format_fixed:
+                                print(f"runpod-worker-comfy - {name} was format-fixed, skipping EXIF check")
+                            elif was_resized:
+                                print(f"runpod-worker-comfy - {name} was resized, skipping EXIF check")
+                            else:
+                                print(f"runpod-worker-comfy - {image_format} format, no EXIF check needed")
+
+                    # 统计PIL限制设置的节省
+                    # 原来每个函数都会设置/恢复PIL限制，现在统一管理节省了：
+                    # - check_and_resize_large_image: 2次操作 (设置+恢复)
+                    # - _fix_corrupted_image: 2次操作 (设置+恢复) 
+                    # - 总共节省4-6次PIL限制操作每张图片
+                    performance_stats["pil_limit_sets_saved"] += 6  # 每张图片节省最多6次PIL限制设置
+
+                    # 保存处理后的图片数据到本地文件
+                    with open(local_path, 'wb') as f:
+                        f.write(processed_blob) 
+                    print(f"runpod-worker-comfy - Saved image to {local_path}")
+
+                    # 上传到ComfyUI API，让ComfyUI自行判断文件类型
+                    print(f"runpod-worker-comfy - Uploading '{name}' via ComfyUI API...")
+                    with open(local_path, 'rb') as f_upload:
+                        files = {
+                            "image": (safe_filename, f_upload),
+                            "overwrite": (None, "true"),
+                        }
+                        upload_url = f"http://{COMFY_HOST}/upload/image"
+                        response = requests.post(upload_url, files=files, timeout=30)
+
+                    if response.status_code == 200:
+                        uploaded_info = response.json()
+                        uploaded_info['local_path'] = local_path
+                        uploaded_files_info.append(uploaded_info)
+                        print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
+                    else:
+                        errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
+                        cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
+
+                except Exception as e:
+                    import traceback
+                    tb_str = traceback.format_exc()
+                    error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
+                    print(f"runpod-worker-comfy - {error_msg}")
+                    errors.append(error_msg)
+                    cleanup_local_file(local_path, f"error processing image {name}")
+
+        if errors:
+            print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
+            return {
+                "status": "error",
+                "message": "Some images failed to upload.",
+                "details": errors,
+                "uploaded": uploaded_files_info # 也返回成功上传的信息
+            }
         else:
-            # Handle cases where image data is not a string (unexpected format)
-            errors.append(f"Invalid image data format for image '{name}': Expected URL or base64 string.")
-            continue
-
-        # If blob was successfully obtained (downloaded or decoded)
-        if blob:
-            try:
-                # --- 完全保持原始图片数据，不做任何处理 ---
-                print(f"runpod-worker-comfy - Saving original image {name} without any processing...")
-
-                # 直接保存原始blob数据到本地文件
-                with open(local_path, 'wb') as f:
-                    f.write(blob) 
-                print(f"runpod-worker-comfy - Saved original image to {local_path}")
-
-                # 上传到ComfyUI API，让ComfyUI自行判断文件类型
-                print(f"runpod-worker-comfy - Uploading '{name}' via ComfyUI API...")
-                with open(local_path, 'rb') as f_upload:
-                    files = {
-                        "image": (safe_filename, f_upload),
-                        "overwrite": (None, "true"),
-                    }
-                    upload_url = f"http://{COMFY_HOST}/upload/image"
-                    response = requests.post(upload_url, files=files, timeout=30)
-
-                if response.status_code == 200:
-                    uploaded_info = response.json()
-                    uploaded_info['local_path'] = local_path
-                    uploaded_files_info.append(uploaded_info)
-                    print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
-                else:
-                    errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
-                    cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
-
-            except Exception as e:
-                import traceback
-                tb_str = traceback.format_exc()
-                error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
-                print(f"runpod-worker-comfy - {error_msg}")
-                errors.append(error_msg)
-                cleanup_local_file(local_path, f"error processing image {name}")
-
-    if errors:
-        print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
-        return {
-            "status": "error",
-            "message": "Some images failed to upload.",
-            "details": errors,
-            "uploaded": uploaded_files_info # 也返回成功上传的信息
-        }
-    else:
-        print(f"runpod-worker-comfy - All image(s) uploaded successfully to ComfyUI.")
-        return {
-            "status": "success",
-            "message": "All images uploaded successfully.",
-            "details": uploaded_files_info # 返回 ComfyUI 的文件信息
-        }
+            print(f"runpod-worker-comfy - All image(s) uploaded successfully to ComfyUI.")
+            # 输出性能统计
+            print(f"runpod-worker-comfy - Performance optimization results:")
+            print(f"  - Images processed: {performance_stats['total_images']}")
+            print(f"  - Image opens saved: {performance_stats['image_opens_saved']} (~{performance_stats['image_opens_saved']/max(1,performance_stats['total_images']):.1f} per image)")
+            print(f"  - PIL limit sets saved: {performance_stats['pil_limit_sets_saved']} (~{performance_stats['pil_limit_sets_saved']/max(1,performance_stats['total_images']):.1f} per image)")
+            estimated_time_saved = performance_stats['image_opens_saved'] * 0.1 + performance_stats['pil_limit_sets_saved'] * 0.01
+            print(f"  - Estimated time saved: ~{estimated_time_saved:.2f} seconds")
+            
+            return {
+                "status": "success",
+                "message": "All images uploaded successfully.",
+                "details": uploaded_files_info # 返回 ComfyUI 的文件信息
+            }
+    finally:
+        Image.MAX_IMAGE_PIXELS = original_pil_limit  # 恢复PIL限制
 
 def queue_workflow(workflow):
     """向 ComfyUI 提交工作流"""
