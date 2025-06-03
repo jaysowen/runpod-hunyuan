@@ -251,9 +251,126 @@ def quick_image_validation(image_blob, name="image"):
             # 其他错误直接返回原数据
             return None, image_blob, False, f"Validation skipped: {str(e)}"
 
+def _apply_exif_orientation(image, name="image"):
+    """
+    统一的EXIF方向处理函数，支持完整的EXIF方向值和最大兼容性
+    返回: (processed_image, was_applied, description)
+    """
+    original_image_has_exif_orientation = False
+    original_orientation_value = 0 # Default to 0 (no orientation tag or normal)
+    try:
+        if hasattr(image, '_getexif') and image._getexif():
+            exif_dict = image._getexif()
+            if exif_dict:
+                orientation_val_from_exif = exif_dict.get(274)
+                if orientation_val_from_exif: # 任何存在的orientation值都记录
+                    original_orientation_value = orientation_val_from_exif
+                    if orientation_val_from_exif != 1:
+                        original_image_has_exif_orientation = True
+    except Exception as e:
+        print(f"runpod-worker-comfy - Warning: Could not get original EXIF orientation for {name}: {e}")
+        pass
+
+    current_processing_image = image.copy() # Start with a copy of the original image
+
+    # 阶段1: 尝试 ImageOps.exif_transpose
+    try:
+        processed_by_ops = ImageOps.exif_transpose(current_processing_image.copy()) # Operate on a sub-copy
+        size_changed_ops = processed_by_ops.size != current_processing_image.size
+        content_changed_ops = current_processing_image.tobytes() != processed_by_ops.tobytes()
+
+        if not original_image_has_exif_orientation: # 原始图片方向正常或无方向信息
+            if not content_changed_ops and not size_changed_ops:
+                return current_processing_image, False, "No EXIF orientation to apply (ImageOps.exif_transpose returned identical image)"
+            else: # 内容或尺寸变了，即使原始方向正常，也认为ImageOps做了事
+                return processed_by_ops, True, f"Applied transformation via ImageOps.exif_transpose (original EXIF orientation was normal or not found, content_changed={content_changed_ops}, size_changed={size_changed_ops})"
+        else: # 原始图片确实有需要校正的方向
+            if size_changed_ops:
+                return processed_by_ops, True, f"Applied EXIF orientation (value: {original_orientation_value}) using ImageOps.exif_transpose (size changed from {current_processing_image.size} to {processed_by_ops.size})"
+            elif content_changed_ops:
+                return processed_by_ops, True, f"Applied EXIF orientation (value: {original_orientation_value}) using ImageOps.exif_transpose (flip/minor adjustment, no size change, content changed)"
+            else: 
+                # 内容和尺寸都没变，但原始EXIF指示需要调整。可能ImageOps清除了EXIF但未改变像素。
+                # 这种情况下，我们应该信任ImageOps已经处理了，但标记为无视觉变化。
+                return processed_by_ops, True, f"EXIF orientation (value: {original_orientation_value}) processed by ImageOps.exif_transpose, but image content and size are identical (no visual change, EXIF likely stripped/corrected)"
+                
+    except (ZeroDivisionError, ValueError, KeyError, TypeError) as exif_error_ops:
+        print(f"runpod-worker-comfy - ImageOps.exif_transpose failed for {name} ({type(exif_error_ops).__name__}: {exif_error_ops}), attempting manual method...")
+    except Exception as unexpected_error_ops:
+        print(f"runpod-worker-comfy - Unexpected error in ImageOps.exif_transpose for {name}: {unexpected_error_ops}, attempting manual method...")
+    
+    # 阶段 2: 手动处理 (仅当ImageOps失败或效果不明确时，或作为补充)
+    # 手动处理始终基于最初传入的image对象的副本，确保状态清晰
+    # 并且仅在 original_image_has_exif_orientation 为True时进行
+    
+    if not original_image_has_exif_orientation:
+        # 如果到这里，说明ImageOps失败了，但原始图片本来就无需校正，直接返回原始副本
+        return image.copy(), False, "Manual processing skipped: No original EXIF orientation requiring correction, and ImageOps failed."
+
+    # 使用原始图片进行手动处理
+    image_for_manual_processing = image.copy() # 确保从最原始状态开始手动处理
+    original_size_manual = image_for_manual_processing.size
+    transformation_desc_manual = ""
+    
+    # 使用 original_orientation_value 进行判断
+    orientation_to_apply = original_orientation_value # 这个值是在函数开始时从原始image中获取的
+
+    processed_image_manual = image_for_manual_processing # 初始化为副本
+
+    if orientation_to_apply == 2:
+        processed_image_manual = image_for_manual_processing.transpose(Image.FLIP_LEFT_RIGHT)
+        transformation_desc_manual = "horizontal flip"
+    elif orientation_to_apply == 3:
+        processed_image_manual = image_for_manual_processing.rotate(180, expand=True)
+        transformation_desc_manual = "rotate 180°"
+    elif orientation_to_apply == 4:
+        processed_image_manual = image_for_manual_processing.rotate(180, expand=True).transpose(Image.FLIP_LEFT_RIGHT)
+        transformation_desc_manual = "rotate 180° + horizontal flip"
+    elif orientation_to_apply == 5:
+        processed_image_manual = image_for_manual_processing.rotate(270, expand=True).transpose(Image.FLIP_LEFT_RIGHT)
+        transformation_desc_manual = "rotate 270° + horizontal flip"
+    elif orientation_to_apply == 6:
+        processed_image_manual = image_for_manual_processing.rotate(270, expand=True)
+        transformation_desc_manual = "rotate 270°"
+    elif orientation_to_apply == 7:
+        processed_image_manual = image_for_manual_processing.rotate(90, expand=True).transpose(Image.FLIP_LEFT_RIGHT)
+        transformation_desc_manual = "rotate 90° + horizontal flip"
+    elif orientation_to_apply == 8:
+        processed_image_manual = image_for_manual_processing.rotate(90, expand=True)
+        transformation_desc_manual = "rotate 90°"
+    else:
+        # Should not be reached if original_image_has_exif_orientation was true,
+        # as it implies orientation was not 1 and was a valid EXIF value.
+        return image.copy(), False, f"Manual processing skipped: Unknown or no-op orientation value {orientation_to_apply}"
+
+    size_changed_manual = processed_image_manual.size != original_size_manual
+    content_changed_manual = image.tobytes() != processed_image_manual.tobytes() # Compare with original 'image' bytes
+
+    if not content_changed_manual and not size_changed_manual:
+         return image.copy(), False, f"Manually processed EXIF orientation {orientation_to_apply} ({transformation_desc_manual}), but image content and size are identical to original."
+
+    desc_manual = f"Manually applied EXIF orientation {orientation_to_apply} ({transformation_desc_manual}"
+    if size_changed_manual:
+        desc_manual += f", size changed from {original_size_manual} to {processed_image_manual.size}"
+    else:
+        desc_manual += ", no size change"
+    if content_changed_manual:
+        desc_manual += ", content changed"
+    desc_manual += ")"
+    
+    return processed_image_manual, True, desc_manual
+            
+    # 最外层捕获不应被触发，因为上面的逻辑应该覆盖所有情况或已返回
+    # 但为保险起见保留
+    # except Exception as e:
+    #     import traceback
+    #     tb_str = traceback.format_exc()
+    #     print(f"runpod-worker-comfy - Critical error in _apply_exif_orientation for {name}: {e}\n{tb_str}")
+    #     return image.copy(), False, f"EXIF orientation processing critically failed: {e}"
+
 def _convert_mpo_to_jpeg(image_blob, name):
     """
-    将MPO格式转换为标准JPEG格式
+    将MPO格式转换为标准JPEG格式，保持正确的方向
     MPO (Multi-Picture Object) 格式通常包含多个图片帧，我们提取第一个帧
     """
     try:
@@ -269,6 +386,15 @@ def _convert_mpo_to_jpeg(image_blob, name):
         # 获取第一帧的图片数据
         # 创建一个新的图片对象，只包含第一帧
         first_frame = mpo_image.copy()
+        original_mode = first_frame.mode  # 保存原始模式，避免后面日志错误
+        
+        # 应用EXIF方向信息
+        processed_frame, orientation_applied, orientation_desc = _apply_exif_orientation(first_frame, f"MPO {name}")
+        if orientation_applied:
+            print(f"runpod-worker-comfy - MPO conversion: {orientation_desc}")
+            first_frame = processed_frame
+        else:
+            print(f"runpod-worker-comfy - MPO conversion: {orientation_desc}")
         
         # 确保颜色模式正确
         if first_frame.mode not in ['RGB', 'L']:
@@ -279,16 +405,23 @@ def _convert_mpo_to_jpeg(image_blob, name):
                     background.paste(first_frame, mask=first_frame.split()[-1])
                 else:  # LA
                     background.paste(first_frame, mask=first_frame.convert('RGBA').split()[-1])
+                current_mode = first_frame.mode  # 保存当前模式
                 first_frame = background
+                print(f"runpod-worker-comfy - MPO conversion: converted from {current_mode} to RGB with white background")
             else:
+                current_mode = first_frame.mode  # 保存当前模式
                 first_frame = first_frame.convert('RGB')
+                print(f"runpod-worker-comfy - MPO conversion: converted from {current_mode} to RGB")
         
         # 保存为标准JPEG格式
         output_buffer = BytesIO()
         first_frame.save(output_buffer, format='JPEG', quality=95, optimize=True)
         
-        print(f"runpod-worker-comfy - Successfully converted MPO {name} to JPEG")
-        return output_buffer.getvalue(), True, "Converted MPO to JPEG"
+        success_msg = f"Successfully converted MPO {name} to JPEG (original mode: {original_mode})"
+        if orientation_applied:
+            success_msg += " with orientation preserved"
+        print(f"runpod-worker-comfy - {success_msg}")
+        return output_buffer.getvalue(), True, success_msg
         
     except Exception as e:
         print(f"runpod-worker-comfy - MPO conversion failed for {name}: {e}")
@@ -297,17 +430,27 @@ def _convert_mpo_to_jpeg(image_blob, name):
 
 def _fix_corrupted_image(image_blob, name, original_error):
     """
-    仅在确认格式损坏时才执行的修复函数
+    仅在确认格式损坏时才执行的修复函数，同时保持正确的方向
     注意：PIL限制已在upload_images函数中统一管理
     """
     try:
         print(f"runpod-worker-comfy - Fixing corrupted image {name}: {original_error}")
         
-        # 不需要设置PIL限制，因为upload_images函数已经统一管理
         # 尝试强制打开并转换为JPEG
         temp_image = Image.open(BytesIO(image_blob))
+        original_mode = temp_image.mode  # 保存原始模式
+        original_size = temp_image.size
         
-        # 快速模式转换
+        # 应用EXIF方向信息
+        processed_image, orientation_applied, orientation_desc = _apply_exif_orientation(temp_image, f"corrupted {name}")
+        if orientation_applied:
+            print(f"runpod-worker-comfy - Image fix: {orientation_desc}")
+            temp_image = processed_image
+        else:
+            print(f"runpod-worker-comfy - Image fix: {orientation_desc}")
+        
+        # 颜色模式转换
+        mode_conversion_desc = ""
         if temp_image.mode not in ['RGB', 'L']:
             if temp_image.mode in ['RGBA', 'LA']:
                 # 创建白色背景
@@ -316,16 +459,34 @@ def _fix_corrupted_image(image_blob, name, original_error):
                     background.paste(temp_image, mask=temp_image.split()[-1])
                 else:  # LA
                     background.paste(temp_image, mask=temp_image.convert('RGBA').split()[-1])
+                current_mode = temp_image.mode  # 保存当前模式
                 temp_image = background
+                mode_conversion_desc = f"converted from {current_mode} to RGB with white background"
+                print(f"runpod-worker-comfy - Image fix: {mode_conversion_desc}")
             else:
+                current_mode = temp_image.mode  # 保存当前模式
                 temp_image = temp_image.convert('RGB')
+                mode_conversion_desc = f"converted from {current_mode} to RGB"
+                print(f"runpod-worker-comfy - Image fix: {mode_conversion_desc}")
         
-        # 保存为JPEG
+        # 保存为JPEG（不包含EXIF数据，因为方向已经应用到像素上了）
         output_buffer = BytesIO()
-        temp_image.save(output_buffer, format='JPEG', quality=95)
+        temp_image.save(output_buffer, format='JPEG', quality=95, optimize=True)
         
-        print(f"runpod-worker-comfy - Successfully fixed corrupted image {name}")
-        return output_buffer.getvalue(), True, "Fixed: converted to JPEG"
+        # 构建详细的成功消息
+        success_components = [f"Successfully fixed corrupted image {name}"]
+        if original_mode != 'JPEG':
+            success_components.append(f"original format: {original_mode}")
+        if orientation_applied:
+            success_components.append("orientation preserved")
+        if temp_image.size != original_size:
+            success_components.append(f"size changed from {original_size} to {temp_image.size}")
+        if mode_conversion_desc:
+            success_components.append(mode_conversion_desc)
+        
+        success_msg = " (".join(success_components[0:1]) + (", ".join(success_components[1:]) + ")" if len(success_components) > 1 else "")
+        print(f"runpod-worker-comfy - {success_msg}")
+        return output_buffer.getvalue(), True, success_msg
         
     except Exception as fix_error:
         print(f"runpod-worker-comfy - Fix failed for {name}: {fix_error}")
