@@ -421,25 +421,42 @@ def upload_to_b2(local_file_path, file_name):
         # 从文件名中提取基础文件名（用于 Content-Disposition）
         base_filename = os.path.basename(file_name)
         
-        # 清理文件名，确保符合 HTTP 头部规范
-        safe_filename = base_filename.replace('"', '\\"')  # 转义双引号
+        # 根据文件扩展名设置正确的 Content-Type
+        file_extension = os.path.splitext(base_filename)[1].lower()
+        content_type_map = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.webp': 'image/webp',
+            '.bmp': 'image/bmp',
+            '.tiff': 'image/tiff',
+            '.mp4': 'video/mp4',
+            '.webm': 'video/webm',
+            '.avi': 'video/x-msvideo',
+            '.mov': 'video/quicktime'
+        }
+        
+        content_type = content_type_map.get(file_extension, 'application/octet-stream')
         
         # 设置 content_disposition 字符串
         file_content_disposition = f'attachment; filename={base_filename}'
 
         print(f"runpod-worker-comfy - 开始上传文件到 B2: {file_name} (大小: {file_size} bytes)")
+        print(f"runpod-worker-comfy - Content-Type: {content_type}")
+        print(f"runpod-worker-comfy - Content-Disposition: {file_content_disposition}")
 
-        # 使用标准上传模式，直接传入 content_disposition 参数
+        # 使用标准上传模式，同时设置 content_type 和 content_disposition
         uploaded_file = b2_bucket_instance.upload_local_file(
             local_file=local_file_path,
             file_name=file_name,
+            content_type=content_type,
             content_disposition=file_content_disposition
         )
 
         download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
         
         print(f"runpod-worker-comfy - 文件已上传到 B2: {download_url}")
-        print(f"runpod-worker-comfy - Content-Disposition: {file_content_disposition}")
         return download_url
 
     except Exception as e:
