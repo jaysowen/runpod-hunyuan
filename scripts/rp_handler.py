@@ -443,22 +443,50 @@ def upload_to_b2(local_file_path, file_name):
         
         content_type = content_type_map.get(file_extension, 'application/octet-stream')
         
-        # 使用 file_info 字典设置 Content-Disposition（B2推荐方式）
+        # 尝试多种设置 Content-Disposition 的方法
         file_info = {
-            'b2-content-disposition': f'attachment; filename="{base_filename}"'
+            # 方法1: 标准HTTP头部名称
+            'Content-Disposition': f'attachment; filename="{base_filename}"',
+            # 方法2: B2特定前缀
+            'b2-content-disposition': f'attachment; filename="{base_filename}"',
+            # 方法3: 小写版本
+            'content-disposition': f'attachment; filename="{base_filename}"'
         }
 
         print(f"runpod-worker-comfy - 开始上传文件到 B2: {file_name} (大小: {file_size} bytes)")
         print(f"runpod-worker-comfy - Content-Type: {content_type}")
         print(f"runpod-worker-comfy - File Info: {file_info}")
 
-        # 使用 file_info 方式而不是直接的 content_disposition 参数
-        uploaded_file = b2_bucket_instance.upload_local_file(
-            local_file=local_file_path,
-            file_name=file_name,
-            content_type=content_type,
-            file_info=file_info
-        )
+        # 尝试直接使用 content_disposition 参数 + file_info
+        try:
+            uploaded_file = b2_bucket_instance.upload_local_file(
+                local_file=local_file_path,
+                file_name=file_name,
+                content_type=content_type,
+                content_disposition=f'attachment; filename="{base_filename}"',
+                file_info=file_info
+            )
+            print(f"runpod-worker-comfy - 使用 content_disposition 参数 + file_info 上传成功")
+        except Exception as e1:
+            print(f"runpod-worker-comfy - content_disposition 参数失败: {e1}")
+            # 回退到只使用 file_info
+            try:
+                uploaded_file = b2_bucket_instance.upload_local_file(
+                    local_file=local_file_path,
+                    file_name=file_name,
+                    content_type=content_type,
+                    file_info=file_info
+                )
+                print(f"runpod-worker-comfy - 使用 file_info 上传成功")
+            except Exception as e2:
+                print(f"runpod-worker-comfy - file_info 也失败: {e2}")
+                # 最后回退到基本上传
+                uploaded_file = b2_bucket_instance.upload_local_file(
+                    local_file=local_file_path,
+                    file_name=file_name,
+                    content_type=content_type
+                )
+                print(f"runpod-worker-comfy - 使用基本上传（无 Content-Disposition）")
 
         download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
         
