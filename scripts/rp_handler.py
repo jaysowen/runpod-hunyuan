@@ -425,7 +425,7 @@ def upload_to_b2(local_file_path, file_name):
         safe_filename = base_filename.replace('"', '\\"')  # 转义双引号
         
         # 设置 content_disposition 字符串
-        file_content_disposition = f'attachment; filename="{safe_filename}"'
+        file_content_disposition = f'attachment; filename={base_filename}'
 
         print(f"runpod-worker-comfy - 开始上传文件到 B2: {file_name} (大小: {file_size} bytes)")
 
