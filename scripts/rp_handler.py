@@ -443,21 +443,19 @@ def upload_to_b2(local_file_path, file_name):
         
         content_type = content_type_map.get(file_extension, 'application/octet-stream')
         
-        # 使用 file_info 字典来设置 B2 的文件信息
-        file_info = {
-            'b2-content-disposition': f'attachment; filename={base_filename}'
-        }
+        # 根据B2文档，content_disposition需要双引号包围文件名
+        content_disposition = f'attachment; filename="{base_filename}"'
 
         print(f"runpod-worker-comfy - 开始上传文件到 B2: {file_name} (大小: {file_size} bytes)")
         print(f"runpod-worker-comfy - Content-Type: {content_type}")
-        print(f"runpod-worker-comfy - File Info: {file_info}")
+        print(f"runpod-worker-comfy - Content-Disposition: {content_disposition}")
 
-        # 使用标准上传模式，通过 file_info 设置头部信息
+        # 使用标准上传模式，直接传入 content_disposition 参数
         uploaded_file = b2_bucket_instance.upload_local_file(
             local_file=local_file_path,
             file_name=file_name,
             content_type=content_type,
-            file_info=file_info
+            content_disposition=content_disposition
         )
 
         download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
