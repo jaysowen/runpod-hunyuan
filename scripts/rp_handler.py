@@ -421,6 +421,10 @@ def upload_to_b2(local_file_path, file_name):
         # 从文件名中提取基础文件名（用于 Content-Disposition）
         base_filename = os.path.basename(file_name)
         
+        # 调试信息：输出原始 file_name 和提取的 base_filename
+        print(f"runpod-worker-comfy - DEBUG: file_name = '{file_name}'")
+        print(f"runpod-worker-comfy - DEBUG: base_filename = '{base_filename}'")
+        
         # 根据文件扩展名设置正确的 Content-Type
         file_extension = os.path.splitext(base_filename)[1].lower()
         content_type_map = {
@@ -439,19 +443,21 @@ def upload_to_b2(local_file_path, file_name):
         
         content_type = content_type_map.get(file_extension, 'application/octet-stream')
         
-        # 设置 content_disposition 字符串
-        file_content_disposition = f'attachment; filename={base_filename}'
+        # 使用 file_info 字典来设置 B2 的文件信息
+        file_info = {
+            'b2-content-disposition': f'attachment; filename={base_filename}'
+        }
 
         print(f"runpod-worker-comfy - 开始上传文件到 B2: {file_name} (大小: {file_size} bytes)")
         print(f"runpod-worker-comfy - Content-Type: {content_type}")
-        print(f"runpod-worker-comfy - Content-Disposition: {file_content_disposition}")
+        print(f"runpod-worker-comfy - File Info: {file_info}")
 
-        # 使用标准上传模式，同时设置 content_type 和 content_disposition
+        # 使用标准上传模式，通过 file_info 设置头部信息
         uploaded_file = b2_bucket_instance.upload_local_file(
             local_file=local_file_path,
             file_name=file_name,
             content_type=content_type,
-            content_disposition=file_content_disposition
+            file_info=file_info
         )
 
         download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
