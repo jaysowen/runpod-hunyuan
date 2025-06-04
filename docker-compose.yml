@@ -1,6 +1,6 @@
 services:
   comfyui-worker:
-    image: jaysowen/runpod-worker-comfy:general-v0.3
+    image: jaysowen/runpod-worker-comfy:wanvideo-v0.2
     environment:
       - SERVE_API_LOCALLY=true
     deploy:
