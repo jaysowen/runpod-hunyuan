@@ -327,14 +327,19 @@ def _apply_exif_orientation(image, name="image"):
         print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed size: {processed_by_ops.size}")
         
         try:
-            ops_processed_exif = processed_by_ops._getexif()
-            if ops_processed_exif:
-                ops_orientation = ops_processed_exif.get(274, "Not found or Stripped")
-                print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed EXIF Orientation: {ops_orientation}")
+            # **修复: 更安全地尝试获取处理后的EXIF数据**
+            getexif_method = getattr(processed_by_ops, '_getexif', None)
+            if getexif_method:
+                ops_processed_exif = getexif_method()
+                if ops_processed_exif is not None: # Check for None explicitly
+                    ops_orientation = ops_processed_exif.get(274, "Not found or Stripped")
+                    print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed EXIF Orientation: {ops_orientation}")
+                else:
+                    print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed image has no EXIF data (getexif returned None).")
             else:
-                print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed image has no EXIF data.")
+                print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed image object does not have _getexif method.")
         except Exception as e_log_exif:
-            print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Error getting processed EXIF: {e_log_exif}")
+            print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Error during processed EXIF access: {type(e_log_exif).__name__}: {e_log_exif}")
 
         size_changed_ops = processed_by_ops.size != current_processing_image.size
         content_changed_ops = current_processing_image.tobytes() != processed_by_ops.tobytes()
