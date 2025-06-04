@@ -16,49 +16,94 @@ import urllib3 # Added import
 # Disable InsecureRequestWarning when verify=False is used with requests
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Added to disable warnings
 
-def check_exif_division_by_zero(image, image_blob=None):
+def check_exif_division_by_zero(image, image_blob=None, name="image_in_check_exif"):
     """
     检测图片EXIF数据是否可能导致除零错误
     使用实际的ImageOps.exif_transpose测试来检测问题
     返回: (has_problem, problem_description)
     """
     try:
+        current_image_to_check = image
+        exif_data_source = "provided image object"
+
         # 如果image为None，则尝试打开
-        if image is None and image_blob is not None:
-            image = Image.open(BytesIO(image_blob))
-        elif image is None:
-            return True, "No image object or blob provided"
+        if current_image_to_check is None and image_blob is not None:
+            print(f"runpod-worker-comfy - [{name}] check_exif: Provided image object is None, opening from blob.")
+            current_image_to_check = Image.open(BytesIO(image_blob))
+            exif_data_source = "image_blob (original image was None)"
+        elif current_image_to_check is None:
+            return True, "No image object or blob provided to check_exif_division_by_zero"
         
         # **修复：移除MPO检测，因为MPO已经在format validation中转换了**
         # 只对JPEG格式进行EXIF检测，其他格式直接返回安全
-        if image.format not in ['JPEG']:
-            return False, f"Format {image.format} - No EXIF check needed"
-        
+        # 检查当前图像对象的格式，如果不是JPEG，也尝试从原始blob加载（如果EXIF可能在转换中丢失）
+        image_format_to_check = getattr(current_image_to_check, 'format', None)
+        if image_format_to_check not in ['JPEG', 'MPO']: # MPO might carry EXIF before conversion
+             print(f"runpod-worker-comfy - [{name}] check_exif: Format {image_format_to_check} - No EXIF check needed based on current image object.")
+             # Even if not JPEG now, if blob exists, it might have been JPEG originally
+             if image_blob:
+                try:
+                    temp_original_image = Image.open(BytesIO(image_blob))
+                    if temp_original_image.format == 'JPEG':
+                        print(f"runpod-worker-comfy - [{name}] check_exif: Current format is {image_format_to_check}, but original blob was JPEG. Re-checking EXIF from blob.")
+                        current_image_to_check = temp_original_image
+                        exif_data_source = "image_blob (current format not JPEG but original was)"
+                        image_format_to_check = 'JPEG' # Update to reflect we are now checking JPEG
+                    else:
+                         return False, f"Format {image_format_to_check} (original blob format {temp_original_image.format}) - No EXIF check needed"
+                except Exception as e_blob_check:
+                    print(f"runpod-worker-comfy - [{name}] check_exif: Error checking original blob format: {e_blob_check}")
+                    return False, f"Format {image_format_to_check} and error checking original blob - No EXIF check needed"
+                        else:
+                return False, f"Format {image_format_to_check} - No EXIF check needed"
+
+
+        if image_format_to_check != 'JPEG': # Double check after potential reload from blob
+             return False, f"Format {image_format_to_check} (after potential blob reload) - No EXIF check needed"
+
+
         # 检查是否有EXIF数据
-        if not hasattr(image, '_getexif') or image._getexif() is None:
-            return False, "JPEG format but no EXIF data"
+        exif_data = None
+        if hasattr(current_image_to_check, '_getexif'):
+            exif_data = current_image_to_check._getexif()
+
+        # 如果从当前对象没拿到EXIF，并且有原始blob，尝试从blob拿
+        if not exif_data and image_blob and current_image_to_check is not image: # Avoid re-opening if image IS from blob already
+            print(f"runpod-worker-comfy - [{name}] check_exif: No EXIF in {exif_data_source}, trying to get EXIF from original image_blob.")
+            try:
+                original_image_from_blob = Image.open(BytesIO(image_blob))
+                if hasattr(original_image_from_blob, '_getexif'):
+                    exif_data = original_image_from_blob._getexif()
+                    if exif_data:
+                        print(f"runpod-worker-comfy - [{name}] check_exif: Successfully got EXIF data from original image_blob.")
+                        current_image_to_check = original_image_from_blob # Test with the image that has EXIF
+                        exif_data_source = "original image_blob"
+                    else:
+                        print(f"runpod-worker-comfy - [{name}] check_exif: No EXIF data found in original image_blob either.")
+                else:
+                    print(f"runpod-worker-comfy - [{name}] check_exif: Original image_blob does not support _getexif.")
+            except Exception as e_blob_exif:
+                print(f"runpod-worker-comfy - [{name}] check_exif: Error getting EXIF from original image_blob: {e_blob_exif}")
         
-        exif_data = image._getexif()
         if not exif_data:
-            return False, "JPEG format but empty EXIF data"
+            return False, f"JPEG format but no EXIF data found (checked {exif_data_source})"
         
+        orientation_in_check_exif = exif_data.get(274)
+        print(f"runpod-worker-comfy - [{name}] check_exif: Successfully read EXIF from {exif_data_source}. Orientation: {orientation_in_check_exif}")
+
         # **关键改进：实际测试ImageOps.exif_transpose**
         try:
             # 创建图片副本进行测试，避免影响原图
-            test_image = image.copy()
-            ImageOps.exif_transpose(test_image)
-            # 如果没有异常，说明EXIF数据是安全的
-            return False, "JPEG EXIF data tested safe with ImageOps.exif_transpose"
+            test_image = current_image_to_check.copy()
+            ImageOps.exif_transpose(test_image) # This is the test
+            return False, f"JPEG EXIF data (from {exif_data_source}, orientation {orientation_in_check_exif}) tested safe with ImageOps.exif_transpose"
         except (ZeroDivisionError, ValueError, KeyError, TypeError) as test_error:
-            # 如果测试失败，说明确实有问题
-            return True, f"JPEG EXIF ImageOps.exif_transpose test failed: {type(test_error).__name__}: {test_error}"
+            return True, f"JPEG EXIF (from {exif_data_source}, orientation {orientation_in_check_exif}) ImageOps.exif_transpose test failed: {type(test_error).__name__}: {test_error}"
         except Exception as unexpected_error:
-            # 其他未预期的错误也视为有问题
-            return True, f"JPEG EXIF unexpected error during test: {type(unexpected_error).__name__}: {unexpected_error}"
+            return True, f"JPEG EXIF (from {exif_data_source}, orientation {orientation_in_check_exif}) unexpected error during ImageOps.exif_transpose test: {type(unexpected_error).__name__}: {unexpected_error}"
         
     except Exception as e:
-        # 如果检测过程出错，为安全起见返回True
-        return True, f"Error checking EXIF: {str(e)}"
+        return True, f"Error checking EXIF for {name}: {str(e)}"
 
 def fix_image_with_orientation_preserved(image_blob):
     """
