@@ -275,7 +275,22 @@ def _apply_exif_orientation(image, name="image"):
 
     # 阶段1: 尝试 ImageOps.exif_transpose
     try:
-        processed_by_ops = ImageOps.exif_transpose(current_processing_image.copy()) # Operate on a sub-copy
+        image_copy_for_ops = current_processing_image.copy()
+        processed_by_ops = ImageOps.exif_transpose(image_copy_for_ops) # Operate on a sub-copy
+        
+        print(f"runpod-worker-comfy - [{name}] Initial size: {current_processing_image.size}, Orientation: {original_orientation_value}")
+        print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed size: {processed_by_ops.size}")
+        
+        try:
+            ops_processed_exif = processed_by_ops._getexif()
+            if ops_processed_exif:
+                ops_orientation = ops_processed_exif.get(274, "Not found or Stripped")
+                print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed EXIF Orientation: {ops_orientation}")
+            else:
+                print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Processed image has no EXIF data.")
+        except Exception as e_log_exif:
+            print(f"runpod-worker-comfy - [{name}] After ImageOps.exif_transpose - Error getting processed EXIF: {e_log_exif}")
+
         size_changed_ops = processed_by_ops.size != current_processing_image.size
         content_changed_ops = current_processing_image.tobytes() != processed_by_ops.tobytes()
 
