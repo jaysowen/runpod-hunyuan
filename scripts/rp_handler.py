@@ -54,8 +54,8 @@ def check_exif_division_by_zero(image, image_blob=None, name="image_in_check_exi
                 except Exception as e_blob_check:
                     print(f"runpod-worker-comfy - [{name}] check_exif: Error checking original blob format: {e_blob_check}")
                     return False, f"Format {image_format_to_check} and error checking original blob - No EXIF check needed"
-                        else:
-                return False, f"Format {image_format_to_check} - No EXIF check needed"
+             else: # Corrected indentation for this else
+                return False, f"Format {image_format_to_check} - No EXIF check needed (no blob to check for original JPEG)"
 
 
         if image_format_to_check != 'JPEG': # Double check after potential reload from blob
