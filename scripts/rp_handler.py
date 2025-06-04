@@ -73,13 +73,14 @@ def initialize_b2():
         return False
 
 def upload_to_b2(local_file_path, file_name):
-    """将文件上传到 B2 存储"""
+    """将文件上传到 B2 存储，设置 Content-Disposition 为 attachment"""
     if not b2_bucket_instance:
         error_msg = "B2 Bucket 未初始化，请检查配置"
         print(f"runpod-worker-comfy - {error_msg}")
         return None
 
     try:
+        # Ensure os is available; normally imported at the top of the file
         endpoint_url = os.environ.get("BUCKET_ENDPOINT_URL", '')
         bucket_name = os.environ.get('BUCKET_NAME')
         
@@ -90,26 +91,62 @@ def upload_to_b2(local_file_path, file_name):
 
         # 检查文件是否存在且可读
         if not os.path.exists(local_file_path):
+            print(f"runpod-worker-comfy - 文件不存在: {local_file_path}")
             return None
             
         if not os.access(local_file_path, os.R_OK):
+            print(f"runpod-worker-comfy - 文件不可读: {local_file_path}")
             return None
 
         # 检查文件是否为空
-        if os.path.getsize(local_file_path) == 0:
+        file_size = os.path.getsize(local_file_path)
+        if file_size == 0:
+            print(f"runpod-worker-comfy - 文件为空: {local_file_path}")
             return None
 
-        # 使用标准上传模式
+        # 从文件名中提取基础文件名
+        base_filename = os.path.basename(file_name)
+        
+        # 根据文件扩展名设置正确的 Content-Type
+        file_extension = os.path.splitext(base_filename)[1].lower()
+        content_type_map = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.webp': 'image/webp',
+            '.bmp': 'image/bmp',
+            '.tiff': 'image/tiff',
+            '.mp4': 'video/mp4',
+            '.webm': 'video/webm',
+            '.avi': 'video/x-msvideo',
+            '.mov': 'video/quicktime'
+            # 您可以根据需要添加更多视频格式
+        }
+        
+        content_type = content_type_map.get(file_extension, 'application/octet-stream')
+
+        print(f"runpod-worker-comfy - 开始上传文件到 B2: {file_name} (大小: {file_size} bytes)")
+
+        # 上传文件，设置 Content-Type 和 Content-Disposition
         uploaded_file = b2_bucket_instance.upload_local_file(
             local_file=local_file_path,
-            file_name=file_name
+            file_name=file_name,  # 这是B2上的完整路径文件名
+            content_type=content_type,
+            content_disposition=f'attachment; filename="{base_filename}"' # 直接参数
         )
 
-        download_url = f"{endpoint_url}/{bucket_name}/{file_name}"
+        download_url = f"{endpoint_url}/{bucket_name}/{file_name}" # 使用B2上的完整路径文件名
+        
+        print(f"runpod-worker-comfy - 文件已上传到 B2: {download_url}")
         return download_url
 
     except Exception as e:
+        import traceback # Import traceback inside the except block
         print(f"runpod-worker-comfy - 上传失败: {str(e)}")
+        print(f"runpod-worker-comfy - Traceback: {traceback.format_exc()}")
+        print(f"runpod-worker-comfy - 文件路径: {local_file_path}")
+        print(f"runpod-worker-comfy - 目标文件名: {file_name}")
         return None
 
 def cleanup_empty_dirs(path_to_clean):
