@@ -128,13 +128,22 @@ ADD src/extra_model_paths.yaml ./
 WORKDIR /ComfyUI/custom_nodes
 RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && \
+    git clone https://github.com/city96/ComfyUI-GGUF.git && \
     git clone https://github.com/rgthree/rgthree-comfy.git && \
     git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git clone https://github.com/SeanScripts/ComfyUI-Unload-Model.git && \
     git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
     git clone https://github.com/orssorbit/ComfyUI-wanBlockswap.git && \
     git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
-    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    git clone https://github.com/cubiq/ComfyUI_essentials.git && \
+    git clone https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
+    git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
+    git clone https://github.com/Flow-two/ComfyUI-WanStartEndFramesNative.git
+# Install ComfyUI-VideoHelperSuite
+WORKDIR /ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install requirements for custom nodes (if any)
 # Reverted to installing requirements for each node individually, ignoring errors.
