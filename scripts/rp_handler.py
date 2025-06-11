@@ -37,7 +37,7 @@ IMAGE_FILTER_BLUR_RADIUS = int(os.environ.get("IMAGE_FILTER_BLUR_RADIUS", 10))
 COMFYUI_OUTPUT_PATH = os.environ.get("COMFYUI_OUTPUT_PATH", "/workspace/ComfyUI/output")
 SUPPORTED_VIDEO_FORMATS = ['.mp4', '.webm', '.avi', '.gif'] # 添加 gif 支持
 # Job timeout in seconds
-JOB_TIMEOUT_SECONDS = 600 # 10 minutes
+JOB_TIMEOUT_SECONDS = 1200 # 20 minutes
 
 # --- B2 API 全局实例 ---
 b2_api_instance = None
