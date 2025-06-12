@@ -107,6 +107,9 @@ COPY --from=builder /ComfyUI /ComfyUI
 WORKDIR /ComfyUI
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Upgrade Pillow to fix "The fill character must be a unicode character" error with Python 3.12
+RUN pip install --no-cache-dir --upgrade "Pillow>=10.3.0"
+
 # Install other Python packages
 RUN pip install --no-cache-dir \
     triton \
