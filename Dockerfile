@@ -140,7 +140,8 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/cubiq/ComfyUI_essentials.git && \
     git clone https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
     git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
-    git clone https://github.com/Flow-two/ComfyUI-WanStartEndFramesNative.git
+    git clone https://github.com/Flow-two/ComfyUI-WanStartEndFramesNative.git &
+    git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git
 # Install ComfyUI-VideoHelperSuite
 WORKDIR /ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite
 RUN pip install --no-cache-dir -r requirements.txt
