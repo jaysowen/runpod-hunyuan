@@ -60,7 +60,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=wanvideo,enable=${{ github.ref == 'refs/heads/wanvideo1.0' }}
-            type=raw,value=wanvideo-v0.3,enable=${{ github.ref == 'refs/heads/wanvideo1.0' }}
+            type=raw,value=wanvideo-v0.4,enable=${{ github.ref == 'refs/heads/wanvideo1.0' }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push

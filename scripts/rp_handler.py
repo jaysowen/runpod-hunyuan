@@ -843,77 +843,20 @@ def upload_images(images):
             # If blob was successfully obtained (downloaded or decoded)
             if blob:
                 try:
-                    # --- 高性能图片处理流程 ---
-                    # 1. 快速格式验证（只在出错时修复）
-                    processed_image, processed_blob, was_fixed, format_desc = quick_image_validation(blob, name)
-                    
-                    if was_fixed:
-                        print(f"runpod-worker-comfy - {name} was repaired: {format_desc}")
-                        # 重新获取修复后的格式
-                        if processed_image:
-                            image_format = processed_image.format
-                            print(f"runpod-worker-comfy - Fixed image format: {image_format} for {name}")
-                        else:
-                            image_format = "JPEG"  # 如果无法获取，默认为JPEG
-                        performance_stats["image_opens_saved"] += 1  # 避免了重复打开
-                    else:
-                        # 正常情况：从已有的image对象获取格式
-                        if processed_image:
-                            image_format = processed_image.format
-                            print(f"runpod-worker-comfy - Detected image format: {image_format} for {name}")
-                            performance_stats["image_opens_saved"] += 1  # 避免了重复打开
-                        else:
-                            print(f"runpod-worker-comfy - Warning: Could not get image object for {name}")
-                            image_format = "Unknown"
-                    
-                    # 2. 尺寸检测（使用已有的image对象）
-                    processed_blob, was_resized, size_desc = check_and_resize_large_image(processed_image, processed_blob, name)
-                    performance_stats["image_opens_saved"] += 1 if processed_image else 0  # 避免了重复打开
-                    
-                    if was_resized:
-                        print(f"runpod-worker-comfy - {name} was resized: {size_desc}")
-                        # 已经处理过的图片，不需要再做EXIF检测
-                        processed_image = None  # 重置image对象，因为已经缩放
-                    else:
-                        print(f"runpod-worker-comfy - {name} size check: {size_desc}")
-                    
-                    # 3. EXIF检测（更安全的检测逻辑）
-                    if not was_resized and processed_image:
-                        # 重新检查图片格式，避免依赖可能不准确的image_format变量
-                        actual_format = processed_image.format
-                        if actual_format == 'JPEG':
-                            print(f"runpod-worker-comfy - JPEG detected, checking EXIF data for potential issues in {name}...")
-                            has_problem, problem_desc = check_exif_division_by_zero(processed_image)
-                            performance_stats["image_opens_saved"] += 1  # 避免了重复打开
-                            
-                            if has_problem:
-                                print(f"runpod-worker-comfy - EXIF issue detected in {name}: {problem_desc}")
-                                print(f"runpod-worker-comfy - Applying smart fix to preserve orientation...")
-                                
-                                # 修复EXIF问题，保持方向
-                                processed_blob = fix_image_with_orientation_preserved(processed_blob)
-                                print(f"runpod-worker-comfy - Successfully fixed EXIF issues in {name}")
-                            else: 
-                                print(f"runpod-worker-comfy - JPEG EXIF data is safe in {name}: {problem_desc}")
-                        else:
-                            print(f"runpod-worker-comfy - {actual_format} format, no EXIF check needed for {name}")
-                    else:
-                        if was_resized:
-                            print(f"runpod-worker-comfy - {name} was resized, skipping EXIF check")
-                        else:
-                            print(f"runpod-worker-comfy - No valid image object for EXIF check in {name}")
-
-                    # 统计PIL限制设置的节省
-                    # 原来每个函数都会设置/恢复PIL限制，现在统一管理节省了：
-                    # - check_and_resize_large_image: 2次操作 (设置+恢复)
-                    # - _fix_corrupted_image: 2次操作 (设置+恢复) 
-                    # - 总共节省4-6次PIL限制操作每张图片
-                    performance_stats["pil_limit_sets_saved"] += 6  # 每张图片节省最多6次PIL限制设置
-
-                    # 保存处理后的图片数据到本地文件
-                    with open(local_path, 'wb') as f:
-                        f.write(processed_blob) 
-                    print(f"runpod-worker-comfy - Saved image to {local_path}")
+                    # --- Sanitize the image by opening and re-saving with Pillow ---
+                    # This removes potentially problematic metadata (like non-standard EXIF)
+                    # and ensures the image is in a standard format before processing.
+                    print(f"runpod-worker-comfy - Processing and sanitizing image {name}...")
+                    with Image.open(BytesIO(blob)) as img:
+                        # Convert to a standard mode to avoid potential issues with palette modes, etc.
+                        if img.mode not in ['RGB', 'RGBA']:
+                             print(f"runpod-worker-comfy - Converting image from mode {img.mode} to RGB.")
+                             img = img.convert('RGB')
+                        
+                        # Saving the image via Pillow strips most metadata by default.
+                        # This mimics the sanitization that happens in web UIs.
+                        img.save(local_path)
+                    print(f"runpod-worker-comfy - Saved sanitized image to {local_path}")
 
                     # 上传到ComfyUI API，让ComfyUI自行判断文件类型
                     print(f"runpod-worker-comfy - Uploading '{name}' via ComfyUI API...")
@@ -940,8 +883,7 @@ def upload_images(images):
                     error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
                     print(f"runpod-worker-comfy - {error_msg}")
                     errors.append(error_msg)
-                    if local_path:  # 添加检查，避免None值
-                        cleanup_local_file(local_path, f"error processing image {name}")
+                    cleanup_local_file(local_path, f"error processing image {name}")
 
         if errors:
             print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
