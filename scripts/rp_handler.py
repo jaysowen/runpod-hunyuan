@@ -6,7 +6,7 @@ import requests
 import base64
 import hashlib
 from io import BytesIO
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageOps
 from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
 import torch
 import gc
@@ -236,138 +236,143 @@ def download_image(url):
         print(f"runpod-worker-comfy - Error downloading image from URL {url}: {str(e)}")
         return None
 
+# --- JPEG EXIF 检查与修复辅助函数 ---
+def check_exif_division_by_zero(image, image_blob=None, name="image_in_check_exif"):
+    try:
+        current_image_to_check = image
+        exif_data_source = "provided image object"
+        if current_image_to_check is None and image_blob is not None:
+            current_image_to_check = Image.open(BytesIO(image_blob))
+            exif_data_source = "image_blob (original image was None)"
+        elif current_image_to_check is None:
+            return True, "No image object or blob provided to check_exif_division_by_zero"
+        image_format_to_check = getattr(current_image_to_check, 'format', None)
+        if image_format_to_check != 'JPEG':
+            return False, f"Format {image_format_to_check} - No EXIF check needed"
+        exif_data = None
+        if hasattr(current_image_to_check, '_getexif'):
+            exif_data = current_image_to_check._getexif()
+        if not exif_data:
+            return False, f"JPEG format but no EXIF data found (checked {exif_data_source})"
+        orientation_in_check_exif = exif_data.get(274)
+        try:
+            test_image = current_image_to_check.copy()
+            ImageOps.exif_transpose(test_image)
+            return False, f"JPEG EXIF data (from {exif_data_source}, orientation {orientation_in_check_exif}) tested safe with ImageOps.exif_transpose"
+        except (ZeroDivisionError, ValueError, KeyError, TypeError) as test_error:
+            return True, f"JPEG EXIF (from {exif_data_source}, orientation {orientation_in_check_exif}) ImageOps.exif_transpose test failed: {type(test_error).__name__}: {test_error}"
+        except Exception as unexpected_error:
+            return True, f"JPEG EXIF (from {exif_data_source}, orientation {orientation_in_check_exif}) unexpected error during ImageOps.exif_transpose test: {type(unexpected_error).__name__}: {unexpected_error}"
+    except Exception as e:
+        return True, f"Error checking EXIF for {name}: {str(e)}"
+
+def fix_image_with_orientation_preserved(image_blob):
+    try:
+        image = Image.open(BytesIO(image_blob))
+        original_format = image.format
+        try:
+            image = ImageOps.exif_transpose(image)
+        except Exception:
+            pass
+        output_buffer = BytesIO()
+        if image.mode not in ['RGB', 'L']:
+            image = image.convert('RGB')
+        image.save(output_buffer, format='JPEG', quality=95, optimize=True)
+        return output_buffer.getvalue()
+    except Exception as e:
+        return image_blob
+
 def upload_images(images):
     if not images:
         return {"status": "success", "message": "No images to upload.", "details": []}
-
-    # 统一设置PIL限制，避免在各个函数中重复设置
-    original_pil_limit = Image.MAX_IMAGE_PIXELS
-    Image.MAX_IMAGE_PIXELS = None  # 临时移除限制，允许处理超大图片
-    
-    # 性能统计
-    performance_stats = {
-        "image_opens_saved": 0,
-        "pil_limit_sets_saved": 0,
-        "total_images": len(images)
-    }
-    
-    try:
-        # 确保输入目录存在
-        input_dir = "/workspace/ComfyUI/input"
-        os.makedirs(input_dir, exist_ok=True)
-        
-        uploaded_files_info = []
-        errors = []
-        print(f"runpod-worker-comfy - Uploading {len(images)} image(s) to ComfyUI with optimized processing...")
-
-        for image_input in images:
-            name = image_input["name"]
-            image_data_str = image_input["image"]
-            blob = None
-            local_path = None  # 添加这行初始化
-
-            # 确保文件名是安全的
-            safe_filename = os.path.basename(name)
-            local_path = os.path.join(input_dir, safe_filename)
-
-            # Check if image_data_str is a URL
-            if isinstance(image_data_str, str) and image_data_str.startswith(('http://', 'https://')):
-                print(f"runpod-worker-comfy - Downloading image {name} from URL: {image_data_str[:100]}...") # Log truncated URL
-                try:
-                    blob = download_image(image_data_str)
-                    if blob is None:
-                        errors.append(f"Failed to download image '{name}' from URL.")
-                        continue # Skip to the next image if download failed
-                except Exception as e:
-                    import traceback
-                    tb_str = traceback.format_exc()
-                    error_msg = f"Error downloading image '{name}' from URL: {e}. Traceback: {tb_str}"
-                    print(f"runpod-worker-comfy - {error_msg}")
-                    errors.append(error_msg)
+    input_dir = "/workspace/ComfyUI/input"
+    os.makedirs(input_dir, exist_ok=True)
+    uploaded_files_info = []
+    errors = []
+    print(f"runpod-worker-comfy - Uploading {len(images)} image(s) to ComfyUI with smart jpeg pre-processing...")
+    for image_input in images:
+        name = image_input["name"]
+        image_data_str = image_input["image"]
+        blob = None
+        safe_filename = os.path.basename(name)
+        local_path = os.path.join(input_dir, safe_filename)
+        if isinstance(image_data_str, str) and image_data_str.startswith(('http://', 'https://')):
+            print(f"runpod-worker-comfy - Downloading image {name} from URL: {image_data_str[:100]}...")
+            try:
+                blob = download_image(image_data_str)
+                if blob is None:
+                    errors.append(f"Failed to download image '{name}' from URL.")
                     continue
-            elif isinstance(image_data_str, str):
-                 # Assume it's base64 if it's a string and not a URL
-                print(f"runpod-worker-comfy - Decoding base64 for image {name}...")
-                try:
-                    blob = base64.b64decode(image_data_str)
-                except Exception as e:
-                    errors.append(f"Failed to decode base64 for image '{name}': {e}")
-                    continue # Skip to next image if decoding failed
-            else:
-                # Handle cases where image data is not a string (unexpected format)
-                errors.append(f"Invalid image data format for image '{name}': Expected URL or base64 string.")
+            except Exception as e:
+                errors.append(f"Error downloading image '{name}' from URL: {e}")
                 continue
-
-            # If blob was successfully obtained (downloaded or decoded)
-            if blob:
-                try:
-                    # --- Sanitize the image by opening and re-saving with Pillow ---
-                    # This removes potentially problematic metadata (like non-standard EXIF)
-                    # and ensures the image is in a standard format before processing.
-                    print(f"runpod-worker-comfy - Processing and sanitizing image {name}...")
-                    with Image.open(BytesIO(blob)) as img:
-                        # Convert to a standard mode to avoid potential issues with palette modes, etc.
-                        if img.mode not in ['RGB', 'RGBA']:
-                             print(f"runpod-worker-comfy - Converting image from mode {img.mode} to RGB.")
-                             img = img.convert('RGB')
-                        
-                        # Saving the image via Pillow strips most metadata by default.
-                        # This mimics the sanitization that happens in web UIs.
-                        img.save(local_path)
-                    print(f"runpod-worker-comfy - Saved sanitized image to {local_path}")
-
-                    # 上传到ComfyUI API，让ComfyUI自行判断文件类型
-                    print(f"runpod-worker-comfy - Uploading '{name}' via ComfyUI API...")
-                    with open(local_path, 'rb') as f_upload:
-                        files = {
-                            "image": (safe_filename, f_upload),
-                            "overwrite": (None, "true"),
-                        }
-                        upload_url = f"http://{COMFY_HOST}/upload/image"
-                        response = requests.post(upload_url, files=files, timeout=30)
-
-                    if response.status_code == 200:
-                        uploaded_info = response.json()
-                        uploaded_info['local_path'] = local_path
-                        uploaded_files_info.append(uploaded_info)
-                        print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
-                    else:
-                        errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
-                        cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
-
-                except Exception as e:
-                    import traceback
-                    tb_str = traceback.format_exc()
-                    error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
-                    print(f"runpod-worker-comfy - {error_msg}")
-                    errors.append(error_msg)
-                    cleanup_local_file(local_path, f"error processing image {name}")
-
-        if errors:
-            print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
-            return {
-                "status": "error",
-                "message": "Some images failed to upload.",
-                "details": errors,
-                "uploaded": uploaded_files_info # 也返回成功上传的信息
-            }
+        elif isinstance(image_data_str, str):
+            print(f"runpod-worker-comfy - Decoding base64 for image {name}...")
+            try:
+                blob = base64.b64decode(image_data_str)
+            except Exception as e:
+                errors.append(f"Failed to decode base64 for image '{name}': {e}")
+                continue
         else:
-            print(f"runpod-worker-comfy - All image(s) uploaded successfully to ComfyUI.")
-            # 输出性能统计
-            print(f"runpod-worker-comfy - Performance optimization results:")
-            print(f"  - Images processed: {performance_stats['total_images']}")
-            print(f"  - Image opens saved: {performance_stats['image_opens_saved']} (~{performance_stats['image_opens_saved']/max(1,performance_stats['total_images']):.1f} per image)")
-            print(f"  - PIL limit sets saved: {performance_stats['pil_limit_sets_saved']} (~{performance_stats['pil_limit_sets_saved']/max(1,performance_stats['total_images']):.1f} per image)")
-            estimated_time_saved = performance_stats['image_opens_saved'] * 0.1 + performance_stats['pil_limit_sets_saved'] * 0.01
-            print(f"  - Estimated time saved: ~{estimated_time_saved:.2f} seconds")
-            
-            return {
-                "status": "success",
-                "message": "All images uploaded successfully.",
-                "details": uploaded_files_info # 返回 ComfyUI 的文件信息
-            }
-    finally:
-        Image.MAX_IMAGE_PIXELS = original_pil_limit  # 恢复PIL限制
+            errors.append(f"Invalid image data format for image '{name}': Expected URL or base64 string.")
+            continue
+        if blob:
+            try:
+                # 只对 JPEG 检查和修复
+                is_jpeg = False
+                try:
+                    with Image.open(BytesIO(blob)) as img:
+                        if img.format == 'JPEG':
+                            is_jpeg = True
+                            has_problem, desc = check_exif_division_by_zero(img, blob, name)
+                            print(f"runpod-worker-comfy - JPEG check for {name}: {desc}")
+                            if has_problem:
+                                print(f"runpod-worker-comfy - Fixing problematic JPEG: {name}")
+                                blob = fix_image_with_orientation_preserved(blob)
+                except Exception as e:
+                    print(f"runpod-worker-comfy - JPEG format check failed for {name}: {e}")
+                # 保存图片
+                with open(local_path, 'wb') as f:
+                    f.write(blob)
+                print(f"runpod-worker-comfy - Saved image to {local_path}")
+                # 上传到ComfyUI API
+                with open(local_path, 'rb') as f_upload:
+                    files = {
+                        "image": (safe_filename, f_upload),
+                        "overwrite": (None, "true"),
+                    }
+                    upload_url = f"http://{COMFY_HOST}/upload/image"
+                    response = requests.post(upload_url, files=files, timeout=30)
+                if response.status_code == 200:
+                    uploaded_info = response.json()
+                    uploaded_info['local_path'] = local_path
+                    uploaded_files_info.append(uploaded_info)
+                    print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
+                else:
+                    errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
+                    cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
+            except Exception as e:
+                import traceback
+                tb_str = traceback.format_exc()
+                error_msg = f"Error during image processing/saving for '{name}': {e}. Traceback: {tb_str}"
+                print(f"runpod-worker-comfy - {error_msg}")
+                errors.append(error_msg)
+                cleanup_local_file(local_path, f"error processing image {name}")
+    if errors:
+        print(f"runpod-worker-comfy - Image upload(s) finished with errors.")
+        return {
+            "status": "error",
+            "message": "Some images failed to upload.",
+            "details": errors,
+            "uploaded": uploaded_files_info
+        }
+    else:
+        print(f"runpod-worker-comfy - All image(s) uploaded successfully to ComfyUI.")
+        return {
+            "status": "success",
+            "message": "All images uploaded successfully.",
+            "details": uploaded_files_info
+        }
 
 def queue_workflow(workflow):
     """向 ComfyUI 提交工作流"""
