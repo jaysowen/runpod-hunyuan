@@ -14,6 +14,14 @@ else
     echo "No pre_start.sh found."
 fi
 
+# Force update for ComfyUI-KJNodes to fix runtime errors
+echo "Force updating ComfyUI-KJNodes to ensure latest bug fixes..."
+if [ -d "/ComfyUI/custom_nodes/ComfyUI-KJNodes" ]; then
+    rm -rf /ComfyUI/custom_nodes/ComfyUI-KJNodes
+fi
+git clone https://github.com/kijai/ComfyUI-KJNodes.git /ComfyUI/custom_nodes/ComfyUI-KJNodes
+echo "ComfyUI-KJNodes updated."
+
 echo "Running post-start script (if exists)..."
 if [[ -f "/post_start.sh" ]]; then
     bash "/post_start.sh"
