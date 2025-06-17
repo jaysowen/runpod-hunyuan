@@ -978,26 +978,19 @@ def upload_images(images):
                         f.write(processed_blob) 
                     print(f"runpod-worker-comfy - Saved image to {local_path}")
 
-                    # 上传到ComfyUI API，让ComfyUI自行判断文件类型
-                    print(f"runpod-worker-comfy - Uploading '{name}' via ComfyUI API...")
-                    with open(local_path, 'rb') as f_upload:
-                        files = {
-                            "image": (safe_filename, f_upload),
-                            "overwrite": (None, "true"),
-                        }
-                        upload_url = f"http://{COMFY_HOST}/upload/image"
-                        response = requests.post(upload_url, files=files, timeout=30)
+                    # --- End Final Verification ---
 
-                    if response.status_code == 200:
-                        uploaded_info = response.json()
-                        uploaded_info['local_path'] = local_path
-                        uploaded_files_info.append(uploaded_info)
-                        print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
-                        # 添加这行来清理文件
-                        cleanup_local_file(local_path, f"successfully uploaded image {name}")
-                    else:
-                        errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
-                        cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
+                    # The file is now verified and placed in the correct directory.
+                    # ComfyUI's LoadImage node will pick it up from there.
+                    # We no longer need to call the /upload/image API.
+                    
+                    # Store the information ComfyUI needs to find the file.
+                    uploaded_files_info.append({
+                        "name": safe_filename,
+                        "subfolder": "",
+                        "type": "input"
+                    })
+                    print(f"runpod-worker-comfy - Image '{name}' is ready in input directory.")
 
                 except Exception as e:
                     import traceback
@@ -1017,7 +1010,7 @@ def upload_images(images):
                 "uploaded": uploaded_files_info # 也返回成功上传的信息
             }
         else:
-            print(f"runpod-worker-comfy - All image(s) uploaded successfully to ComfyUI.")
+            print(f"runpod-worker-comfy - All image(s) are ready in the input directory.")
             # 输出性能统计
             print(f"runpod-worker-comfy - Performance optimization results:")
             print(f"  - Images processed: {performance_stats['total_images']}")
@@ -1028,8 +1021,8 @@ def upload_images(images):
             
             return {
                 "status": "success",
-                "message": "All images uploaded successfully.",
-                "details": uploaded_files_info # 返回 ComfyUI 的文件信息
+                "message": "All images are ready.",
+                "details": uploaded_files_info
             }
     finally:
         Image.MAX_IMAGE_PIXELS = original_pil_limit  # 恢复PIL限制
@@ -1527,6 +1520,39 @@ def handler(job):
             if upload_result["status"] == "error":
                 print(f"runpod-worker-comfy - Input image upload failed: {upload_result.get('message')}")
                 return {"error": f"Input image upload failed: {upload_result.get('message')}", "details": upload_result.get("details")}
+            
+            # **新增逻辑：更新工作流中的 LoadImage 节点**
+            uploaded_files = upload_result.get("details", [])
+            if uploaded_files:
+                # 寻找所有 LoadImage 节点
+                load_image_nodes_with_ids = []
+                for node_id, node_data in workflow.items():
+                    if node_data.get("class_type") == "LoadImage":
+                        load_image_nodes_with_ids.append((node_id, node_data))
+
+                # 为了保证图片分配的顺序是可预测的，我们按节点ID（通常是数字）排序
+                try:
+                    # 尝试将ID转为整数进行排序
+                    load_image_nodes_with_ids.sort(key=lambda item: int(item[0]))
+                except ValueError:
+                    # 如果ID不是纯数字，则按字符串排序作为后备
+                    print("runpod-worker-comfy - Warning: Some LoadImage node IDs are not integers, sorting alphabetically.")
+                    load_image_nodes_with_ids.sort(key=lambda item: item[0])
+                
+                # 提取排序后的节点数据
+                load_image_nodes = [node_data for node_id, node_data in load_image_nodes_with_ids]
+                
+                # 将上传的图片按顺序分配给找到的 LoadImage 节点
+                if len(uploaded_files) > len(load_image_nodes):
+                    print(f"runpod-worker-comfy - Warning: Provided {len(uploaded_files)} images, but only found {len(load_image_nodes)} LoadImage nodes. Some images will not be used.")
+                
+                for i, file_info in enumerate(uploaded_files):
+                    if i < len(load_image_nodes):
+                        node_to_update = load_image_nodes[i]
+                        node_to_update["inputs"]["image"] = file_info["name"]
+                        print(f"runpod-worker-comfy - Updated LoadImage node {load_image_nodes_with_ids[i][0]} to use image: {file_info['name']}")
+                    else:
+                        break # 没有更多的 LoadImage 节点可供更新
 
         # 5. 提交工作流
         print("runpod-worker-comfy - Queuing workflow...")
