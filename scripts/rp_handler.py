@@ -13,6 +13,7 @@ from b2sdk.v2 import B2Api, InMemoryAccountInfo, UploadMode
 import torch
 import gc
 import urllib3 # Added import
+import traceback
 
 # Disable InsecureRequestWarning when verify=False is used with requests
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Added to disable warnings
@@ -790,14 +791,46 @@ def check_server(url, retries=COMFY_API_AVAILABLE_MAX_RETRIES, delay=COMFY_API_A
 
 # --- ComfyUI 交互 ---
 def download_image(url):
-    """从URL下载图片"""
+    """从URL下载图片，并验证文件完整性。"""
+    print(f"runpod-worker-comfy - Starting download from URL: {url}")
     try:
-        # 在这里为外部图片下载添加 verify=False
-        response = requests.get(url, timeout=20, verify=False) 
-        response.raise_for_status()
-        return response.content
+        with requests.get(url, timeout=20, verify=False, stream=True) as response:
+            response.raise_for_status()
+
+            # 检查 Content-Length 头是否存在
+            content_length_str = response.headers.get('Content-Length')
+            if content_length_str is None:
+                print("runpod-worker-comfy - Warning: Content-Length header missing. Reading entire response body.")
+                # 如果没有长度头，直接读取全部内容（适用于某些服务器）
+                image_blob = response.content
+                print(f"runpod-worker-comfy - Downloaded {len(image_blob)} bytes (no length check).")
+                return image_blob
+            
+            expected_size = int(content_length_str)
+            print(f"runpod-worker-comfy - Expected file size: {expected_size} bytes.")
+
+            # 使用流式下载来确保文件完整
+            downloaded_size = 0
+            image_chunks = []
+            for chunk in response.iter_content(chunk_size=8192):
+                image_chunks.append(chunk)
+                downloaded_size += len(chunk)
+
+            # 验证下载大小是否与 Content-Length 匹配
+            if downloaded_size != expected_size:
+                error_msg = f"Incomplete download for {url}. Expected {expected_size} bytes, got {downloaded_size} bytes."
+                print(f"runpod-worker-comfy - {error_msg}")
+                raise IOError(error_msg)
+
+            print(f"runpod-worker-comfy - Download successful and verified. Total size: {downloaded_size} bytes.")
+            return b"".join(image_chunks)
+
     except requests.exceptions.RequestException as e:
         print(f"runpod-worker-comfy - Error downloading image from URL {url}: {str(e)}")
+        return None
+    except IOError as e:
+        # 捕获我们自己抛出的不完整下载错误
+        print(f"runpod-worker-comfy - IO Error during download: {str(e)}")
         return None
 
 def upload_images(images):
@@ -868,6 +901,9 @@ def upload_images(images):
                     # --- 高性能图片处理流程 ---
                     # 1. 快速格式验证（只在出错时修复）
                     processed_image, processed_blob, was_fixed, format_desc = quick_image_validation(blob, name)
+                    if not processed_blob:
+                        errors.append(f"Image '{name}' became invalid after quick_image_validation.")
+                        continue
                     
                     if was_fixed:
                         print(f"runpod-worker-comfy - {name} was repaired: {format_desc}")
@@ -890,7 +926,9 @@ def upload_images(images):
                     
                     # 2. 尺寸检测（使用已有的image对象）
                     processed_blob, was_resized, size_desc = check_and_resize_large_image(processed_image, processed_blob, name)
-                    performance_stats["image_opens_saved"] += 1 if processed_image else 0  # 避免了重复打开
+                    if not processed_blob:
+                        errors.append(f"Image '{name}' became invalid after check_and_resize_large_image.")
+                        continue
                     
                     if was_resized:
                         print(f"runpod-worker-comfy - {name} was resized: {size_desc}")
@@ -914,6 +952,9 @@ def upload_images(images):
                                 
                                 # 修复EXIF问题，保持方向
                                 processed_blob = fix_image_with_orientation_preserved(processed_blob)
+                                if not processed_blob:
+                                    errors.append(f"Image '{name}' became invalid after fix_image_with_orientation_preserved.")
+                                    continue
                                 print(f"runpod-worker-comfy - Successfully fixed EXIF issues in {name}")
                             else: 
                                 print(f"runpod-worker-comfy - JPEG EXIF data is safe in {name}: {problem_desc}")
@@ -1544,7 +1585,6 @@ def handler(job):
     except Exception as e:
         error_type = type(e).__name__
         # Log the full traceback for unexpected errors
-        import traceback
         traceback_str = traceback.format_exc()
         print(f"runpod-worker-comfy - Unexpected error in handler for job {job_id}: {error_type} - {str(e)}\n{traceback_str}")
         return {"error": f"An unexpected error occurred: {error_type} - {str(e)}"}
