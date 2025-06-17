@@ -89,16 +89,26 @@ while true; do
     if [ $waited_file -ge $max_wait_file ]; then
         echo "Error: Timed out waiting for ${BERT_TOKENIZER_CONFIG} to be a valid JSON file." >&2
         echo "  - The file might be missing, empty, or corrupted on the network volume." >&2
+        # Final attempt with verbose error before exiting
+        echo "Final attempt to validate JSON failed. Displaying file content and error:"
+        cat "${BERT_TOKENIZER_CONFIG}" || echo "Could not read file."
+        python -c "import json; import sys; f=open(sys.argv[1]); json.load(f)" "${BERT_TOKENIZER_CONFIG}"
         exit 1
     fi
 
     # Check if the file exists and is a valid JSON by attempting to load it with Python.
-    # This is the most reliable way to ensure the file is fully written and not corrupt.
     if [ -f "${BERT_TOKENIZER_CONFIG}" ] && python -c "import json; import sys; f=open(sys.argv[1]); json.load(f)" "${BERT_TOKENIZER_CONFIG}" &> /dev/null; then
         echo "  - BERT tokenizer config successfully validated as JSON. Proceeding."
         break
     else
-        echo "  - Waiting for BERT tokenizer config to become a valid JSON file..."
+        echo "  - Waiting for BERT tokenizer config to become a valid JSON file... (Attempt $((waited_file/2 + 1)))"
+        # Add debugging: print file content if it fails validation
+        if [ -f "${BERT_TOKENIZER_CONFIG}" ]; then
+            echo "--- DEBUG: Content of ${BERT_TOKENIZER_CONFIG} ---"
+            cat "${BERT_TOKENIZER_CONFIG}"
+            echo
+            echo "--- END DEBUG ---"
+        fi
         sleep 2
         waited_file=$((waited_file + 2))
     fi
