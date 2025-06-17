@@ -5,6 +5,7 @@ import os
 import requests
 import base64
 import hashlib
+import shutil
 from io import BytesIO
 from PIL import Image, ImageFilter, ImageOps
 from PIL.ExifTags import TAGS
@@ -686,6 +687,27 @@ def upload_to_b2(local_file_path, file_name):
         print(f"runpod-worker-comfy - 目标文件名: {file_name}")
         return None
 
+def cleanup_directory(directory_path, description="directory"):
+    """
+    Recursively cleans all files and subdirectories within a given directory.
+    This acts as a failsafe to prevent orphaned files from filling up the disk.
+    """
+    if not os.path.isdir(directory_path):
+        # No need to log if the dir doesn't exist, it's a clean state.
+        return
+
+    print(f"runpod-worker-comfy - Starting final cleanup of {description} at: {directory_path}")
+    for item_name in os.listdir(directory_path):
+        item_path = os.path.join(directory_path, item_name)
+        try:
+            if os.path.isfile(item_path) or os.path.islink(item_path):
+                os.unlink(item_path)
+            elif os.path.isdir(item_path):
+                shutil.rmtree(item_path)
+        except Exception as e:
+            print(f"runpod-worker-comfy - Error removing {item_path} during final cleanup: {e}")
+    print(f"runpod-worker-comfy - Finished final cleanup of {description}.")
+
 def cleanup_empty_dirs(path_to_clean):
     """递归清理指定路径下的空目录"""
     if not os.path.isdir(path_to_clean):
@@ -930,6 +952,8 @@ def upload_images(images):
                         uploaded_info['local_path'] = local_path
                         uploaded_files_info.append(uploaded_info)
                         print(f"runpod-worker-comfy - Successfully uploaded '{name}' to ComfyUI.")
+                        # 添加这行来清理文件
+                        cleanup_local_file(local_path, f"successfully uploaded image {name}")
                     else:
                         errors.append(f"Error uploading '{name}' to ComfyUI API: {response.status_code} - {response.text}")
                         cleanup_local_file(local_path, f"failed ComfyUI API upload for image {name}")
@@ -1524,6 +1548,12 @@ def handler(job):
         traceback_str = traceback.format_exc()
         print(f"runpod-worker-comfy - Unexpected error in handler for job {job_id}: {error_type} - {str(e)}\n{traceback_str}")
         return {"error": f"An unexpected error occurred: {error_type} - {str(e)}"}
+    finally:
+        # This block ensures that cleanup happens regardless of success or failure.
+        print(f"runpod-worker-comfy - Performing final workspace cleanup for job {job_id}.")
+        cleanup_directory("/workspace/ComfyUI/input", "input directory")
+        cleanup_directory(COMFYUI_OUTPUT_PATH, "output directory")
+        print(f"runpod-worker-comfy - Final workspace cleanup finished for job {job_id}.")
 
 
 # --- 启动 RunPod Serverless ---

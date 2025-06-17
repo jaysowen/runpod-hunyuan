@@ -16,42 +16,62 @@ chmod 755 /workspace
 # Custom nodes are cloned and their requirements installed during Docker build.
 # No node installation/update is expected during startup.
 
-# --- Function to create model symlinks ---
+# --- Function to create model symlinks with waiting ---
 create_model_symlink() {
   local source_dir="$1"
   local target_dir="$2"
   local model_name="$(basename "${target_dir}")"
 
-  echo "Checking symlink for ${model_name} models..."
+  echo "Mapping model: ${model_name}"
+
+  # Wait for the source directory to become available from the network volume.
+  echo "  - Waiting for source: ${source_dir}"
+  local max_wait=120
+  local waited=0
+  while [ ! -d "${source_dir}" ]; do
+      if [ $waited -ge $max_wait ]; then
+          echo "Error: Timed out waiting for source directory ${source_dir}." >&2
+          echo "  - Please ensure the model is correctly placed on your network volume." >&2
+          exit 1
+      fi
+      sleep 5
+      waited=$((waited + 5))
+  done
+  echo "  - Source directory found."
 
   # Ensure the parent directory for the target exists
   mkdir -p "$(dirname "${target_dir}")"
 
-  # Check if the source directory exists on the volume
-  if [ -d "${source_dir}" ]; then
-    # Check if the target path doesn't exist or is not already a symlink
-    if [ ! -e "${target_dir}" ] && [ ! -L "${target_dir}" ]; then
-      echo "Creating symlink for ${model_name}: ${target_dir} -> ${source_dir}"
-      ln -s "${source_dir}" "${target_dir}"
-    elif [ -L "${target_dir}" ]; then
-       echo "Symlink ${target_dir} already exists."
-    else
-       echo "Warning: ${target_dir} exists but is not a symlink. Cannot create link for ${model_name}."
-    fi
+  # Create the symlink if the target path doesn't exist or is a broken link
+  if [ -L "${target_dir}" ] && [ ! -e "${target_dir}" ]; then
+      echo "  - Removing broken symlink at ${target_dir}."
+      rm "${target_dir}"
+  fi
+  
+  if [ -e "${target_dir}" ]; then
+      echo "  - Target path ${target_dir} already exists. Skipping."
   else
-    echo "Warning: Source directory ${source_dir} not found on volume. Cannot create symlink for ${model_name}."
+      echo "  - Creating symlink: ${target_dir} -> ${source_dir}"
+      ln -s "${source_dir}" "${target_dir}"
+      echo "  - Symlink created successfully."
   fi
 }
 
 # --- Create Symlinks using the function ---
-create_model_symlink "/runpod-volume/ComfyUI/models/insightface" "/workspace/ComfyUI/models/insightface"
-create_model_symlink "/runpod-volume/ComfyUI/models/ultralytics" "/workspace/ComfyUI/models/ultralytics"
-create_model_symlink "/runpod-volume/ComfyUI/models/landmarks" "/workspace/ComfyUI/models/landmarks"
-create_model_symlink "/runpod-volume/ComfyUI/models/sams" "/workspace/ComfyUI/models/sams"
-create_model_symlink "/runpod-volume/ComfyUI/models/sams2" "/workspace/ComfyUI/models/sams2"
-create_model_symlink "/runpod-volume/ComfyUI/models/segformer_b3_clothes" "/workspace/ComfyUI/models/segformer_b3_clothes"
-create_model_symlink "/runpod-volume/ComfyUI/models/grounding-dino" "/workspace/ComfyUI/models/grounding-dino"
+SOURCE_BASE="/runpod-volume/ComfyUI/models"
+TARGET_BASE="/workspace/ComfyUI/models"
 
+create_model_symlink "${SOURCE_BASE}/insightface" "${TARGET_BASE}/insightface"
+create_model_symlink "${SOURCE_BASE}/ultralytics" "${TARGET_BASE}/ultralytics"
+create_model_symlink "${SOURCE_BASE}/landmarks" "${TARGET_BASE}/landmarks"
+create_model_symlink "${SOURCE_BASE}/sams" "${TARGET_BASE}/sams"
+create_model_symlink "${SOURCE_BASE}/sams2" "${TARGET_BASE}/sams2"
+create_model_symlink "${SOURCE_BASE}/segformer_b3_clothes" "${TARGET_BASE}/segformer_b3_clothes"
+create_model_symlink "${SOURCE_BASE}/grounding-dino" "${TARGET_BASE}/grounding-dino"
+create_model_symlink "${SOURCE_BASE}/vitmatte" "${TARGET_BASE}/vitmatte"
+create_model_symlink "${SOURCE_BASE}/bert-base-uncased" "${TARGET_BASE}/bert-base-uncased"
+create_model_symlink "${SOURCE_BASE}/jonathandinu--face-parsing" "${TARGET_BASE}/jonathandinu--face-parsing"
+create_model_symlink "${SOURCE_BASE}/bisenet" "${TARGET_BASE}/bisenet"
 # --- End Symlink Creation ---
 
 echo "MOVING COMFYUI TO WORKSPACE"
