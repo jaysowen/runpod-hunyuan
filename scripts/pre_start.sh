@@ -4,6 +4,12 @@ set -e  # Exit on error
 export PYTHONUNBUFFERED=1
 export PATH="/workspace/bin:$PATH"
 
+# [FIX V3] Force transformers library to use our specified models directory.
+# This prevents it from trying to re-download models to a different cache path.
+export HF_HOME="/workspace/ComfyUI/models"
+export TRANSFORMERS_CACHE="/workspace/ComfyUI/models"
+echo "Set HF_HOME and TRANSFORMERS_CACHE to: ${HF_HOME}"
+
 # Ensure workspace directory exists with proper permissions
 mkdir -p /workspace
 chmod 755 /workspace
@@ -73,22 +79,30 @@ create_model_symlink "${SOURCE_BASE}/bert-base-uncased" "${TARGET_BASE}/bert-bas
 #create_model_symlink "${SOURCE_BASE}/jonathandinu--face-parsing" "${TARGET_BASE}/jonathandinu--face-parsing"
 create_model_symlink "${SOURCE_BASE}/bisenet" "${TARGET_BASE}/bisenet"
 
-# --- [FIX] Explicitly wait for critical model files after linking ---
+# --- [FIX V2] Explicitly wait for critical model files using JSON validation ---
 echo "Verifying critical model files are ready..."
 BERT_TOKENIZER_CONFIG="${TARGET_BASE}/bert-base-uncased/tokenizer_config.json"
 echo "  - Waiting for BERT tokenizer config: ${BERT_TOKENIZER_CONFIG}"
 max_wait_file=60
 waited_file=0
-while [ ! -f "${BERT_TOKENIZER_CONFIG}" ] || [ ! -s "${BERT_TOKENIZER_CONFIG}" ]; do
+while true; do
     if [ $waited_file -ge $max_wait_file ]; then
-        echo "Error: Timed out waiting for ${BERT_TOKENIZER_CONFIG} to be a non-empty file." >&2
-        echo "  - The file might be missing or empty on the network volume." >&2
+        echo "Error: Timed out waiting for ${BERT_TOKENIZER_CONFIG} to be a valid JSON file." >&2
+        echo "  - The file might be missing, empty, or corrupted on the network volume." >&2
         exit 1
     fi
-    sleep 2
-    waited_file=$((waited_file + 2))
+
+    # Check if the file exists and is a valid JSON by attempting to load it with Python.
+    # This is the most reliable way to ensure the file is fully written and not corrupt.
+    if [ -f "${BERT_TOKENIZER_CONFIG}" ] && python -c "import json; import sys; f=open(sys.argv[1]); json.load(f)" "${BERT_TOKENIZER_CONFIG}" &> /dev/null; then
+        echo "  - BERT tokenizer config successfully validated as JSON. Proceeding."
+        break
+    else
+        echo "  - Waiting for BERT tokenizer config to become a valid JSON file..."
+        sleep 2
+        waited_file=$((waited_file + 2))
+    fi
 done
-echo "  - BERT tokenizer config is ready."
 echo "Critical model file verification complete."
 # --- End Fix ---
 
