@@ -72,6 +72,26 @@ create_model_symlink "${SOURCE_BASE}/vitmatte" "${TARGET_BASE}/vitmatte"
 create_model_symlink "${SOURCE_BASE}/bert-base-uncased" "${TARGET_BASE}/bert-base-uncased"
 #create_model_symlink "${SOURCE_BASE}/jonathandinu--face-parsing" "${TARGET_BASE}/jonathandinu--face-parsing"
 create_model_symlink "${SOURCE_BASE}/bisenet" "${TARGET_BASE}/bisenet"
+
+# --- [FIX] Explicitly wait for critical model files after linking ---
+echo "Verifying critical model files are ready..."
+BERT_TOKENIZER_CONFIG="${TARGET_BASE}/bert-base-uncased/tokenizer_config.json"
+echo "  - Waiting for BERT tokenizer config: ${BERT_TOKENIZER_CONFIG}"
+max_wait_file=60
+waited_file=0
+while [ ! -f "${BERT_TOKENIZER_CONFIG}" ] || [ ! -s "${BERT_TOKENIZER_CONFIG}" ]; do
+    if [ $waited_file -ge $max_wait_file ]; then
+        echo "Error: Timed out waiting for ${BERT_TOKENIZER_CONFIG} to be a non-empty file." >&2
+        echo "  - The file might be missing or empty on the network volume." >&2
+        exit 1
+    fi
+    sleep 2
+    waited_file=$((waited_file + 2))
+done
+echo "  - BERT tokenizer config is ready."
+echo "Critical model file verification complete."
+# --- End Fix ---
+
 # --- End Symlink Creation ---
 
 echo "MOVING COMFYUI TO WORKSPACE"
