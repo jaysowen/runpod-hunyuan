@@ -70,7 +70,7 @@ create_model_symlink "${SOURCE_BASE}/segformer_b3_clothes" "${TARGET_BASE}/segfo
 create_model_symlink "${SOURCE_BASE}/grounding-dino" "${TARGET_BASE}/grounding-dino"
 create_model_symlink "${SOURCE_BASE}/vitmatte" "${TARGET_BASE}/vitmatte"
 create_model_symlink "${SOURCE_BASE}/bert-base-uncased" "${TARGET_BASE}/bert-base-uncased"
-create_model_symlink "${SOURCE_BASE}/jonathandinu--face-parsing" "${TARGET_BASE}/jonathandinu--face-parsing"
+#create_model_symlink "${SOURCE_BASE}/jonathandinu--face-parsing" "${TARGET_BASE}/jonathandinu--face-parsing"
 create_model_symlink "${SOURCE_BASE}/bisenet" "${TARGET_BASE}/bisenet"
 # --- End Symlink Creation ---
 
