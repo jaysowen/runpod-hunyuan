@@ -427,8 +427,10 @@ def process_output_item(item_info, job_id, should_generate_blur, blur_radius, th
         filename = item_info.get("filename")
         item_type_reported = item_info.get("type", "output")
 
-        if not filename or "_temp_" in filename or item_type_reported == "temp":
-            print(f"runpod-worker-comfy - Skipping likely temporary file: {filename} (type: {item_type_reported})")
+        # [FIX] Do not skip temp files, as some workflows only output temp files.
+        # We will process them as regular outputs.
+        if not filename:
+            print(f"runpod-worker-comfy - Skipping item with no filename.")
             return None, None
 
         subfolder = item_info.get("subfolder", "")
