@@ -143,6 +143,7 @@ RUN git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && \
     git clone https://github.com/pollockjj/ComfyUI-MultiGPU.git && \
     git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git && \
     git clone https://github.com/asagi4/ComfyUI-Adaptive-Guidance.git && \
+    git clone https://github.com/BigStationW/flowmatch_scheduler-comfyui.git && \
     git clone https://github.com/Flow-two/ComfyUI-WanStartEndFramesNative.git
     
 # Install ComfyUI-VideoHelperSuite
