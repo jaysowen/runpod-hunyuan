@@ -9,7 +9,7 @@ on:
     inputs:
       promote_to_prod:
         description: 'Promote dev image to production'
-        required: false
+        required: true
         default: 'false'
 
 env:
@@ -63,7 +63,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=general-dev,enable=${{ github.ref == 'refs/heads/general' }}
-            type=raw,value=general-v0.4,enable=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.promote_to_prod == 'true' }}
+            type=raw,value=general-v0.5,enable=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.promote_to_prod == 'true' }}
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push
