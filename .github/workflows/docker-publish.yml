@@ -9,7 +9,7 @@ on:
     inputs:
       promote_to_prod:
         description: 'Promote dev image to production'
-        required: true
+        required: false
         default: 'false'
 
 env:
