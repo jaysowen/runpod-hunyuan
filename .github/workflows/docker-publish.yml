@@ -7,7 +7,7 @@ on:
     inputs:
       promote_to_prod:
         description: 'Promote dev image to production'
-        required: true
+        required: false
         default: 'false'
 
 env:
@@ -49,7 +49,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.IMAGE_NAME }}:wanvideo-dev
+          tags: |
+            ${{ env.IMAGE_NAME }}:wanvideo-dev
+            ${{ env.IMAGE_NAME }}:wanvideo-v0.5
 
       - name: Promote DEV to PROD (manual)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.promote_to_prod == 'true'
