@@ -3,12 +3,6 @@ name: Build and Push Docker Images
 on:
   push:
     branches: [ "wanvideo1.0" ]
-  workflow_dispatch:
-    inputs:
-      promote_to_prod:
-        description: 'Promote dev image to production'
-        required: false
-        default: 'false'
 
 env:
   IMAGE_NAME: jaysowen/runpod-worker-comfy
@@ -43,8 +37,7 @@ jobs:
           username: ${{ vars.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PAT }}
 
-      - name: Build and push DEV image
-        if: github.event_name == 'push'
+      - name: Build and push images
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -52,13 +45,6 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:wanvideo-dev
             ${{ env.IMAGE_NAME }}:wanvideo-v0.5
-
-      - name: Promote DEV to PROD (manual)
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.promote_to_prod == 'true'
-        run: |
-          docker pull ${{ env.IMAGE_NAME }}:wanvideo-dev
-          docker tag ${{ env.IMAGE_NAME }}:wanvideo-dev ${{ env.IMAGE_NAME }}:wanvideo-v0.5
-          docker push ${{ env.IMAGE_NAME }}:wanvideo-v0.5
 
       - name: Check disk space after
         run: df -h
