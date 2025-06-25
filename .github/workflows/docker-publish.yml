@@ -5,12 +5,6 @@ on:
     branches: [ "general" ]
   pull_request:
     branches: [ "general" ]
-  workflow_dispatch:
-    inputs:
-      promote_to_prod:
-        description: 'Promote dev image to production'
-        required: false
-        default: 'false'
 
 env:
   IMAGE_NAME: jaysowen/runpod-worker-comfy
@@ -62,9 +56,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=general-dev,enable=${{ github.ref == 'refs/heads/general' }}
-            type=raw,value=general-v0.5,enable=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.promote_to_prod == 'true' }}
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=general-dev,enable=${{ github.ref_name == 'general' }}
+            type=raw,value=general-v0.5,enable=${{ github.ref_name == 'general' }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
